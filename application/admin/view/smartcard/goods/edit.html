@@ -1,0 +1,72 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$row.name|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Picimages')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-picimages" data-rule="required" class="form-control" size="50" name="row[picimages]" type="text" value="{$row.picimages|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-picimages" class="btn btn-danger faupload" data-input-id="c-picimages" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="true" data-preview-id="p-picimages"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                    <span><button type="button" id="fachoose-picimages" class="btn btn-primary fachoose" data-input-id="c-picimages" data-mimetype="image/*" data-multiple="true"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-picimages"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-picimages"></ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Recommenddata')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            
+            <div class="radio">
+            {foreach name="recommenddataList" item="vo"}
+            <label for="row[recommenddata]-{$key}"><input id="row[recommenddata]-{$key}" name="row[recommenddata]" type="radio" value="{$key}" {in name="key" value="$row.recommenddata"}checked{/in} /> {$vo}</label> 
+            {/foreach}
+            </div>
+
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Category_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-category_id" data-rule="required" data-source="smartcard/category/index" class="form-control selectpage" name="row[category_id]" type="text" value="{$row.category_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Company_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-company_id" data-rule="required" data-source="smartcard/company/index" class="form-control selectpage" name="row[company_id]" type="text" value="{$row.company_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Maincontent')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-maincontent" data-rule="required" class="form-control editor" rows="5" name="row[maincontent]" cols="50">{$row.maincontent|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Tags')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-tags" data-rule="required" class="form-control" name="row[tags]" type="text" value="{$row.tags|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Weigh')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-weigh" data-rule="required" class="form-control" name="row[weigh]" type="number" value="{$row.weigh|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
