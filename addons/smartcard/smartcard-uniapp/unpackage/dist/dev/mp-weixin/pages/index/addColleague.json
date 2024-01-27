@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "添加员工",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "upload-img": "/components/uploadImg/uploadImg"
+  }
+}

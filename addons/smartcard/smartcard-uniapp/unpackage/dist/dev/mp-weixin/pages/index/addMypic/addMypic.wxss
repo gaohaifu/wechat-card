@@ -1,0 +1,94 @@
+.flex_layout{display: flex; align-items: center; flex-wrap: wrap;}
+.flex_between{ display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between;}
+.nodata{padding: 50rpx 30rpx;text-align: center;color: #999;font-size: 24rpx;text-align: center;background: #fff;}
+.submit_btn{padding: 30rpx 85rpx; margin-top: 20rpx;}
+.submit_btn button{width: 100%; height: 80rpx; line-height: 80rpx; border-radius: 80rpx; background: rgba(36,255,255,0.2); font-size: 30rpx; color: #fff;}
+._a{text-decoration: none;}
+.noresult{ color: #fff; text-align: center; font-size: 24rpx;}
+/*宽度百分比减某值*/
+.width{ width:calc(50% - 15rpx);}
+view,text,scroll-view,input{box-sizing: border-box;}
+.pull-up {
+        width: 100%;
+        margin-bottom: 20rpx;
+        text-align: center;
+        height: 80rpx;
+        color: #c1c1c1;
+}
+.rect-text {
+        height: 100%;
+        line-height: 80rpx;
+}
+.rect-wrap {
+        margin: 0 auto;
+        width: 100rpx;
+        height: 60rpx;
+        text-align: center;
+        font-size: 8rpx;
+        margin-top: 8rpx;
+}
+.rect-wrap .rect {
+        background-color: #7ad237;
+    height: 100%;
+    width: 6rpx;
+    display: inline-block;
+    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+    animation: stretchdelay 1.2s infinite ease-in-out;
+}
+.rect-wrap .rect {
+        margin: 4rpx;
+}
+.rect-wrap .rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+.rect-wrap .rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+.rect-wrap .rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+.rect-wrap .rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+@keyframes stretchdelay {
+0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+}
+20% {
+            transform: scaleY(1.0);
+            -webkit-transform: scaleY(1.0);
+}
+}
+@-webkit-keyframes stretchdelay {
+0%, 40%, 100% { -webkit-transform: scaleY(0.4)
+}
+20% { -webkit-transform: scaleY(1.0)
+}
+}
+.positionFixe {
+        padding-top: 130rpx;
+}
+.positionFixe{position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: -1; box-sizing: border-box; background: #4a85b2;}
+.positionFixe image{display: block; width: 100%; height: 1108rpx;}
+page{background: #fff;}
+.right_icon{width: 100%; margin-top: 30rpx;}
+.chatIcon image{width: 85rpx; height: 85rpx; border-radius: 50%; display: block;}
+.rightIcon{margin-left: 30rpx;}
+.infoItem{justify-content: space-between; padding: 30rpx; border-bottom: 1px solid #f8f8f8;}
+.infoItem:last-child{border: none;}
+.rightIcon image{width: 30rpx; height: 30rpx; display: block;}
+.right_info input{width: 300rpx; height: 50rpx; color: #333; font-size: 28rpx; text-align: right;}
+.right_info image{width: 30rpx; height: 30rpx; display: block; margin-left: 20rpx;}
+.infoItem_textarea .right_info{margin-top: 30rpx;}
+.infoItem_textarea .right_info textarea{width: 100%; min-height: 200rpx; color: #333; font-size: 28rpx; border-radius: 10px; background: #F8F8F8; padding: 30rpx;}
+.select_radio{width: 200rpx;}
+.inspect_name{font-size: 28rpx; color: #333; width: 150rpx;}
+.sunmit_btn{padding: 40rpx;}
+.sunmit_btn button{color: #fff; background: #0084bf; font-size: 36rpx; height: 74rpx; line-height: 74rpx; width: 360rpx; border-radius: 74rpx; margin: 0 auto; padding: 0; display: block;}
+.sunmit_btn button::after{display: none;}
+

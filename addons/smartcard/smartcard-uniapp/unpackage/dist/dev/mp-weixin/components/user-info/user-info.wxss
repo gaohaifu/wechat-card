@@ -1,0 +1,97 @@
+.flex_layout{display: flex; align-items: center; flex-wrap: wrap;}
+.flex_between{ display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between;}
+.nodata{padding: 50rpx 30rpx;text-align: center;color: #999;font-size: 24rpx;text-align: center;background: #fff;}
+.submit_btn{padding: 30rpx 85rpx; margin-top: 20rpx;}
+.submit_btn button{width: 100%; height: 80rpx; line-height: 80rpx; border-radius: 80rpx; background: rgba(36,255,255,0.2); font-size: 30rpx; color: #fff;}
+._a{text-decoration: none;}
+.noresult{ color: #fff; text-align: center; font-size: 24rpx;}
+/*宽度百分比减某值*/
+.width{ width:calc(50% - 15rpx);}
+view,text,scroll-view,input{box-sizing: border-box;}
+.pull-up {
+        width: 100%;
+        margin-bottom: 20rpx;
+        text-align: center;
+        height: 80rpx;
+        color: #c1c1c1;
+}
+.rect-text {
+        height: 100%;
+        line-height: 80rpx;
+}
+.rect-wrap {
+        margin: 0 auto;
+        width: 100rpx;
+        height: 60rpx;
+        text-align: center;
+        font-size: 8rpx;
+        margin-top: 8rpx;
+}
+.rect-wrap .rect {
+        background-color: #7ad237;
+    height: 100%;
+    width: 6rpx;
+    display: inline-block;
+    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+    animation: stretchdelay 1.2s infinite ease-in-out;
+}
+.rect-wrap .rect {
+        margin: 4rpx;
+}
+.rect-wrap .rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+.rect-wrap .rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+.rect-wrap .rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+.rect-wrap .rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+@keyframes stretchdelay {
+0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+}
+20% {
+            transform: scaleY(1.0);
+            -webkit-transform: scaleY(1.0);
+}
+}
+@-webkit-keyframes stretchdelay {
+0%, 40%, 100% { -webkit-transform: scaleY(0.4)
+}
+20% { -webkit-transform: scaleY(1.0)
+}
+}
+.positionFixe {
+        padding-top: 130rpx;
+}
+.positionFixe{position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: -1; box-sizing: border-box; background: #4a85b2;}
+.positionFixe image{display: block; width: 100%; height: 1108rpx;}
+.userInfo{padding: 30rpx; background: #fff; justify-content: space-between; border-bottom: 1px solid #f1f1f1; position: fixed; top: 0px; left: 0; width: 100%; z-index: 100;}
+.userImg image{width: 90rpx; height: 90rpx; border-radius: 50%; display: block;}
+.name_grade{padding-left: 20rpx;}
+.name{color: #333; font-size: 36rpx;}
+.name view{width: 100rpx; font-size: 28rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+.name text{display: block; color: #333; font-size: 24rpx; margin-left: 15rpx;}
+.grade{color: #999; font-size: 24rpx; line-height:50rpx; height:50rpx; width: 300rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;}
+.right_phone{padding: 0 15rpx;}
+.right_phone ._i{display: block; font-size: 45rpx; text-align: center; color: #0084bf;}
+.right_phone text{display: block; text-align: center; margin-top: 10rpx;}
+.name-position{ border:1px solid #f0f0f0; padding:5rpx 15rpx; background:#f3f3f3;border-radius:10rpx;}
+.zzc{position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99;}
+.wechat_content{position: fixed; width: 80%; left: 10%; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); background: #fff; border-radius: 10px; z-index: 100;}
+.wechat_img{border-radius: 10px;background: #fff;}
+.wechat_img view{color: #f00;font-size: 28rpx;margin-top: 30rpx;text-align: center;}
+.wechat_img image{display: block; width: 100%;}
+.wechat_text{padding: 30rpx; text-align: center; font-size: 28rpx; color: #333;}
+.title{font-size: 30rpx;text-align: center;color: #333;}
+.content{font-size: 28rpx;margin-top: 30rpx;color: #333;text-align: center;}
+

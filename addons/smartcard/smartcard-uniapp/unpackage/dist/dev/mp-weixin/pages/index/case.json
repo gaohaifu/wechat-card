@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "成功案例",
+  "usingComponents": {
+    "user-info": "/components/user-info/user-info",
+    "no-data": "/components/no-data/no-data"
+  }
+}

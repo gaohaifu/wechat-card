@@ -1,0 +1,91 @@
+.flex_layout{display: flex; align-items: center; flex-wrap: wrap;}
+.flex_between{ display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between;}
+.nodata{padding: 50rpx 30rpx;text-align: center;color: #999;font-size: 24rpx;text-align: center;background: #fff;}
+.submit_btn{padding: 30rpx 85rpx; margin-top: 20rpx;}
+.submit_btn button{width: 100%; height: 80rpx; line-height: 80rpx; border-radius: 80rpx; background: rgba(36,255,255,0.2); font-size: 30rpx; color: #fff;}
+._a{text-decoration: none;}
+.noresult{ color: #fff; text-align: center; font-size: 24rpx;}
+/*宽度百分比减某值*/
+.width{ width:calc(50% - 15rpx);}
+view,text,scroll-view,input{box-sizing: border-box;}
+.pull-up {
+        width: 100%;
+        margin-bottom: 20rpx;
+        text-align: center;
+        height: 80rpx;
+        color: #c1c1c1;
+}
+.rect-text {
+        height: 100%;
+        line-height: 80rpx;
+}
+.rect-wrap {
+        margin: 0 auto;
+        width: 100rpx;
+        height: 60rpx;
+        text-align: center;
+        font-size: 8rpx;
+        margin-top: 8rpx;
+}
+.rect-wrap .rect {
+        background-color: #7ad237;
+    height: 100%;
+    width: 6rpx;
+    display: inline-block;
+    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+    animation: stretchdelay 1.2s infinite ease-in-out;
+}
+.rect-wrap .rect {
+        margin: 4rpx;
+}
+.rect-wrap .rect2 {
+    -webkit-animation-delay: -1.1s;
+    animation-delay: -1.1s;
+}
+.rect-wrap .rect3 {
+    -webkit-animation-delay: -1.0s;
+    animation-delay: -1.0s;
+}
+.rect-wrap .rect4 {
+    -webkit-animation-delay: -0.9s;
+    animation-delay: -0.9s;
+}
+.rect-wrap .rect5 {
+    -webkit-animation-delay: -0.8s;
+    animation-delay: -0.8s;
+}
+@keyframes stretchdelay {
+0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+}
+20% {
+            transform: scaleY(1.0);
+            -webkit-transform: scaleY(1.0);
+}
+}
+@-webkit-keyframes stretchdelay {
+0%, 40%, 100% { -webkit-transform: scaleY(0.4)
+}
+20% { -webkit-transform: scaleY(1.0)
+}
+}
+.positionFixe {
+        padding-top: 130rpx;
+}
+.positionFixe{position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: -1; box-sizing: border-box; background: #4a85b2;}
+.positionFixe image{display: block; width: 100%; height: 1108rpx;}
+page{background: #f2f6f7;}
+.cast_content{padding: 15rpx 30rpx;}
+.cast_item{padding: 30rpx; background: #fff; border-radius: 10px; margin-bottom: 30rpx;}
+.cast_item image{width: 300rpx; height: 200rpx; border-radius: 10px; display: block; margin: 0 auto;}
+.cast_text{font-size: 30rpx; color: #333; text-align: center; margin-top: 30rpx;}
+.transverse_line{height: 1px; width: 100rpx; margin: 40rpx auto 0; background: #d4d4d4;}
+.cast_num{justify-content: center; margin-top: 30px;}
+.drop{background: #888; width: 7px; height: 7px; border-radius: 50%; margin: 0 15px;}
+.castNum_item{color: #999; font-size: 24rpx;}
+.castNum_item text{color: #333; font-size: 24rpx;}
+.add_btn{position: fixed; left: 0; bottom: 0; z-index: 100; height: 100rpx; width: 100%;}
+.add_btn button{width: 100%; height: 100rpx; background: #0084bf; color: #fff; font-size: 30rpx; border-radius: 0; line-height: 100rpx; margin: 0; padding: 0;}
+.edit_button button{width: 150rpx; height: 50rpx; background: #0084bf; color: #fff; font-size: 24rpx; border-radius: 0; line-height: 50rpx; margin: 0; padding: 0; display: block; margin: 30rpx auto 0;}
+

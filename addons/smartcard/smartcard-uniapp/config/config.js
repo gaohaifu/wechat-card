@@ -1,9 +1,9 @@
 // // 前端路径
-export const baseUrl = 'http://www.ftest.com/h5/smartcard/#'
+export const baseUrl = 'http://beta.wechat-card.com/h5/smartcard/#'
 // api调用目录
-export const baseApiUrl = 'http://www.ftest.com/api/'
+export const baseApiUrl = 'http://beta.wechat-card.com/api/'
 // cdn域名。没有就填写后端域名
-export const cdnUrl = 'http://www.ftest.com/' 
+export const cdnUrl = 'http://beta.wechat-card.com/' 
 // logo使用base64编码
 export const baseLogo = ''
 // 网站标题

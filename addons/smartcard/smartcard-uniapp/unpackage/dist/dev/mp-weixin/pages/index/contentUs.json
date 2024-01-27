@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "企业介绍",
+  "usingComponents": {
+    "user-info": "/components/user-info/user-info"
+  }
+}
