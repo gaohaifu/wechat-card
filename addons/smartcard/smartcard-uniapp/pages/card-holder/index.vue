@@ -1,0 +1,224 @@
+<template>
+	<view class="page-wrap">
+		<view class="section-one">
+			<view class="search-box">
+				<image class="search-icon" src="../../static/images/search.png" />
+				<input placeholder="请输入姓名/公司/职位" />
+			</view>
+			<view class="wechart-card">
+				<view class="wechart-left">
+					<image src="../../static/images/wechart.png" />
+					<text>微信名片组</text>
+				</view>
+				<view class="wechart-right">
+					<text>建立自己的人脉圈</text>
+					<image src="../../static/images/right.png" />
+				</view>
+			</view>
+			<view class="wechart-card exchange-card" >
+				<view class="wechart-left">
+					<image src="../../static/images/exchange_icon.png" />
+					<text>名片交换请求</text>
+				</view>
+				<view class="wechart-right">
+					<text>全部请求</text>
+					<text class="exchange-num">5</text>
+					<image src="../../static/images/right.png" />
+				</view>
+			</view>
+			<view v-for="item in [1,2]" :key="item">
+				<view class="card-item">
+					<image src="../../static/images/img.jpg"></image>
+					<view class="card-content">
+						<view class="card-user">
+							<view>陈立荣</view>
+							<view class="exchange-btn">同意</view>
+						</view>
+						<view>总经理</view>
+						<view>厦门巴达尔科技有限公司</view>
+					</view>
+				</view>
+				<view class="exchange-content">
+					<view class="excontent-text">
+						对方发起与名片 <text>厦门八达尔科技有限公司｜总经理</text> 的交换
+					</view>
+					<view class="excontent-text flex flex-hsb">
+						<view>来源：对方名片夹</view>
+						<view>2023/01/30</view>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="section-two">
+			<view class="section-title">所有名片（2）</view>
+			<view class="card-item" v-for="item in [1,2,3]" :key="item">
+				<image src="../../static/images/img.jpg"></image>
+				<view class="card-content">
+					<view class="card-user">
+						<view>陈立荣</view>
+						<text>2024/01/30</text>
+					</view>
+					<view>总经理</view>
+					<view>厦门巴达尔科技有限公司</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {}
+		},
+		methods: {}
+	}
+</script>
+
+<style>
+	.page-wrap {
+		background-color: #F6F7F9;
+		border-bottom: 1px solid #F6F7F9;
+	}
+	.section-one {
+		background-color: #fff;
+		padding: 1rpx 32rpx;
+		margin-bottom: 16rpx;
+	}
+	.search-box {
+		display: flex;
+		align-items: center;
+		height: 64rpx;
+		line-height: 64rpx;
+		margin: 8rpx 0 32rpx;
+		background-color: #F6F7F9;
+		border-radius: 40rpx;
+	}
+	.search-icon {
+		flex-shrink: 0;
+		width: 32rpx;
+		height: 32rpx;
+		margin-right: 16rpx;
+		margin-left: 16rpx;
+	}
+	.search-box input {
+		flex: 1;
+		font-size: 24rpx;
+		margin-right: 16rpx;
+	}
+	.wechart-card {
+		height: 100rpx;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-size: 24rpx;
+		color: #999;
+		border-bottom: 2rpx solid #E6E6E6;
+	}
+	.exchange-card {
+		border-bottom: 0;
+		margin-bottom: 16rpx;
+	}
+	.exchange-num {
+		padding: 4rpx 8rpx;
+		height: 26rpx;
+		line-height: 26rpx;
+		background-color: #EA0000;
+		border-radius: 16rpx;
+		font-size: 18rpx;
+		color: #fff;
+		margin-left: 8rpx;
+	}
+	.exchange-btn {
+		width: 112rpx;
+		height: 56rpx;
+		background: #0256FF;
+		border-radius: 60rpx;
+		line-height: 56rpx;
+		text-align: center;
+		font-size: 24rpx;
+		color: #fff;
+	}
+	.exchange-content {
+		padding: 0 28rpx;
+		margin-bottom: 24rpx;
+		background-color: #FAFAFA;
+		border-radius: 16rpx;
+		line-height: 40rpx;
+		font-size: 22rpx;
+		color: #999;
+	}
+	.excontent-text {
+		padding: 16rpx 0;
+		border-bottom: 2rpx solid #E6E6E6;
+	}
+	.excontent-text:nth-last-child(1) {
+		border: 0;
+	}
+	.excontent-text text {
+		display: inline-block;
+		padding: 0 8rpx;
+		color: #333;
+	}
+	.wechart-left {
+		font-size: 28rpx;
+		color: #333;
+		display: flex;
+		align-items: center;
+	}
+	.wechart-left image {
+		width: 48rpx;
+		height: 48rpx;
+		margin-right: 16rpx;
+	}
+	.wechart-right image {
+		width: 11rpx;
+		height: 19rpx;
+		margin-left: 20rpx;
+	}
+	.section-two {
+		background-color: #fff;
+		margin-bottom: 48rpx;
+		padding: 0 32rpx;
+	}
+	.section-title {
+		height: 80rpx;
+		font-size: 32rpx;
+		line-height: 80rpx;
+		color: #333;
+		font-weight: 700;
+		margin-bottom: 16rpx;
+	}
+	.card-item {
+		display: flex;
+		margin-bottom: 20rpx;
+	}
+	.card-item image {
+		flex-shrink: 0;
+		width: 80rpx;
+		height: 80rpx;
+		border-radius: 40rpx;
+		margin-right: 32rpx;
+	}
+	.card-content {
+		flex: 1;
+		border-bottom: 1px solid #F6F7F9;
+		line-height: 48rpx;
+		font-size: 24rpx;
+		color: #666;
+		padding-bottom: 24rpx;
+	}
+	.card-user {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 32rpx;
+		color: #333;
+		font-weight: 500;
+	}
+	.card-user text{
+		font-size: 22rpx;
+		color: #999;
+		font-weight: 400;
+	}
+</style>

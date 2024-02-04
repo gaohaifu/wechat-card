@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "企业宣传册",
-  "usingComponents": {
-    "jing-swiper": "/components/jing-swiper/jing-swiper",
-    "user-info": "/components/user-info/user-info",
-    "no-data": "/components/no-data/no-data"
-  }
-}

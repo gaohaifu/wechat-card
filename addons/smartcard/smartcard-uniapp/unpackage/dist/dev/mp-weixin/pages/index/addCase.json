@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "新增成功案例",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "upload-img": "/components/uploadImg/uploadImg"
-  }
-}

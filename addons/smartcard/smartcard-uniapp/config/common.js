@@ -9,6 +9,13 @@ import {
 } from './config.js'
 import htmlParser from '@/common/html-parser' //引入htmlParser
 
+// 小程序要用到各种背景图
+export const smartcardBG = {
+	backgroundImg: cdnUrl + '/uploads/20240202/0c0ba632ab08bb4e34b3643267c13dca.png', // 自定义头部背景
+	cardimage: cdnUrl + '/uploads/20240202/2ef527af6aaef43fb534d081ff048a60.png', // 用户个人信息面板背景
+	cert: cdnUrl + '/uploads/20240202/6931c2d991a68fb9c68dc3c4ca1ce057.png', // 认证背景
+	unCert: cdnUrl + '/uploads/20240202/8698ab6a90ba338e35481ea3fd87bc3a.png', // 未认证状态背景图
+}
 
 /**
  * 跳转登陆页面

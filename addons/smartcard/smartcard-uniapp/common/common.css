@@ -1,83 +1,433 @@
-.flex_layout{display: flex; align-items: center; flex-wrap: wrap;}
-.flex_between{ display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between;}
-.nodata{padding: 50rpx 30rpx;text-align: center;color: #999;font-size: 24rpx;text-align: center;background: #fff;}
-.submit_btn{padding: 30upx 85upx; margin-top: 20upx;}
-.submit_btn button{width: 100%; height: 80upx; line-height: 80upx; border-radius: 80upx; background: rgba(36,255,255,0.2); font-size: 30upx; color: #fff;}
-a{text-decoration: none;}
-.noresult{ color: #fff; text-align: center; font-size: 24upx;}
+.flex_layout {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.flex_between {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.nodata {
+	padding: 50rpx 30rpx;
+	text-align: center;
+	color: #999;
+	font-size: 24rpx;
+	text-align: center;
+	background: #fff;
+}
+
+.submit_btn {
+	padding: 30upx 85upx;
+	margin-top: 20upx;
+}
+
+.submit_btn button {
+	width: 100%;
+	height: 80upx;
+	line-height: 80upx;
+	border-radius: 80upx;
+	background: rgba(36, 255, 255, 0.2);
+	font-size: 30upx;
+	color: #fff;
+}
+
+a {
+	text-decoration: none;
+}
+
+.noresult {
+	color: #fff;
+	text-align: center;
+	font-size: 24upx;
+}
+
 /*宽度百分比减某值*/
-.width{width:-webkit-calc(50% - 15rpx); width:-moz-calc(50% - 15rpx); width:calc(50% - 15rpx);}
-view,text,scroll-view,input{box-sizing: border-box;}
-    .pull-up {
-        width: 100%;
-        margin-bottom: 20upx;
-        text-align: center;
-        height: 80upx;
-        color: #c1c1c1;
-    }
-    .rect-text {
-        height: 100%;
-        line-height: 80upx;
-    }
-    .rect-wrap {
-        margin: 0 auto;
-        width: 100upx;
-        height: 60upx;
-        text-align: center;
-        font-size: 8upx;
-        margin-top: 8upx;
-    }
-    .rect-wrap .rect {
-        background-color: #7ad237;
-    height: 100%;
-    width: 6upx;
-    display: inline-block;
-    -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
-    animation: stretchdelay 1.2s infinite ease-in-out;
-    }
-    .rect-wrap .rect {
-        margin: 4upx;
-    }
-    .rect-wrap .rect2 {
-    -webkit-animation-delay: -1.1s;
-    animation-delay: -1.1s;
-  }
-  .rect-wrap .rect3 {
-    -webkit-animation-delay: -1.0s;
-    animation-delay: -1.0s;
-  }
-  .rect-wrap .rect4 {
-    -webkit-animation-delay: -0.9s;
-    animation-delay: -0.9s;
-  }
-  .rect-wrap .rect5 {
-    -webkit-animation-delay: -0.8s;
-    animation-delay: -0.8s;
-  }
-    @keyframes stretchdelay {
-        0%, 40%, 100% {
-            transform: scaleY(0.4);
-            -webkit-transform: scaleY(0.4);
-        }
-        20% {
-            transform: scaleY(1.0);
-            -webkit-transform: scaleY(1.0);
-        }
-    }
-    @-webkit-keyframes stretchdelay {
-        0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
-        20% { -webkit-transform: scaleY(1.0) }
-     }
+.width {
+	width: -webkit-calc(50% - 15rpx);
+	width: -moz-calc(50% - 15rpx);
+	width: calc(50% - 15rpx);
+}
+
+view,
+text,
+scroll-view,
+input {
+	box-sizing: border-box;
+}
+
+.pull-up {
+	width: 100%;
+	margin-bottom: 20upx;
+	text-align: center;
+	height: 80upx;
+	color: #c1c1c1;
+}
+
+.rect-text {
+	height: 100%;
+	line-height: 80upx;
+}
+
+.rect-wrap {
+	margin: 0 auto;
+	width: 100upx;
+	height: 60upx;
+	text-align: center;
+	font-size: 8upx;
+	margin-top: 8upx;
+}
+
+.rect-wrap .rect {
+	background-color: #7ad237;
+	height: 100%;
+	width: 6upx;
+	display: inline-block;
+	-webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+	animation: stretchdelay 1.2s infinite ease-in-out;
+}
+
+.rect-wrap .rect {
+	margin: 4upx;
+}
+
+.rect-wrap .rect2 {
+	-webkit-animation-delay: -1.1s;
+	animation-delay: -1.1s;
+}
+
+.rect-wrap .rect3 {
+	-webkit-animation-delay: -1.0s;
+	animation-delay: -1.0s;
+}
+
+.rect-wrap .rect4 {
+	-webkit-animation-delay: -0.9s;
+	animation-delay: -0.9s;
+}
+
+.rect-wrap .rect5 {
+	-webkit-animation-delay: -0.8s;
+	animation-delay: -0.8s;
+}
+
+@keyframes stretchdelay {
+
+	0%,
+	40%,
+	100% {
+		transform: scaleY(0.4);
+		-webkit-transform: scaleY(0.4);
+	}
+
+	20% {
+		transform: scaleY(1.0);
+		-webkit-transform: scaleY(1.0);
+	}
+}
+
+@-webkit-keyframes stretchdelay {
+
+	0%,
+	40%,
+	100% {
+		-webkit-transform: scaleY(0.4)
+	}
+
+	20% {
+		-webkit-transform: scaleY(1.0)
+	}
+}
+
 /* #ifdef H5 */
-    .positionFixe {
-        padding-top: 90upx;
-    }
-    /* #endif */
-    
-    /* #ifdef MP-WEIXIN */
-    .positionFixe {
-        padding-top: 130upx;
-    }
-    /* #endif */
-    .positionFixe{position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: -1; box-sizing: border-box; background: #4a85b2;}
-    .positionFixe image{display: block; width: 100%; height: 1108upx;}
+.positionFixe {
+	padding-top: 90upx;
+}
+
+/* #endif */
+
+/* #ifdef MP-WEIXIN */
+.positionFixe {
+	padding-top: 130upx;
+}
+
+/* #endif */
+.positionFixe {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+	box-sizing: border-box;
+	background: #4a85b2;
+}
+
+.positionFixe image {
+	display: block;
+	width: 100%;
+	height: 1108upx;
+}
+
+.flex {
+	display: flex;
+}
+
+.flex-hc {
+	justify-content: center;
+}
+
+.flex-hsb {
+	justify-content: space-between;
+}
+
+.flex-v {
+	flex-direction: column;
+}
+
+.flex-vc {
+	align-items: center;
+}
+
+.flex-wrap {
+	flex-wrap: wrap;
+}
+
+.flex-1 {
+	flex: 1;
+}
+
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+  font-family: 'iconfont';  /* Project id 4425411 */
+  src: url('//at.alicdn.com/t/c/font_4425411_nd104da019.woff2?t=1706448835480') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4425411_nd104da019.woff?t=1706448835480') format('woff'),
+       url('//at.alicdn.com/t/c/font_4425411_nd104da019.ttf?t=1706448835480') format('truetype');
+}
+
+.iconfont {
+	font-family: "iconfont" !important;
+	font-size: 16px;
+	font-style: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-weibiaoti1:before {
+  content: "\e62b";
+}
+
+.icon-jiahao:before {
+  content: "\e726";
+}
+
+.icon-jiahao1:before {
+  content: "\e727";
+}
+
+.icon-dizhi1:before {
+  content: "\e641";
+}
+
+.icon-dizhi2:before {
+  content: "\e614";
+}
+
+.icon-search2:before {
+  content: "\e601";
+}
+
+.icon-yulan:before {
+  content: "\e637";
+}
+
+.icon-jianhao:before {
+  content: "\e656";
+}
+
+.icon-bianji:before {
+  content: "\e624";
+}
+
+.icon-jianhao1:before {
+  content: "\e84f";
+}
+
+.icon-zengjiatianjiajiahao:before {
+  content: "\e62a";
+}
+
+.icon-bianji1:before {
+  content: "\e6c5";
+}
+
+.icon-jiahao2:before {
+  content: "\e620";
+}
+
+.icon-zhaoxiangji:before {
+  content: "\e705";
+}
+
+.icon-queding:before {
+  content: "\e60e";
+}
+
+.icon-gengduo:before {
+  content: "\e607";
+}
+
+.icon-zhaoxiangji1:before {
+  content: "\e630";
+}
+
+.icon-xiazai:before {
+  content: "\e626";
+}
+
+.icon-wenhao1:before {
+  content: "\e648";
+}
+
+.icon-jiahao3:before {
+  content: "\e61a";
+}
+
+.icon-search:before {
+  content: "\e840";
+}
+
+.icon-success-fill:before {
+  content: "\e842";
+}
+
+.icon-a-yulan1:before {
+  content: "\ea65";
+}
+
+.icon-tongxunlu01-F:before {
+  content: "\e62f";
+}
+
+.icon-down:before {
+  content: "\e619";
+}
+
+.icon-Rightyou:before {
+  content: "\e606";
+}
+
+.icon-shouji:before {
+  content: "\e600";
+}
+
+.icon-dizhi:before {
+  content: "\e62e";
+}
+
+.icon-youxiang:before {
+  content: "\e604";
+}
+
+.icon-phone:before {
+  content: "\e63f";
+}
+
+.icon-fayoujian:before {
+  content: "\e6fc";
+}
+
+.icon-dadianhua:before {
+  content: "\e6fd";
+}
+
+.icon-shouyeoff:before {
+  content: "\e6fe";
+}
+
+.icon-chenggonganli:before {
+  content: "\e6ff";
+}
+
+.icon-dingwei:before {
+  content: "\e700";
+}
+
+.icon-fenxiangshezhi:before {
+  content: "\e701";
+}
+
+.icon-shouyeon:before {
+  content: "\e702";
+}
+
+.icon-appxiazaion:before {
+  content: "\e703";
+}
+
+.icon-appxiazaioff:before {
+  content: "\e704";
+}
+
+.icon-mingpianma:before {
+  content: "\e6ee";
+}
+
+.icon-baocunmingpian:before {
+  content: "\e6ef";
+}
+
+.icon-wodeon:before {
+  content: "\e6ed";
+}
+
+.icon-ziliao:before {
+  content: "\e6f0";
+}
+
+.icon-moban:before {
+  content: "\e6f1";
+}
+
+.icon-mingpianjiaoff:before {
+  content: "\e6f2";
+}
+
+.icon-mingpianjiaon:before {
+  content: "\e6f3";
+}
+
+.icon-wodeoff:before {
+  content: "\e6f4";
+}
+
+.icon-rexiaoshangpin:before {
+  content: "\e6f5";
+}
+
+.icon-qiyejianjie:before {
+  content: "\e6f6";
+}
+
+.icon-qiyedongtai:before {
+  content: "\e6f7";
+}
+
+.icon-qiyexuanchuance:before {
+  content: "\e6f8";
+}
+
+.icon-jiaweixin:before {
+  content: "\e6f9";
+}
+
+.icon-famingpian:before {
+  content: "\e6fa";
+}
+
+.icon-xiangce:before {
+  content: "\e6fb";
+}

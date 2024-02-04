@@ -1,9 +1,10 @@
+const Uri = 'http://smartcard.wanyq.com/'
 // // 前端路径
-export const baseUrl = 'http://beta.wechat-card.com/h5/smartcard/#'
+export const baseUrl = `${Uri}h5/smartcard/#`
 // api调用目录
-export const baseApiUrl = 'http://beta.wechat-card.com/api/'
+export const baseApiUrl = `${Uri}api/`
 // cdn域名。没有就填写后端域名
-export const cdnUrl = 'http://beta.wechat-card.com/' 
+export const cdnUrl = Uri // 'http://beta.wechat-card.com/' 
 // logo使用base64编码
 export const baseLogo = ''
 // 网站标题

@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "热销商品",
-  "usingComponents": {
-    "no-data": "/components/no-data/no-data"
-  }
-}

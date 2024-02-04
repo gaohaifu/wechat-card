@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "企业动态",
-  "usingComponents": {
-    "user-info": "/components/user-info/user-info",
-    "no-data": "/components/no-data/no-data"
-  }
-}

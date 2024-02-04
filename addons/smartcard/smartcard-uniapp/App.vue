@@ -46,6 +46,7 @@
 	@import "colorui/main.css";
 	@import "colorui/icon.css";	
 	@import "common/iconfont.css";
+	@import "common/common.css";
 	.flex_layout{display: flex; align-items: center; flex-wrap: wrap;}
 	button::after{display: none;}
 </style>

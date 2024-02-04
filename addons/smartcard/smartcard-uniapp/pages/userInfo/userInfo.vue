@@ -1,0 +1,787 @@
+<template>
+	<view class="overall_content">
+		<view class="header_background" :style="{'background-image':'url('+smartcardBG.backgroundImg+')'}">
+			<cu-custom :bgColor="bgColor" :isBack="true" :backGround="backGround">
+				<block slot="backText">返回</block>
+				<block slot="content">编辑资料</block>
+			</cu-custom>
+			<view class="header_padding">
+				<smallUserInfo @getAllUserData="getAllUserData"></smallUserInfo>
+			</view>
+		</view>
+		<view class="padding_content">
+			<div class="flex flex-hsb flex-vc Inside_fast change-card-box">
+				<text class="title">名片样式</text>
+				<view class="flex flex-vc">
+					<text class="title2">更换名片背景</text>
+					<text class="iconfont icon-Rightyou"></text>
+				</view>
+			</div>
+			<view class="Inside_fast">
+				<view class="title">
+					基本信息
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">
+						头像
+						<!-- <text style="color:#ff0000">*</text> -->
+						<text class="iconfont icon-wenhao"></text>
+					</view>
+					<view class="right_info">
+						<view class="chatIcon">
+							<uploadImg ref='gUpload' type="avatar" :mode="imgList" :maxCount="maxCount"
+								@chooseFile='chooseFileTest'></uploadImg>
+						</view>
+						<text class="iconfont icon-Rightyou"></text>
+					</view>
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">姓名<text style="color:#ff0000">*</text></view>
+					<view class="right_info">
+						<input type="text" v-model="name" placeholder="请填写真实姓名" value="" />
+					</view>
+				</view>
+				<!--选择公司-->
+				<view class="infoItem flex_layout">
+					<view class="left_title">公司<text style="color:#ff0000">*</text></view>
+					<view class="right_info" style="position: relative;">
+						<input type="text" v-model="companyname" @input="companyInput" placeholder="选择公司" />
+						<view class="companyContent" v-if="ifCompany">
+							<scroll-view class="hospital_body" scroll-y="true" @scrolltolower="bottomHospital">
+								<block v-if="companyList.length>0">
+									<view class="hospital_item" v-for="(item,index) in companyList"
+										@click="selectCompany(item.id,item.name)" :key="index">{{item.name}}</view>
+								</block>
+								<block v-else>
+									<view class="hospital_item">没有找到</view>
+								</block>
+							</scroll-view>
+						</view>
+					</view>
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">职位<text style="color:#ff0000">*</text></view>
+					<view class="right_info">
+						<input type="text" v-model="position" placeholder="请填写职位" value="" />
+						<text class="iconfont icon-zengjiatianjiajiahao"></text>
+					</view>
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">行业<text style="color:#ff0000">*</text></view>
+					<view class="right_info">
+						<input type="text" v-model="business" placeholder="请填写行业" value="" />
+						<text class="iconfont icon-Rightyou"></text>
+					</view>
+				</view>
+			</view>
+
+			<view class="Inside_fast">
+				<view class="title">
+					联系方式
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">手机<text style="color:#ff0000">*</text></view>
+					<view class="right_info">
+						<input type="number" v-model="mobile" placeholder="请填写手机号" value="" />
+					</view>
+				</view>
+				<view class="infoItem flex_layout" v-if="platform_status==2">
+					<view class="left_title">微信</view>
+					<view class="right_info">
+						<input type="text" v-model="wechat" placeholder="请填写微信号" value="" />
+						<text class="iconfont icon-Rightyou"></text>
+					</view>
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">邮箱</view>
+					<view class="right_info">
+						<input type="text" v-model="email" placeholder="请填写邮箱" value="" />
+					</view>
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">地址<text style="color:#ff0000">*</text></view>
+					<view class="right_info" @click="addressClick">
+						<input type="text" v-model="address" placeholder="请选择地址" :disabled="true" />
+						<text class="iconfont icon-dizhi1"></text>
+					</view>
+				</view>
+				<view class="infoItem flex_layout">
+					<view class="left_title">QQ</view>
+					<view class="right_info">
+						<input type="text" v-model="email" placeholder="请填写QQ" value="" />
+						<text class="iconfont icon-jianhao"></text>
+					</view>
+				</view>
+			</view>
+		</view>
+		<!--提交按钮-->
+		<view style=" paddiing:20rpx; color:#ff0000;text-align:center">*如果修改了关联公司，账户将变为未认证状态，请谨慎操作</view>
+		<view class="flex flex-vc footer">
+			<view class="flex flex-v left-box">
+				<text class="iconfont icon-yulan"></text>
+				<text>预览名片</text>
+			</view>
+			<view class="flex-1 primary-btn">保存</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import uploadImg from "../../components/uploadImg/uploadImg.vue"
+	import smallUserInfo from "../../components/small-user-info/small-user-info.vue"
+	import {
+		smartcardBG
+	} from '../../config/common.js'
+	let page = 1,
+		reachbottom = false;
+	export default {
+		components: {
+			uploadImg,
+			smallUserInfo
+		},
+		data() {
+			return {
+				smartcardBG: smartcardBG,
+				userInfo: '',
+				imgList: [],
+				avatar: '',
+				name: '',
+				wechat: '',
+				address: '',
+				birthday: '',
+				gender: '1',
+				mobile: '',
+				idcard: '',
+				email: '',
+				QQ: '',
+				titlesArray: [],
+				titlesIdArray: [],
+				departmentIdArray: [],
+				//titlesId:'',
+				departmentArray: [],
+				department: '请选择科室',
+				titles: '请选择职称',
+				title_id: '', //关联医生职称
+				department_id: '', //关联科室
+				departmentIndex: 0,
+				titleIndex: 0,
+				user_id: '',
+				company_id: '',
+				position: '',
+				introcontent: '',
+				color: '',
+				maxCount: 1,
+				ifCompany: false,
+				loadingStatus: true,
+				companyname: '',
+				companyList: [],
+				ids: 0,
+				platform_status: 1
+			}
+		},
+		onShow() {
+
+		},
+		onLoad(options) {
+			console.info(smartcardBG, '====smartcardBG')
+			this.color = uni.getStorageSync('color')
+			//修改导航条背景颜色
+			uni.setNavigationBarColor({
+				frontColor: '#ffffff',
+				backgroundColor: this.color
+			})
+			this.user_id = options.user_id;
+			this.staff_id = options.staff_id
+			this.company_id = options.company_id;
+			this.company_id_s = options.company_id;
+			this.smartcardfind();
+		},
+		methods: {
+			getAllUserData(allData) {
+				console.info('@getAllUserData', allData)
+			},
+			companyInput(e) {
+				page = 1;
+				reachbottom = false;
+				console.log(e.detail.value);
+				if (e.detail.value.length > 0) {
+					if (this.loadingStatus) {
+						var keywords = e.detail.value;
+						this.keywords = keywords
+						this.companyList = []
+						this.companylist(keywords);
+					}
+				} else {
+					this.keywords = '';
+					this.ifCompany = false
+				}
+			},
+			//医院列表
+			companylist(keywords) {
+				this.loadingStatus = false;
+				this.$api.companylist({
+						companyname: keywords,
+						page: page,
+						limit: 10
+					},
+					data => {
+						if (data.code == 1) {
+							this.ifCompany = true
+							this.loadingStatus = true;
+							var arr = data.data.map(item => {
+								return {
+									...item
+								}
+							})
+							if (data.data == '' || data.data.length == 0) {
+								reachbottom = true
+								uni.showToast({
+									title: "已经加载全部",
+									icon: "none",
+									duration: 500
+								});
+							} else {
+								page++;
+								uni.stopPullDownRefresh();
+								this.companyList = this.companyList.concat(arr);
+							}
+							//输入框字数为0时
+							if (this.keywords.length == 0) {
+								this.companyList = []
+								page = 1;
+								reachbottom = false;
+								this.ifCompany = false;
+							}
+						}
+					})
+			},
+			bottomHospital(e) {
+				if (!reachbottom) {
+					this.companylist(this.keywords);
+				}
+			},
+			selectCompany(id, name) {
+				this.company_id = id
+				this.companyname = name
+				console.log('名称：' + name);
+				this.companyList = []
+				this.ifCompany = false;
+			},
+			addressClick() {
+				console.log('address');
+				uni.chooseLocation({
+					success: (res) => {
+						console.log(res);
+						this.address = res.address
+					}
+				});
+			},
+			chooseFileTest(list, ulist) {
+				this.imgList = ulist
+				console.log(list)
+				this.avatar = list[0]
+			},
+			radioChange(e) {
+				this.gender = e.detail.value;
+			},
+			bindDateChange(e) {
+				this.birthday = e.detail.value
+			},
+			smartcardfind() {
+				this.$api.smartcardfind({},
+					data => {
+						if (data.code) {
+							this.maxCount = 1
+							this.userInfo = data.data
+							this.platform_status = data.data[0] ? data.data[0].platform_status : 2
+							this.name = data.data[0] ? data.data[0].name : '' //真实姓名
+							this.mobile = data.data[0] ? data.data[0].mobile : '' //手机号
+							this.email = data.data[0] ? data.data[0].email : '' //邮箱
+							this.address = data.data[0] ? data.data[0].address : '' //地址
+							this.wechat = data.data[0] ? data.data[0].wechat : '' //微信
+							this.position = data.data[0] ? data.data[0].position : '' //职位
+							this.companyname = data.data[0] ? data.data[0].smartcardcompany.name : ''
+							this.company_id = data.data[0] ? data.data[0].company_id : 0
+							this.introcontent = data.data[0] ? data.data[0].introcontent : ''
+							this.ids = data.data[0] ? data.data[0].id : 0
+							if (data.data[0]) {
+								this.imgList[0] = data.data[0].user.avatar; //头像
+								console.log(this.imgList);
+								this.avatar = data.data[0].user.avatar;
+							} else {
+								this.imgList = []
+							}
+						} else {
+							uni.navigateTo({
+								url: '../index/index'
+							})
+						}
+					})
+			},
+			submit() {
+				var data = {};
+				var that = this;
+				data['user_id'] = this.user_id
+				data['company_id'] = this.company_id
+				data['name'] = this.name //真实姓名
+				data['wechat'] = this.wechat //微信号
+				data['mobile'] = this.mobile //手机号
+				data['email'] = this.email //邮箱
+				data['position'] = this.position //职位
+				data['address'] = this.address //地址
+				data['avatar'] = this.avatar //头像
+				data['introcontent'] = this.introcontent;
+				data['company_id'] = this.company_id //公司id
+				data['company_id_s'] = this.company_id_s
+				if (this.ids != 0) {
+					data['id'] = this.ids
+				}
+				if (this.avatar == '') {
+					uni.showToast({
+						title: '请上传头像',
+						icon: 'none'
+					})
+					return false;
+				}
+				if (this.name == '') {
+					uni.showToast({
+						title: '请填写姓名',
+						icon: 'none'
+					})
+					return false;
+				}
+				if (this.company_id == '' || this.company_id == 0) {
+					uni.showToast({
+						title: '请选择所在公司',
+						icon: 'none'
+					})
+					return false;
+				}
+				// if(this.wechat==''){
+				// 	uni.showToast({
+				// 		title:'请填写微信号',
+				// 		icon:'none'
+				// 	})
+				// 	return false;
+				// }
+				if (!this.$common.testString(this.mobile, 'mobile')) {
+					uni.showToast({
+						title: '请正确填写手机号',
+						icon: 'none'
+					})
+					return false;
+				}
+				if (!this.$common.testString(this.email, 'mail')) {
+					uni.showToast({
+						icon: 'none',
+						position: 'bottom',
+						title: '请正确填写邮箱'
+					});
+					return false;
+				}
+				if (this.position == '') {
+					uni.showToast({
+						title: '请填写职位',
+						icon: 'none'
+					})
+					return false;
+				}
+				// if(this.address==''){
+				// 	uni.showToast({
+				// 		title:'请选择地址',
+				// 		icon:'none'
+				// 	})
+				// 	return false;
+				// }	
+				this.$api.staffEdit(
+					data,
+					data => {
+						if (data.code) {
+							that.$common.successToShow(data.msg, function() {
+								uni.navigateBack()
+							})
+						}
+					})
+			}
+		}
+	}
+</script>
+
+<style>
+	page {
+		background: #F6F7F9;
+	}
+
+	/* .header_background {
+		padding-top: 110rpx;
+		height: 460rpx;
+		background-repeat: no-repeat;
+		background-position: left top;
+		background-size: cover;
+	} */
+
+	.header_padding {
+		padding: 0 30rpx;
+	}
+
+	.overall_padding {
+		padding: 30rpx 15rpx;
+	}
+
+	.header_background {
+		background-repeat: no-repeat;
+		background-position: left top;
+		background-size: cover;
+	}
+
+	.grade {
+		text-align: right;
+		font-size: 26rpx;
+		margin-top: 20rpx;
+	}
+
+	.header_message {
+		position: relative;
+		height: 360rpx;
+		box-sizing: border-box;
+		background-repeat: no-repeat;
+		background-position: left top;
+		background-size: cover;
+		padding: 40rpx 40rpx;
+		margin-top: 30rpx;
+		border-radius: 15px;
+		color: #e1d27e;
+		box-shadow: 0 0 10px #999;
+		position: relative;
+	}
+
+	.userImg {
+		position: relative;
+		padding-bottom: 20rpx;
+		border-bottom: 1rpx solid #D2E7FF;
+		margin-bottom: 16rpx;
+	}
+
+	.userImg::after {
+		content: '';
+		position: absolute;
+		bottom: -2rpx;
+		left: 0;
+		width: 100%;
+		border-bottom: solid 1rpx #FAFDFF;
+		height: 0;
+	}
+
+	.userImg image {
+		display: block;
+		width: 130rpx;
+		height: 130rpx;
+		border-radius: 50%;
+	}
+
+	.cert-status {
+		position: absolute;
+		right: -4rpx;
+		top: 40rpx;
+		width: 106rpx;
+		height: 44rpx;
+		line-height: 44rpx;
+		font-size: 20rpx;
+		font-weight: 400;
+		text-align: center;
+		box-sizing: border-box;
+		background-repeat: no-repeat;
+		background-position: left top;
+		background-size: cover;
+	}
+
+	.cert-status.waitOp {
+		color: #8897AD;
+	}
+
+	.cert-status.op {
+		color: #fff;
+	}
+	.extra { font-size: 24rpx;}
+	.extra > view {
+		margin-bottom: 8rpx;
+	}
+	.extra .iconfont {
+		width: 30rpx;
+		height: 30rpx;
+		background: #3658FF;
+		border-radius: 50%;
+		font-size: 20rpx;
+		line-height: 32rpx;
+		text-align: center;
+		color: #fff;
+		margin-right: 8rpx;
+	}
+
+	.name_position {
+		padding-left: 30rpx;
+		width: 400rpx;
+	}
+
+	.name_position view {
+		font-size: 42rpx;
+		width: 100%;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.name_position text {
+		display: block;
+		font-size: 26rpx;
+		margin-top: 10rpx;
+		width: 100%;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+	.isHC-box {
+		position: absolute;
+		bottom: 1rpx;
+		right: 1rpx;
+		border-radius: 40rpx;
+		width: 172rpx;
+		height: 66rpx;
+	}
+	.isHC-box .bg {
+		width: 100%;
+		height: 100%;
+		background-color: #163778;
+		transform: rotate(-45deg);
+		font-size: 28rpx;
+		color: #fff;
+		font-weight: 400;
+	}
+
+
+	/* 实体内容 */
+	.padding_content {
+		padding: 0rpx 30rpx 108rpx;
+	}
+
+	.padding_content .iconfont {
+		width: 32rpx;
+		height: 32rpx;
+		font-size: 32rpx;
+		line-height: 32rpx;
+		text-align: center;
+		color: #999;
+	}
+
+	.padding_content .icon-jianhao {
+		font-size: 28rpx;
+	}
+
+	.change-card-box {
+		padding-right: 30rpx;
+		height: 104rpx;
+	}
+
+	.change-card-box .title2 {
+		font-size: 28rpx;
+		font-weight: 400;
+		color: #333;
+	}
+
+	.Inside_fast {
+		background: #fff;
+		border-radius: 10px;
+		margin-top: 30rpx;
+		border: 1px solid #eaeaea;
+	}
+
+	.change-card-box .title,
+	.Inside_fast .title {
+		padding: 16rpx 30rpx;
+		font-size: 30rpx;
+		font-weight: 700;
+		color: #333;
+	}
+
+	.Inside_fast_padding {
+		padding: 30rpx;
+		justify-content: space-between;
+	}
+
+	.chatIcon image {
+		width: 80rpx;
+		height: 80rpx;
+		border-radius: 50%;
+		display: block;
+	}
+
+	>>>.chatIcon .uploadImg_btn {
+		width: 80rpx;
+		height: 80rpx;
+	}
+
+	.rightIcon {
+		margin-left: 30rpx;
+	}
+
+	.infoItem {
+		justify-content: space-between;
+		padding: 40rpx 30rpx;
+		border-bottom: 1px solid #eaeaea;
+	}
+
+	.infoItem:last-child {
+		border: none;
+	}
+
+	.rightIcon image {
+		width: 12rpx;
+		height: 22rpx;
+		display: block;
+	}
+
+	.left_title {
+		width: 140rpx;
+	}
+
+	.right_info {
+		flex: 1;
+		margin-left: 60rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.right_info input {
+		width: 100%;
+		height: 50rpx;
+		color: #333;
+		font-size: 28rpx;
+		/* text-align: right; */
+	}
+
+	.right_info image {
+		width: 12rpx;
+		height: 22rpx;
+		display: block;
+		margin-left: 20rpx;
+	}
+
+	.right_info textarea {
+		width: 100%;
+		margin: 10rpx;
+		padding: 15rpx;
+		background: #f7f7f7;
+		border: 1px solid #f3f3f3;
+		border-radius: 20rpx;
+		font-size: 28rpx;
+	}
+
+	.select_radio {
+		width: 200rpx;
+	}
+
+	.inspect_name {
+		font-size: 28rpx;
+		color: #333;
+		width: 150rpx;
+	}
+
+	.sunmit_btn {
+		padding: 40rpx;
+	}
+
+	.sunmit_btn button {
+		color: #fff;
+		background: #0084bf;
+		font-size: 36rpx;
+		height: 74rpx;
+		line-height: 74rpx;
+		width: 360rpx;
+		border-radius: 74rpx;
+		margin: 0 auto;
+		padding: 0;
+		display: block;
+	}
+
+	.sunmit_btn button::after {
+		display: none;
+	}
+
+	.companyContent {
+		position: absolute;
+		top: 100rpx;
+		left: 0;
+		width: 100%;
+		z-index: 100;
+		background: #fff;
+		box-shadow: 0 0 10px #ccc;
+	}
+
+	.companyList {
+		padding: 30rpx;
+		color: #333;
+		font-size: 28rpx;
+		border-bottom: 1px solid #F2F2F2;
+	}
+
+	.hospital_body {
+		max-height: 400rpx;
+		overflow-y: auto;
+	}
+
+	.manual_input {
+		color: #45cb8c;
+		font-size: 24rpx;
+		padding: 10rpx 0;
+		text-align: center;
+	}
+
+	.hospital_item {
+		padding: 20rpx 30rpx;
+		border-bottom: 1px solid #f2f2f2;
+		font-size: 24rpx;
+		color: #666;
+		text-align: center;
+	}
+
+	.hospital_item:last-child {
+		border: none;
+	}
+
+	.footer {
+		height: 108rpx;
+		padding: 0 32rpx;
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		background-color: #fff;
+	}
+
+	.footer .left-box {
+		font-size: 20rpx;
+		font-weight: 400;
+		color: #666;
+	}
+
+	.footer .left-box .iconfont {
+		width: 48rpx;
+		height: 48rpx;
+		font-size: 48rpx;
+		color: #0256FF;
+	}
+
+	.footer .primary-btn {
+		margin-left: 48rpx;
+		height: 80rpx;
+		cursor: pointer;
+		text-align: center;
+		border-radius: 80rpx;
+		line-height: 80rpx;
+		font-size: 28rpx;
+		font-weight: 400;
+		color: #fff;
+		background-color: #0256FF;
+		border: solid 1px #0256FF;
+	}
+</style>

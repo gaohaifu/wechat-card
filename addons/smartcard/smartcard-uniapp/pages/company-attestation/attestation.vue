@@ -1,0 +1,143 @@
+<template>
+	<view class="page-wrap">
+		<view class="company-label">企业名称</view>
+		<view class="company-name">
+			<input v-model="company" placeholder="请输入企业名称" />
+		</view>
+		<view class="company-label">
+			<text>认证拆料</text>
+			<text class="example-text">上传拆料示例</text>
+		</view>
+		<view class="up-box">
+			<image src="../../static/images/attestation01.png" />
+			<view>营业执照</view>
+			<view class="up-text">与企业名称保持一致</view>
+		</view>
+		<view class="company-label">
+			<text>认证拆料</text>
+			<text class="example-text">上传拆料示例</text>
+		</view>
+		<view class="up-box">
+			<image src="../../static/images/attestation02.png" />
+			<view style="font-size: 24rpx;">营业执照</view>
+			<view class="up-text" style="color: #0256FF;">下载模板</view>
+		</view>
+		<view class="company-label">注明：</view>
+		<view class="descript">
+			<view>1、依据《公司法》相关规定，未经依法登记而冒用公司和分公司的名义将<text style="color: #EA6100;">被处以最高10万元的罚款，并追究相关刑事责任</text> </view>
+			<view>2、上传图片必须为清晰完整的实物图片，请严格按照 <text style="color: #0256FF;">示例</text> 上传根据《中华人民共和国个人信息保护法》，上传材料仅作审核用</view>
+			<view>3、不在页面公开展示</view>
+		</view>
+		<view class="aggrement-box" @click="aggreFn">
+			<checkbox value="cb" :checked="aggre" style="transform:scale(0.7)" />
+			<view>我已阅读并同意<text style="color: #0256FF;">《企业认证服务协议》</text></view>
+		</view>
+		<view class="attestation-btn">
+			<view>提交</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				company: '',
+				aggre: false,
+			}
+		},
+		methods: {
+			aggreFn() {
+				this.aggre = !this.aggre
+			}
+		}
+	}
+</script>
+
+<style>
+	.page-wrap {
+		padding-bottom: 128rpx;
+	}
+	.company-label {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin: 48rpx 32rpx 16rpx;
+		font-size: 30rpx;
+		color: #333;
+		font-weight: 500;
+	}
+	.example-text {
+		font-size: 24rpx;
+		color: #0256FF;
+	}
+	.company-name {
+		margin: 0 32rpx;
+		padding: 0 20px;
+		height: 88rpx;
+		line-height: 88rpx;
+		background-color: #F6F7F9;
+		border-radius: 8rpx;
+	}
+	.company-name input {
+		display: inline-block;
+		width: 100%;
+		height: 40rpx;
+		line-height: 40rpx;
+		margin-top: 24rpx;
+		font-size: 28rpx;
+		color: #333;
+	}
+	.up-box {
+		display: inline-block;
+		padding: 24rpx 32rpx;
+		margin: 0 32rpx;
+		background-color: #FAFAFA;
+		border-radius: 16rpx;
+		font-size: 32rpx;
+		color: #333;
+		text-align: center;
+	}
+	.up-box image {
+		width: 288rpx;
+		height: 200rpx;
+		margin-bottom: 16rpx;
+	}
+	.up-text {
+		font-size: 24rpx;
+		color: #999;
+		line-height: 32rpx;
+		margin-top: 8rpx;
+	}
+	.descript {
+		margin: 0 32rpx 40rpx;
+		font-size: 20rpx;
+		color: #666;
+		line-height: 40rpx;
+	}
+	.aggrement-box {
+		display: flex;
+		align-items: center;
+		margin: 0 32rpx;
+		font-size: 24rpx;
+		color: #333;
+	}
+	.attestation-btn {
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 108rpx;
+		background-color: #fff;
+	}
+	.attestation-btn view {
+		margin: 14rpx 32rpx 0;
+		height: 80rpx;
+		line-height: 80rpx;
+		font-size: 28rpx;
+		text-align: center;
+		color: #fff;
+		background-color: #0256FF;
+		border-radius: 60rpx;
+	}
+</style>
