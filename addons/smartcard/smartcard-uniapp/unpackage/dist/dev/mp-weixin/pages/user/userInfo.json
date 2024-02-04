@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "个人信息",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "upload-img": "/components/uploadImg/uploadImg"
-  }
-}

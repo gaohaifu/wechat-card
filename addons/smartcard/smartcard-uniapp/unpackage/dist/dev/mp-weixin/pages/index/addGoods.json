@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "新增商品",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "upload-img": "/components/uploadImg/uploadImg"
-  }
-}

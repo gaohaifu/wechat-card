@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "我的相册",
-  "usingComponents": {
-    "user-info": "/components/user-info/user-info"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "员工列表",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "user-info": "/components/user-info/user-info",
-    "no-data": "/components/no-data/no-data"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "添加信息",
-  "enablePullDownRefresh": false,
-  "usingComponents": {
-    "upload-img": "/components/uploadImg/uploadImg"
-  }
-}

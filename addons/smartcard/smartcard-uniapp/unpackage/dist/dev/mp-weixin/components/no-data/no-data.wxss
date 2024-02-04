@@ -1,7 +1,0 @@
-
-.noData_img image{width: 360rpx; height: 360rpx; display: block; margin: 150rpx auto 0;}
-.none_thread{width: 440rpx; margin: 50rpx auto 0;}
-.thread_item{width: 140rpx; height: 1px; background: #cccccc;}
-.text_item{width: 160rpx; color: #999; font-size: 24rpx; justify-content: space-between;}
-.text_item text{display: block; width: 10rpx; height: 10rpx; border-radius: 10rpx; background: #ccc;}
-
