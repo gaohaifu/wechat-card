@@ -1,0 +1,46 @@
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        {:build_heading()}
+        <ul class="nav nav-tabs" data-field="status">
+            <li class="{:$Think.get.type === null ? 'active' : ''}"><a href="#t-all" data-value="" data-toggle="tab">{:__('All')}</a></li>
+            {foreach $statusList as $key=>$vo}
+            <li class="{:$Think.get.type === (string)$key ? 'active' : ''}"><a href="#t-{$key}" data-value="{$key}" data-toggle="tab">{$vo}</a></li>
+            {/foreach}
+        </ul>
+    </div>
+
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                       
+                        {:build_toolbar('refresh,add,edit,del')}
+                        <div class="dropdown btn-group {:$auth->check('web/product/multi')?'':'hide'}">
+                            <a class="btn btn-primary btn-more dropdown-toggle btn-disabled disabled" data-toggle="dropdown"><i class="fa fa-cog"></i> {:__('More')}</a>
+                            <ul class="dropdown-menu text-left" role="menu">
+                                <li><a class="btn btn-link btn-multi btn-disabled disabled" href="javascript:;" data-params="status=normal"><i class="fa fa-eye"></i> {:__('Set to normal')}</a></li>
+                                <li><a class="btn btn-link btn-multi btn-disabled disabled" href="javascript:;" data-params="status=hidden"><i class="fa fa-eye-slash"></i> {:__('Set to hidden')}</a></li>
+                            </ul>
+                        </div>
+
+                        <a class="btn btn-success btn-recyclebin btn-dialog {:$auth->check('web/product/recyclebin')?'':'hide'}"
+                            data-area='["90%","90%"]' href="web/product/recyclebin" title="{:__('Recycle bin')}"><i
+                                class="fa fa-recycle"></i> {:__('Recycle bin')}</a>
+                                
+                        <a class="btn btn-warning btn-addtabs {:$auth->check('web/product_category/index')?'':'hide'}"
+                            data-area='["90%","90%"]' href="web/product_category/index"
+                            title="产品{:__('List category')}"><i class="fa fa-list"></i> {:__('List category')}</a>
+                        <a class="btn btn-info btn-dialog {:$auth->check('web/product_category/add')?'':'hide'}"
+                            href="web/product_category/add" title="{:__('Add category')}"><i
+                                class="fa fa-plus"></i> {:__('Add category')}</a>
+
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap" data-operate-edit="{:$auth->check('web/product/edit')}" data-operate-del="{:$auth->check('mybox/product_category/del')}" width="100%">
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

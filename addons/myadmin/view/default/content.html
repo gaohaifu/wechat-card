@@ -1,0 +1,70 @@
+<style>
+
+    .mould-nav {
+        font-size: 16px !important;
+    }
+
+    .mould-nav .mould-item {
+        display: inline-block
+    }
+</style>
+
+<div class="container container-body">
+    <div class="panel panel-default">
+
+    </div>
+    <div class="row">
+        <div class="col-lg-9 col-md-9 col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+
+                        <div class=" mould-nav">
+                            <div class="mould-item" style="padding-left: 10px;">
+                                <a href="{:addon_urls('/myadmin/web/content')}">
+                                    <span class="{:$mould_id==''?'text-danger':'text-primary'}">全部</span>
+                                </a>
+                            </div>
+                            {volist name='mouldList' id='mould'}
+                            <div class="mould-item" style="padding-left: 10px;">
+                                <a href="{:addon_urls('/myadmin/web/content',['mould_id'=>$mould['id']])}">
+                                    <span class="{:$mould_id==$mould['id']?'text-danger':'text-primary'}">{$mould.name}</span>
+                                </a>
+                            </div>
+                            {/volist}
+
+                        </div>
+                    </h3>
+                </div>
+
+                <div class="panel-body p-0" style="min-height: 500px;">
+                    <div class="article-list">
+                        <!-- S 首页列表 -->
+                        {volist name='list' id='item'}
+                        {include file="common/item"}
+                        {/volist}
+                        <!-- E 首页列表 -->
+                    </div>
+                    
+                    {if $list->isEmpty()}
+                    <p class="text-center" style="padding: 100px;">暂无记录</p>
+                    {/if}
+
+                    {$list->render()}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-xs-12">
+            <div class="sidebar-toggle" data-toggle="collapse"><i class="fa fa-bars"></i></div>
+            <div class="sidenav" id="sidebar-nav">
+                <ul class="list-group">
+                    <li class="list-group-item {:check_nav_active('myadmin/web/content')}" style="font-size: 16px;"><a href="{:addon_urls('/myadmin/web/content')}"><i class="fa fa-list fa-fw"></i> {:__('全部资讯')}</a></li>
+                    {volist name='category' id='item'}
+                    <li class="list-group-item {:$item['id'] == $category_id?'active':''}"><a
+                            href="{:addon_urls('/myadmin/web/content', ['category_id'=>$item.id])}"><i class="fa fa-circle-o fa-fw"></i> {$item.name}</a></li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

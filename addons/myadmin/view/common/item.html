@@ -1,0 +1,24 @@
+<article class="article-item">
+    
+    <div class="media">
+        <div class="media-left">
+            <a href="{:addon_urls('/myadmin/web/content_detail',['id'=>$item.id])}">
+                <div class="embed-responsive embed-responsive-4by3 img-zoom">
+                    <img src="{$item.cover}" alt="{$item.title}">
+                </div>
+            </a>
+        </div>
+        <div class="media-body">
+            <h3 class="article-title">
+                <a href="{:addon_urls('/myadmin/web/content_detail',['id'=>$item.id])}">{$item->title}</a>
+            </h3>
+            <div class="article-intro">
+                {$item.description}
+            </div>
+            <div class="article-tag">
+                <span itemprop="date"><i class="fa fa-clock-o"></i> {:date("Y年m月d日", $item['createtime'])}</span>
+                <span class="hidden-xs" itemprop="views" title="浏览次数"><i class="fa fa-eye"></i> {$item.views}</span>
+            </div>
+        </div>
+    </div>
+</article>

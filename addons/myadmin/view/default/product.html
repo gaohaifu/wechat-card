@@ -1,0 +1,51 @@
+<div class="container container-body">
+    <div class="panel panel-default"> </div>
+
+
+    <div class="row">
+        <div class="col-lg-9 col-md-9 col-xs-12">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <span>产品展示</span>
+
+                    </h3>
+                </div>
+                <div class="panel-body" style="min-height: 500px;">
+                    <div class="rows">
+                        <div class="product-list">
+                            {volist name='list' id='item'}
+                            {include file="common/item_product" /}
+                            {/volist}
+                        </div>
+                        {if $list->isEmpty()}
+                        <p class="text-center" style="padding: 100px;">暂无记录</p>
+                        {/if}
+
+                    </div>
+                    {$list->render()}
+                </div>
+
+
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-xs-12">
+            <div class="sidebar-toggle" data-toggle="collapse"><i class="fa fa-bars"></i></div>
+            <div class="sidenav" id="sidebar-nav">
+                <ul class="list-group">
+                    <li class="list-group-item {:check_nav_active('myadmin/web/product')}" style="font-size: 16px;"><a
+                            href="{:addon_urls('/myadmin/web/product')}"><i class="fa fa-list fa-fw"></i>
+                            {:__('全部商品')}</a></li>
+                    {volist name='category' id='item'}
+                    <li class="list-group-item {:$item['id'] == $category_id?'active':''}"><a
+                            href="{:addon_urls('/myadmin/web/product', ['category_id'=>$item.id])}"><i
+                                class="fa fa-circle-o fa-fw"></i> {$item.name}</a></li>
+                    {/volist}
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</div>

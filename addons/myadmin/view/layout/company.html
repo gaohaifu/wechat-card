@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{:isset($title)?$title:'首页'} - {$site.name|htmlentities}</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="__CDN__/assets/libs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link
+        href="__CDN__/assets/css/frontend{$Think.config.app_debug?'':'.min'}.css?v={$Think.config.site.version|htmlentities}"
+        rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="__ADDON__/css/common.css?v={$Think.config.site.version|htmlentities}" rel="stylesheet">
+    <link href="__ADDON__/css/content.css?v={$Think.config.site.version|htmlentities}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="__CDN__/assets/libs/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" media="screen" href="__ADDON__/css/swiper.min.css?v={$site.version}">
+    <link rel="stylesheet" media="screen"
+        href="__CDN__/assets/libs/fastadmin-layer/dist/theme/default/layer.css?v={$site.version}" />
+    <script type="text/javascript" src="__CDN__/assets/libs/jquery/dist/jquery.min.js?v={$site.version}"></script>
+    <script type="text/javascript" src="__CDN__/assets/libs/fastadmin-layer/dist/layer.js?v={$site.version}"></script>
+    <script type="text/javascript" src="__ADDON__/js/swiper.min.js?v={$site.version}"></script>
+
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+            <script src="https://cdn.bootcdn.net/ajax/libs/html5shiv/3.7.0/html5shiv.min.js"></script>
+            <script src="https://cdn.bootcdn.net/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    <script type="text/javascript">
+        var require = {$config_json};
+    </script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{:addon_urls('myadmin/web/index')}">{$site.name|htmlentities}</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="{:addon_urls('myadmin/web/index')}">企业首页</a>
+                    </li>
+                    <li>
+                        <a href="{:addon_urls('myadmin/web/content')}">新闻资讯</a>
+                    </li>
+                    <li>
+                        <a href="{:addon_urls('myadmin/web/product')}">产品展示</a>
+                    <li>
+                        <a href="{:addon_urls('myadmin/web/single')}">关于我们</a>
+                    </li>                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {__CONTENT__}
+    <footer class="footer" style="clear:both">
+        <p class="copyright">Copyright&nbsp;©&nbsp;{:date("Y")} {$site.name|htmlentities} All Rights Reserved <a
+                href="https://beian.miit.gov.cn" target="_blank">{$site.beian|htmlentities}</a></p>
+    </footer>
+    <script src="__CDN__/assets/js/require{$Think.config.app_debug?'':'.min'}.js" data-main="__CDN__/assets/js/require-frontend{$Think.config.app_debug?'':'.min'}.js?v={$site.version|htmlentities}"></script>
+
+</body>
+
+
+</html>

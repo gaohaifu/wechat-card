@@ -1,0 +1,159 @@
+<style>
+    .plupload-preview li,
+    .faupload-preview li {
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+
+    <div class="form-group" style="display: {$category_id>0?'none':'block'};">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Category')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-category_id" data-rule="required" data-source="web/category/selectpage" placeholder="请选择分类"
+                data-field="name" class="form-control selectpage" name="row[category_id]" type="text"
+                data-params='{"custom[mould_id]":"{$mould_id}"}' value="{$category_id>0?$category_id:''}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="required" class="form-control" placeholder="请输入资讯名称" name="row[name]"
+                type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Title')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-title" data-rule="required" class="form-control" placeholder="请输入标题" name="row[title]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Description')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-description" data-rule="required" placeholder="请输入描述" class="form-control" rows="4" name="row[description]" cols="50"></textarea>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Cover')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-cover"></ul>
+            <div class="input-group">
+                <input id="c-cover" readonly class="form-control" data-rule="" size="50" name="row[cover]" type="text"
+                    value="">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-cover" class="btn btn-danger faupload"
+                            data-input-id="c-cover" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                            data-multiple="false" data-preview-id="p-cover"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-cover" class="btn btn-primary fachoose"
+                            data-input-id="c-cover" data-mimetype="image/*" data-multiple="false"> <i
+                                class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-cover"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('type')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                {foreach name="typeList" item="vo"}
+                <label for="row[type]-{$key}"><input id="row[type]-{$key}" name="row[type]" type="radio" value="{$key}"
+                        {in name="key" value="article" }checked{/in} /> {$vo}</label> {/foreach}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group box-image" style="display: none;">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Image')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-image"></ul>
+            <div class="input-group">
+                <input id="c-image" readonly class="form-control" data-rule="" size="50" name="row[images]" type="text"
+                    value="" data-tip="请上传图片">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-image" class="btn btn-danger faupload"
+                            data-input-id="c-image" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                            data-multiple="true" data-preview-id="p-image"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-image" class="btn btn-primary fachoose"
+                            data-input-id="c-image" data-mimetype="image/*" data-multiple="true"> <i
+                                class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-image"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group box-video" style="display: none;">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Video')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-video" readonly class="form-control" name="row[video]" type="text" value=""
+                    data-tip="请上传视频文件">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="plupload-video" class="btn btn-danger plupload"
+                            data-input-id="c-video" data-mimetype="video/mp4" data-multiple="false"><i
+                                class="fa fa-upload"></i> </button></span>
+                    <span><button type="button" id="fachoose-video" class="btn btn-primary fachoose"
+                            data-input-id="c-video" data-mimetype="video/mp4" data-multiple="false"> <i
+                                class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-video"></span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group box-audio" style="display: none;">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Audio')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-audio" readonly class="form-control" name="row[audio]" type="text" value=""
+                    data-tip="请上传音频文件">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="plupload-audio" class="btn btn-danger plupload"
+                            data-input-id="c-audio"
+                            data-mimetype="mp3,acc,wav,act,rec,vy1,vy2,vy3,vy4,sc4,dvf,msc,wma,aiff"
+                            data-multiple="false">
+                            <i class="fa fa-upload"></i> </button></span>
+                    <span><button type="button" id="fachoose-audio" class="btn btn-primary fachoose"
+                            data-input-id="c-audio" data-mimetype="audio/*" data-multiple="false"> <i
+                                class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-audio"></span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Content')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-content" class="form-control editor" rows="5" name="row[content]" cols="50"></textarea>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                {foreach name="statusList" item="vo"}
+                <label for="row[status]-{$key}"><input id="row[status]-{$key}" name="row[status]" type="radio"
+                        value="{$key}" {in name="key" value="normal" }checked{/in} /> {$vo}</label> {/foreach}
+            </div>
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

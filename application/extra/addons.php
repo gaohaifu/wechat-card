@@ -3,6 +3,24 @@
 return [
     'autoload' => false,
     'hooks' => [
+        'app_init' => [
+            'myadmin',
+        ],
+        'user_sidenav_after' => [
+            'myadmin',
+        ],
+        'install_myadmin_menu' => [
+            'myadmin',
+        ],
+        'uninstall_myadmin_menu' => [
+            'myadmin',
+        ],
+        'enable_myadmin_menu' => [
+            'myadmin',
+        ],
+        'disable_myadmin_menu' => [
+            'myadmin',
+        ],
         'user_delete_successed' => [
             'third',
         ],
@@ -23,6 +41,12 @@ return [
         ],
     ],
     'route' => [
+        '/web$' => 'myadmin/web/index',
+        '/web/content$' => 'myadmin/web/content',
+        '/web/product$' => 'myadmin/web/product',
+        '/web/single$' => 'myadmin/web/single',
+        '/web/product/detail$' => 'myadmin/web/product_detail',
+        '/web/content/detail$' => 'myadmin/web/content_detail',
         '/third$' => 'third/index/index',
         '/third/connect/[:platform]' => 'third/index/connect',
         '/third/callback/[:platform]' => 'third/index/callback',

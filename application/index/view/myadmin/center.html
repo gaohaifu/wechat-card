@@ -1,0 +1,86 @@
+<style>
+    .basicinfo {
+        margin: 3px 0;
+    }
+
+    .basicinfo .row>.col-xs-4 {
+        padding-right: 0;
+    }
+
+    .basicinfo .row>div {
+        margin: 5px 0;
+    }
+</style>
+<h2 class="page-header">
+    {$title}
+    {if isset($company['status']) && in_array($company['status'], ['normal','hidden']) }
+    <a href="{:url('/myadmin/index/index/company_identify/'.$company['identifier'])}"
+        target="_blank" class="btn btn-primary pull-right"><i class="fa fa-user-circle fa-fw"></i>
+        {:__('进入后台')}</a>
+    {else}
+    <a href="#" class="btn btn-warning pull-right"><i class="fa fa-user-circle fa-fw"></i>
+        {:__($company['status'])}</a>
+    {/if}
+        
+    {if $termvalidity == 'vip'}
+    <a href="{:url('vip/viplist')}" title="{:__('点击去续费')}" class="btn btn-success pull-right"
+        style="margin-right:10px">
+        <i class="fa fa-diamond fa-fw"></i>
+        <span>续费</span>
+    </a>
+    {/if}
+
+</h2>
+<div class="row user-baseinfo">
+    <div class="col-md-3 col-sm-3 col-xs-2 text-center user-center">
+        <a href="{:url('myadmin/profile')}" title="{:__('Click to edit')}">
+            <span class="avatar-img" style="border-radius:10px"><img style="border-radius:10px"
+                    src="{$company.logo|default='/assets/img/qrcode.png'|htmlentities|cdnurl}" alt=""></span>
+        </a>
+    </div>
+    <div class="col-md-9 col-sm-9 col-xs-10">
+        <!-- Content -->
+        <div class="ui-content">
+            <!-- Heading -->
+            <h4><a href="{:url('myadmin/profile')}">{$company.name|htmlentities}</a></h4>
+            <!-- Paragraph -->
+            <p class="text-muted">
+                {$company.address|default=__("请去设置您的地址吧")|htmlentities}
+            </p>
+            <!-- Success -->
+        </div>
+    </div>
+
+    <div class="col-md-9 col-sm-9 col-xs-12">
+        <!-- Content -->
+        <div class="ui-content">
+            <div class="basicinfo">
+                <div class="row">
+                    <div class="col-xs-4 col-md-2">{:__('企业编号')}</div>
+                    <div class="col-xs-8 col-md-4">{$company.identifier|default='无'}</div>
+                    <div class="col-xs-4 col-md-2">{:__('登录账号')}</div>
+                    <div class="col-xs-8 col-md-4">{$company.founder.username|default='无'}</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-md-2">可用{:__('Money')}</div>
+                    <div class="col-xs-8 col-md-4">
+                        <a href="javascript:;" class="viewmoney">{$company.money}</a>
+                    </div>
+                    <div class="col-xs-4 col-md-2">剩余{:__('Score')}</div>
+                    <div class="col-xs-8 col-md-4">
+                        <a href="javascript:;" class="viewscore">{$company.score}</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-4 col-md-2">{:__('开始时间')}</div>
+                    <div class="col-xs-8 col-md-4">{$company.createtime|date="Y-m-d",###}</div>
+                    {if $termvalidity == 'vip'}
+                    <div class="col-xs-4 col-md-2">{:__('到期时间')}</div>
+                    <div class="col-xs-8 col-md-4">{$vip.expiredate|default='已过期'}</div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

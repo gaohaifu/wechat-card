@@ -1,0 +1,47 @@
+<style>
+    .plupload-preview li,
+    .faupload-preview li {
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('配置键名')}:</label>
+        <div class="col-xs-12 col-sm-8">
+
+            <select name="row[name]" data-rule="required" id="c-name" class="form-control selectpicker">
+                <option value="">请选择配置键名(仅可选择未设置的键名)</option>
+                {foreach name="apply" id="item"}
+                <option value="{$item.name}">{$item.name}</option>
+                {/foreach}
+            </select>
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-title" class="control-label col-xs-12 col-sm-2">{:__('配置名称')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-title" data-rule="required" placeholder="请输入配置名称" class="form-control" name="row[title]" type="text" value="">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-intro" class="control-label col-xs-12 col-sm-2">{:__('配置说明')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-intro" data-rule="required" class="form-control" placeholder="请输入配置说明" name="row[intro]" type="text" value="">
+        </div>
+    </div>
+
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

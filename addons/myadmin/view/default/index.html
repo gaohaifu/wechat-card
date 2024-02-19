@@ -1,0 +1,103 @@
+<style>
+    .page-header {
+        text-align: left;
+    }
+
+    .index-list h4 {
+        color: #000000;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        margin-bottom: 0px;
+    }
+
+    .index-list .index-intro {
+        height: 66px;
+        line-height: 22px;
+        color: #828a92;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+    }
+
+    .carousel-inner .fill {
+        background: #222222;
+        background-size: 100%;
+        background-position: center;
+    }
+
+    @media screen and (max-width: 768px) {
+        header.carousel{
+            height: 40%;
+        }
+    }
+</style>
+
+<!-- Header Carousel -->
+<header id="myCarousel" class="carousel slide">
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+        <div class="item active">
+            <a href="javascript:">
+                <div class="fill"
+                    style="background-image:url('{$background}');">
+                </div>
+                <div class="carousel-body">
+                    <div class="container">
+                        <h1 class="display-1 text-white">{$site.name|htmlentities}</h1>
+                        {if $company['address']}
+                        <h2 class="display-4 text-white">联系地址：{$company.address}</h2>
+                        {/if}
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Page Content -->
+<div class="container" style=" margin-top: 20px;">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="page-header">
+                最新产品
+            </h2>
+        </div>
+        <div>
+            {volist name='product' id='item'}
+            {include file="common/item_product" /}
+            {/volist}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h2 class="page-header">
+                关于我们
+            </h2>
+        </div>
+        {volist name='single' id='item'}
+        <div class="col-xs-12 col-md-4 col-sm-6 index-list">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4> {$item.name}</h4>
+                </div>
+                <div class="panel-body">
+                    <p class="index-intro">{$item.description}</p>
+                    <a href="{:addon_urls('/myadmin/web/single', ['id'=>$item.id])}" target="_blank"
+                        class="btn btn-default pull-right">了解详情</a>
+                </div>
+            </div>
+        </div>
+        {/volist}
+    </div>
+
+
+    <hr>
+
+</div>
