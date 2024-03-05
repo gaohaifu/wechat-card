@@ -1,6 +1,6 @@
 <?php
 
-namespace app\api\controller\discover;
+namespace app\api\controller\smartcard;
 
 use app\common\controller\Backend;
 use app\common\exception\UploadException;

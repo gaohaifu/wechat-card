@@ -18,12 +18,12 @@ use think\Db;
 use think\Config;
 
 header('Access-Control-Allow-Origin:*');//允许跨域
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+/*if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     header('Access-Control-Allow-Headers:x-requested-with,content-type,token');
     //浏览器页面ajax跨域请求会请求2次，第一次会发送OPTIONS预请求,不进行处理，直接exit返回，但因为下次发送真正的请求头部有带token
     //所以这里设置允许下次请求头带token否者下次请求无法成功
     exit();
-}
+}*/
 
 /**
  * 基本类，初始化请求
