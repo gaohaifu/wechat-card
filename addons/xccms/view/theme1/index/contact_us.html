@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme1/common/scripts" /}
+    <style type="text/css">
+        #map {width: 100%;height: 500px;}
+        .map-info-box {background: #fff;width: 200px;height: 200px;border:0;}
+        .gps-box {border: 1px solid #b61a29;color: #b61a29;margin-left: 0.5rem;}
+        .gps-box:hover {border: 1px solid #b61a29;background: #b61a29;color: #fff;}
+    </style>
+</head>
+
+<body>
+    {include file="theme1/common/header" /}
+    <div class="xccms-page-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active">联系我们</li>
+            </ol>
+            <div class="title">
+                <h1>联系我们</h1>
+                <hr class="my-4" />
+            </div>
+            <div class="content py-4">
+                <p>名称：{$site_config['name']}</p>
+                <p>地址：{$site_config['address']}</p>
+                <p>联系电话：{$site_config['tel']}</p>
+                <p>Email：{$site_config['email']}</p>
+                {if isset($site_config['center_point']) && $site_config['center_point']}
+                <div id="map"></div>
+                {/if}
+            </div>
+        </div>
+    </div>
+    {include file="theme1/common/footer" /}
+
+    {if isset($site_config['center_point']) && $site_config['center_point']}
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak={$site_config['map_ak']}"></script>
+    <script>
+        var center_point = "{$site_config['center_point']}";
+        var center_point_split = center_point.split(',');
+        // 百度地图API功能
+        var map = new BMap.Map("map");
+        var point = new BMap.Point(center_point_split[0],center_point_split[1]);
+        
+        map.enableScrollWheelZoom();
+        map.enableContinuousZoom();
+        map.centerAndZoom(point, 18);
+        var marker = new BMap.Marker(point);
+        map.addOverlay(marker);
+
+
+        var site_name = "{$site_config['name']}";
+        var opts = {
+            width: 250,     // 信息窗口宽度
+            height: 100,    // 信息窗口高度
+            title: site_name  // 信息窗口标题
+        }
+        var href = '<a class="btn btn-default gps-box" href="http://api.map.baidu.com/marker?location='+center_point_split[1]+','+center_point_split[0]+'&title=我的位置&content='+site_name+'&output=html" target="_blank">到这去 &gt;&gt;</a>';
+        var infoWindow = new BMap.InfoWindow("地址：{$site_config['address']}" + href, opts);  // 创建信息窗口对象
+        map.openInfoWindow(infoWindow, point);        // 打开信息窗口
+        marker.addEventListener("click", function(){          
+            map.openInfoWindow(infoWindow, point); //开启信息窗口
+        });
+
+
+    </script>
+    {/if}
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme2/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme2/common/header" /}
+    <div class="xccms-partner-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active">合作伙伴</li>
+            </ol>
+            <div class="title">
+                <h1>合作伙伴</h1>
+                <hr class="my-4" />
+            </div>
+
+            <div class="content row py-4 partner-list">
+                {if count($partner_list) == 0}<p align="center">没有找到信息</p>{/if}
+                {volist name="partner_list" id="item"}
+                <div class="col-lg-3 item">
+                    <a href="{$item['url']}">
+                        <div class="list-image-box">
+                            <img src="{$item['list_image']}" class="list-image">
+                        </div>
+                        <span class="fw-normal">{$item['name']}</span>
+                    </a>
+                </div>
+                {/volist}
+            </div>
+        </div>
+    </div>
+
+    {include file="theme2/common/footer" /}
+</body>
+
+</html>

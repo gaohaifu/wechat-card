@@ -1,0 +1,79 @@
+    <header class="sticky-top">
+        <div class="container hidden-xs">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand py-0" href="{:addon_url('xccms/index/index')}">
+                            <img src="{$site_config['logo']}" alt="{$site_config['name']}" title="{$site_config['name']}">
+                        </a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            {volist name="menu_list" id="item"}
+                            <li class="text-center {if $item['sub_menu']}dropdown{/if}">
+                                <a href="{$item['url']}"{if $item['sub_menu']} class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"{/if} title="{$item['name']}">
+                                    {$item['name']}
+                                    <small class="hidden-xs">{$item['en_name']}</small>
+                                    {if $item['sub_menu']}
+                                    <span class="caret"></span>
+                                    {/if}
+                                </a>
+                                {if $item['sub_menu']}
+                                <ul class="dropdown-menu">
+                                    {volist name="$item['sub_menu']" id="sitem"}
+                                    <li><a href="{$sitem['url']}" title="{$sitem['name']}">{$sitem['name']}</a></li>
+                                    {/volist}
+                                </ul>
+                                {/if}
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="container hidden-lg hidden-md hidden-sm xccms-mobile-nav">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand py-0" href="{:addon_url('xccms/index/index')}">
+                            <img src="{$site_config['logo']}" alt="{$site_config['name']}" title="{$site_config['name']}logo">
+                        </a>
+                    </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                        <ul class="nav navbar-nav">
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            {volist name="menu_list" id="item"}
+                            <li{if $item['sub_menu']} class="dropdown"{/if}>
+                                <a href="{$item['url']}"{if $item['sub_menu']} class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"{/if} title="{$item['name']}">
+                                    {$item['name']}
+                                    <small class="hidden-xs">{$item['en_name']}</small>
+                                    {if $item['sub_menu']}
+                                    <span class="caret"></span>
+                                    {/if}
+                                </a>
+                                {if $item['sub_menu']}
+                                <ul class="dropdown-menu">
+                                    {volist name="$item['sub_menu']" id="sitem"}
+                                    <li><a href="{$sitem['url']}" title="{$sitem['name']}">{$sitem['name']}</a></li>
+                                    {/volist}
+                                </ul>
+                                {/if}
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>

@@ -1,0 +1,24 @@
+    {include file="theme1/common/nav" /}
+    <div id="carouselExampleIndicators" class="carousel slide">
+        {if count($carousel_list) == 0}<p align="center">请先添加轮播幻灯片</p>{/if}
+        <div class="carousel-indicators">
+            {volist name="carousel_list" id="item"}
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{$key}" {if $key == 0}class="active" aria-current="true" aria-label="{$item['title']}"{/if}></button>
+            {/volist}
+        </div>
+        <div class="carousel-inner">
+            {volist name="carousel_list" id="item"}
+            <div class="carousel-item {if $key == 0}active{/if}">
+                <img src="{$item['list_image']}" class="vcenter" alt="{$item['title']}" alt="{$item['title']}" />
+            </div>
+            {/volist}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>

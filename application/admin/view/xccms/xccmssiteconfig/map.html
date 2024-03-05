@@ -1,0 +1,66 @@
+{__NOLAYOUT__}
+<!DOCTYPE html>
+<html lang="{$config.language}">
+
+<head>
+    {include file="common/meta" /}
+    <style type="text/css">
+    body,
+    html,
+    #allmap {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        font-family: "微软雅黑";
+    }
+
+    #search {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+
+    #searchBox {
+        z-index: 999999;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+    }
+
+    #centre-point {
+        position: absolute;
+        z-index: 999999;
+        font-size: 4rem;
+        color: #c00;
+        top: 0;
+        left: 0;
+    }
+    </style>
+</head>
+
+<body class="inside-header inside-aside {:defined('IS_DIALOG') && IS_DIALOG ? 'is-dialog' : ''}">
+    <i class="fa fa-map-marker" id="centre-point"></i>
+    <div class="container-fluid" id="search">
+        <div class="row">
+            <div class="col-xs-12 col-sm-4">
+                <form role="form" action="">
+                    <div class="input-group" style="width:300px;">
+                        <input type="text" id="suggestId" class="form-control" placeholder="输入地域关键词" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-success btn-search" id="set-point" type="button">选定中心点位置</button>
+                        </span>
+                    </div>
+                    <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id='allmap'></div>
+    {include file="common/script" /}
+    <script>
+        var center_point_data = "{$center_point}";
+    </script>
+</body>
+
+</html>

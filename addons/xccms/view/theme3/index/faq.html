@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme3/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme3/common/header" /}
+    <div class="xccms-page-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active">FAQ</li>
+            </ol>
+            <div class="title">
+                <h1>FAQ</h1>
+                <hr class="my-4" />
+            </div>
+            <div class="faq-list-box py-4">
+                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    {volist name="faq_list" id="item"}
+                    <div class="panel panel-default mb-5">
+                        <div class="panel-heading{if $key == 0} active{/if}" role="tab" id="heading{$key}">
+                            <h4 class="panel-title">
+                                {if $key == 0}
+                                <img src="__ADDON__/img/-.png" class="icon hidden-xs">
+                                {else}
+                                <img src="__ADDON__/img/+.png" class="icon hidden-xs">
+                                {/if}
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{$key}" aria-expanded="{if $key == 0}true{else}false{/if}" aria-controls="collapse{$key}" style="display: block;">
+                                    {$key + 1}. {$item['question']}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse{$key}" class="panel-collapse collapse{if $key == 0} in{/if}" role="tabpanel" aria-labelledby="heading{$key}">
+                            <div class="panel-body">
+                                {$item['answer']}
+                            </div>
+                        </div>
+                    </div>
+                    {/volist}
+
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file="theme3/common/footer" /}
+    <script>
+        $(function(){
+            $('.faq-list-box a[role="button"]').click(function(){
+                var that = $(this);
+                $('.faq-list-box .panel-heading').removeClass('active');
+                $('.faq-list-box .panel-heading .icon').attr('src', '__ADDON__/img/+.png')
+                that.parents('.panel-heading').addClass('active');
+                that.parents('.panel-heading').find('.icon').attr('src', '__ADDON__/img/-.png')
+
+                if (that.attr('aria-expanded') == 'false')
+                {
+                    that.parents('.panel-heading').find('.icon').attr('src', '__ADDON__/img/-.png')
+                }
+                else
+                {
+                    that.parents('.panel-heading').find('.icon').attr('src', '__ADDON__/img/+.png')
+                }
+
+            })
+        })
+    </script>
+</body>
+
+</html>

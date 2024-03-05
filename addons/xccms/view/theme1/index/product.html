@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {include file="theme1/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme1/common/header" /}
+    <div class="xccms-list-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active">产品中心</li>
+            </ol>
+            <div class="title">
+                <h1>产品中心</h1>
+                <hr class="my-4" />
+            </div>
+            <div class="product-box py-4">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="list-group">
+                            <a class="list-group-item list-group-item-action active topic" aria-current="true">
+                                产品分类
+                            </a>
+                            {volist name="product_category_list" id="item"}
+                            <a href="{:addon_url('xccms/index/product', [':id'=>$item['id']])}" class="list-group-item list-group-item-action {if $item['id'] == $model['id']}active{/if}">
+                                <span class="badge bg-danger rounded-pill">{$item['product_count']}</span>
+                                {$item['name']}
+                            </a>
+                            {/volist}
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            {if count($product_list) == 0}<p align="center">没有找到信息</p>{/if}
+                            {volist name="product_list" id="item"}
+                            <div class="col-md-4 item">
+                                <a href="{:addon_url('xccms/index/product_detail', [':id'=>$item['id']])}" title="{$item['title']}" class="list-image-box">
+                                    <img src="{$item['list_image']}" alt="{$item['title']}" class="list-image">
+                                </a>
+                                <div class="title">
+                                    <a href="{:addon_url('xccms/index/product_detail', [':id'=>$item['id']])}" title="{$item['title']}">{$item['title']}</a>
+                                </div>
+                            </div>
+                            {/volist}
+                        </div>
+                        {$pagenav}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file="theme1/common/footer" /}
+</body>
+
+</html>

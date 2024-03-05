@@ -1,0 +1,388 @@
+<style type="text/css">
+@media (max-width: 375px) {
+    .edit-form tr td input {
+        width: 100%;
+    }
+
+    .edit-form tr th:first-child,
+    .edit-form tr td:first-child {
+        width: 20%;
+    }
+
+    .edit-form tr th:nth-last-of-type(-n+2),
+    .edit-form tr td:nth-last-of-type(-n+2) {
+        display: none;
+    }
+}
+
+.edit-form table>tbody>tr td a.btn-delcfg {
+    visibility: hidden;
+}
+
+.edit-form table>tbody>tr:hover td a.btn-delcfg {
+    visibility: visible;
+}
+
+@media (max-width: 767px) {
+
+    .edit-form table tr th:nth-last-child(-n + 2),
+    .edit-form table tr td:nth-last-child(-n + 2) {
+        display: none;
+    }
+
+    .edit-form table tr td .msg-box {
+        display: none;
+    }
+}
+</style>
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        {:build_heading(null, false)}
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-config" data-toggle="tab">基础配置</a></li>
+            <li><a href="#tab-theme" data-toggle="tab">站点主题</a></li>
+            <li><a href="#tab-guestbook" data-toggle="tab">留言板配置</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <form id="config-form" class="edit-form form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+            {:token()}
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane active" id="tab-config">
+                    <div class="widget-body no-padding">
+                        <input type="hidden" id="c-map_ak" name="row[map_ak]" value="{$json_data['map_ak']}">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="15%">{:__('Title')}</th>
+                                    <th width="83%">{:__('Value')}</th>
+                                    <th width="2%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>网站名称</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-name" name="row[name]" class="form-control" value="{$json_data['name']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>ICP备案号</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-icp" name="row[icp]" class="form-control" value="{$json_data['icp']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Logo<br />(225 x 45)
+                                    </td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <div class="form-inline">
+                                                    <input id="c-logo" class="form-control" size="50" name="row[logo]" type="text" value="{$json_data['logo']}">
+                                                    <span><button type="button" id="faupload-logo" class="btn btn-danger faupload" data-input-id="c-logo" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" data-preview-id="p-logo"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                                                    <span><button type="button" id="fachoose-logo" class="btn btn-primary fachoose" data-input-id="c-logo" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                                                    <span class="msg-box n-right" for="c-logo"></span>
+                                                    <ul class="row list-inline faupload-preview" id="p-logo"></ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        底部Logo<br />(225 x 45)
+                                    </td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <div class="form-inline">
+                                                    <input id="c-logo_bottom" class="form-control" size="50" name="row[logo_bottom]" type="text" value="{$json_data['logo_bottom']}">
+                                                    <span><button type="button" id="faupload-logo_bottom" class="btn btn-danger faupload" data-input-id="c-logo_bottom" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" data-preview-id="p-logo_bottom"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                                                    <span><button type="button" id="fachoose-logo_bottom" class="btn btn-primary fachoose" data-input-id="c-logo_bottom" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                                                    <span class="msg-box n-right" for="c-logo_bottom"></span>
+                                                    <ul class="row list-inline faupload-preview" id="p-logo_bottom"></ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>联系电话</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-tel" name="row[tel]" class="form-control" value="{$json_data['tel']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-email" name="row[email]" class="form-control" value="{$json_data['email']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>地址</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-address" name="row[address]" class="form-control" value="{$json_data['address']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>地图配置</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <div class="input-group">
+                                                    <input type="text" id="c-center_point" name="row[center_point]" class="form-control" value="{$json_data['center_point']}" />
+                                                    <div class="input-group-addon no-border no-padding">
+                                                        <span><a href="javascript:;" id="js_configAk" class="btn btn-danger" title="配置百度AK"><i class="fa fa-plug"></i> 配置百度AK</a></span>
+                                                        <span><a href="javascript:;" id="js_setMap" data-map_ak="{$json_data['map_ak']}" class="btn btn-info" title="配置地址坐标"><i class="fa fa-map-signs"></i> 配置地址坐标</a></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        简介配图<br />(380 x 300)
+                                    </td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <div class="form-inline">
+                                                    <input id="c-desc_image" class="form-control" size="50" name="row[desc_image]" type="text" value="{$json_data['desc_image']}">
+                                                    <span><button type="button" id="faupload-desc_image" class="btn btn-danger faupload" data-input-id="c-desc_image" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" data-preview-id="p-desc_image"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                                                    <span><button type="button" id="fachoose-desc_image" class="btn btn-primary fachoose" data-input-id="c-desc_image" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                                                    <span class="msg-box n-right" for="c-desc_image"></span>
+                                                    <ul class="row list-inline faupload-preview" id="p-desc_image"></ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>简介</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <textarea name="row[description]" id="c-description" class="form-control" rows="5">{$json_data['description']}</textarea>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>详细介绍</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <textarea name="row[summary]" id="c-summary" class="form-control editor" rows="5">{$json_data['summary']}</textarea>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>首页SEO标题</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-seo_title" name="row[seo_title]" class="form-control" value="{$json_data['seo_title']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>首页SEO关键词</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <input type="text" id="c-seo_keywords" name="row[seo_keywords]" class="form-control" value="{$json_data['seo_keywords']}" />
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>首页SEO描述</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <textarea name="row[seo_description]" id="c-seo_description" class="form-control">{$json_data['seo_description']}</textarea>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>统计分析代码</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <textarea name="row[analysis_code]" id="c-analysis_code" class="form-control" rows="8">{$json_data['analysis_code']}</textarea>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>网站状态</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                {:build_radios('row[site_status]', ['1'=>__('开放'), '0'=>__('关闭')], $json_data['site_status'])}
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>网站关闭描述</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <textarea name="row[site_closed_desciption]" id="c-site_closed_desciption" class="form-control">{$json_data['site_closed_desciption']}</textarea>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>网站灰度模式</td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                {:build_radios('row[site_grayscale]', ['0'=>__('未开启'), '1'=>__('仅首页灰度'), '2'=>__('全站灰度')], $json_data['site_grayscale'])}
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab-theme">
+                    {volist name="theme_list" id="item"}
+                    <div class="col-sm-4 col-md-3">
+                        <div class="thumbnail example">
+                            <img src="/assets/addons/xccms/img/{$item['id']}/xccms-demo.jpg" style="width:100%;min-height:160px;">
+                            <div class="caption">
+                                <p class="text-muted">{$item['name']}</p>
+                                <p>
+                                    <button type="button" class="btn btn-success js_selectTheme" data-value="{$item['id']}" {if $json_data['theme']==$item['id']} disabled{/if}> {if $json_data['theme']==$item['id']} <i class="fa fa-check-square"></i> <span>已启用</span>
+                                        {else}
+                                        <i class="fa fa-check-square"></i> <span>启用</span>
+                                        {/if}
+                                    </button>
+                                    <button type="button" class="btn btn-info js_setTheme" data-value="{$item['id']}" {if $json_data['theme'] !=$item['id']} disabled{/if}> <i class="fa fa-cogs"></i> 扩展配置
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {/volist}
+                </div>
+                <div class="tab-pane" id="tab-guestbook">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th width="15%">{:__('Title')}</th>
+                                <th width="83%">{:__('Value')}</th>
+                                <th width="2%"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>留言板标题</td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-sm-8 col-xs-12">
+                                            <input type="text" id="c-guestbook_title" name="row[guestbook_title]" class="form-control" value="{$json_data['guestbook_title']}" />
+                                        </div>
+                                        <div class="col-sm-4"></div>
+                                    </div>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>留言板描述</td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-sm-8 col-xs-12">
+                                            <textarea name="row[guestbook_description]" id="c-guestbook_description" class="form-control">{$json_data['guestbook_description']}</textarea>
+                                        </div>
+                                        <div class="col-sm-4"></div>
+                                    </div>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <table class="table table-striped" id="bottom_btn">
+                <tfoot>
+                    <tr>
+                        <td width="15%"></td>
+                        <td width="83%">
+                            <div class="layer-footer">
+                                <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+                                <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+                            </div>
+                        </td>
+                        <td width="2%"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+</div>
