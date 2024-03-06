@@ -1,1 +1,3 @@
 addons/smartcard/smartcard-uniapp/unpackage
+.idea
+.env
