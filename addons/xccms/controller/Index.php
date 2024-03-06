@@ -258,7 +258,7 @@ class Index extends Controller
         $this->view->assign('menu_list', $main_menu_list);
         $this->view->assign('bottom_menu_list', $bottom_menu_list);
         $this->view->assign('carousel_list', $carousel_list);
-        $this->view->assign('language_list',Language::languageList($this->company_id));
+        //$this->view->assign('language_list',Language::languageList($this->company_id));
     }
 
     public function closed()
