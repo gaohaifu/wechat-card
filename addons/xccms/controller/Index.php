@@ -2,6 +2,8 @@
 
 namespace addons\xccms\controller;
 
+use addons\myadmin\model\Domain;
+use app\common\service\Language;
 use think\addons\Controller;
 use think\Config;
 use think\Validate;
@@ -27,13 +29,28 @@ class Index extends Controller
     protected $site_config = [];
     protected $page_code = '';
     protected $page_id = 0;
+    protected $company_id = 0;
 
     public function _initialize()
     {
+        if (!isset($_SERVER['HTTP_HOST'])){
+            $this->error('域名异常');
+        }
+        $domain = get_first_host($_SERVER['HTTP_HOST']);
+        $domains = cache($domain);
+        if(!$domains){
+            $domains = Domain::where(['name'=>$domain])->cache($domain,60)->find();
+            if(!$domains){
+                $this->error('该企业已被删除');
+            }
+        }
+
         parent::_initialize();
 
+        $this->company_id = $domains['company_id'];
+        $where['company_id'] = $this->company_id;
         //站点配置
-        $site_configM = Xccmssiteconfig::field('id,json_data')->find();
+        $site_configM = Xccmssiteconfig::where($where)->field('id,json_data')->find();
         if (!$site_configM)
         {
             $this->error('请在后台生成站点配置后，再访问前台');
@@ -44,7 +61,7 @@ class Index extends Controller
 
 
         //菜单
-        $main_menu_list = Xccmsmenuinfo::field('id,parent_id,name,en_name,menu_type,menu_object_id,url')
+        $main_menu_list = Xccmsmenuinfo::where($where)->field('id,parent_id,name,en_name,menu_type,menu_object_id,url')
             ->where('parent_id', 0)
             ->where('is_top_show', 1)
             ->where('state', 1)
@@ -87,7 +104,7 @@ class Index extends Controller
                     $main_menu_item_url = addon_url('xccms/index/faq');
                     break;
             }
-            $sub_menu = Xccmsmenuinfo::field('id,name,menu_type,menu_object_id,url')
+            $sub_menu = Xccmsmenuinfo::where($where)->field('id,name,menu_type,menu_object_id,url')
                 ->where('parent_id', $item['id'])
                 ->where('is_top_show', 1)
                 ->where('state', 1)
@@ -139,10 +156,10 @@ class Index extends Controller
         }
 
         //轮播
-        $carousel_list = Xccmswebsitecarousel::field('id,title,list_image')->where('state', 1)->order('weigh desc')->select();
+        $carousel_list = Xccmswebsitecarousel::where($where)->field('id,title,list_image')->where('state', 1)->order('weigh desc')->select();
 
         //底部菜单
-        $bottom_menu_list = Xccmsmenuinfo::field('id,name,menu_type,menu_object_id,url')
+        $bottom_menu_list = Xccmsmenuinfo::where($where)->field('id,name,menu_type,menu_object_id,url')
             ->where('parent_id', 0)
             ->where('Is_bottom_show', 1)
             ->where('state', 1)
@@ -186,7 +203,7 @@ class Index extends Controller
                     break;
             }
 
-            $sub_menu = Xccmsmenuinfo::field('id,name,menu_type,menu_object_id,url')
+            $sub_menu = Xccmsmenuinfo::where($where)->field('id,name,menu_type,menu_object_id,url')
                 ->where('parent_id', $item['id'])
                 ->where('Is_bottom_show', 1)
                 ->where('state', 1)
@@ -233,7 +250,6 @@ class Index extends Controller
             }
 
             $main_menu_item_url = count($sub_menu) > 0 ? 'javascript:;' : $main_menu_item_url;
-
             $bottom_menu_list[$i]['url'] = $main_menu_item_url;
             $bottom_menu_list[$i]['sub_menu'] = $sub_menu;
         }
@@ -242,6 +258,7 @@ class Index extends Controller
         $this->view->assign('menu_list', $main_menu_list);
         $this->view->assign('bottom_menu_list', $bottom_menu_list);
         $this->view->assign('carousel_list', $carousel_list);
+        $this->view->assign('language_list',Language::languageList($this->company_id));
     }
 
     public function closed()
@@ -259,6 +276,7 @@ class Index extends Controller
         $this->page_code = 'index';
         //产品中心
         $product_category_list = Xccmsproductcategory::field('id,name')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->where('is_recommend', 1)
             ->order('weigh desc')
@@ -266,6 +284,7 @@ class Index extends Controller
         foreach($product_category_list as $i=>$item)
         {
             $product_category_list[$i]['product_list'] = Xccmsproductinfo::field('id,title,list_image,description')
+                ->where('company_id',$this->company_id)
                 ->where('category_id', $item['id'])
                 ->where('state', 1)
                 ->where('is_recommend', 1)
@@ -276,6 +295,7 @@ class Index extends Controller
         //新闻
         $news_limit = $this->site_config['theme'] == 'theme1' ? 4 : 6;
         $news_list = Xccmsnewsinfo::field('id,title,list_image,description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('id desc')
             ->limit($news_limit)
@@ -283,6 +303,7 @@ class Index extends Controller
 
         //友情链接
         $friendlink_list = Xccmsfriendlink::field('id,name,url')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('weigh desc')
             ->select();
@@ -308,6 +329,7 @@ class Index extends Controller
         $page = input('page', 1);
 
         $news_list = Xccmsnewsinfo::field('id,title,list_image,description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('id desc')
             ->paginate(10,false,array('query'=>array()));
@@ -335,6 +357,7 @@ class Index extends Controller
         }
 
         $model = Xccmsnewsinfo::field('id,title,content,visits,seo_title,seo_keywords,seo_description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('id', $id)
             ->where('state', 1)
             ->find();
@@ -345,8 +368,16 @@ class Index extends Controller
         }
         $model['seo_title'] = $model['seo_title'] ? $model['seo_title'] : $model['title'];
 
-        $prev_model = Xccmsnewsinfo::field('id,title')->where('id', '<', $id)->where('state', 1)->order('id desc')->find();
-        $next_model = Xccmsnewsinfo::field('id,title')->where('id', '>', $id)->where('state', 1)->find();
+        $prev_model = Xccmsnewsinfo::field('id,title')
+            ->where('company_id',$this->company_id)
+            ->where('id', '<', $id)
+            ->where('state', 1)
+            ->order('id desc')->find();
+        $next_model = Xccmsnewsinfo::field('id,title')
+            ->where('company_id',$this->company_id)
+            ->where('id', '>', $id)
+            ->where('state', 1)
+            ->find();
 
         $this->add_visits('news', $model['id'], $model['visits']);
 
@@ -373,6 +404,7 @@ class Index extends Controller
         }
 
         $model = Xccmscontentcategory::field('id,name,seo_title,seo_keywords,seo_description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('id', $id)
             ->where('state', 1)
             ->find();
@@ -384,6 +416,7 @@ class Index extends Controller
         $model['seo_title'] = $model['seo_title'] ? $model['seo_title'] : $model['name'];
 
         $info_list = Xccmscontentinfo::field('id,title,list_image,description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('category_id', $id)
             ->where('state', 1)
             ->order('id desc')
@@ -401,7 +434,7 @@ class Index extends Controller
         $this->view->assign('pagenav', $pagenav);
         return $this->view->fetch($this->site_config['theme'] . '/index/info');
     }
-    
+
     public function info_detail()
     {
         $id = input('id', 0);
@@ -413,6 +446,7 @@ class Index extends Controller
         }
 
         $model = Xccmscontentinfo::field('id,category_id,title,content,visits,seo_title,seo_keywords,seo_description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('id', $id)
             ->where('state', 1)
             ->find();
@@ -424,18 +458,21 @@ class Index extends Controller
         $model['seo_title'] = $model['seo_title'] ? $model['seo_title'] : $model['title'];
 
         $prev_model = Xccmscontentinfo::field('id,title')
+            ->where('company_id',$this->company_id)
             ->where('id', '<', $id)
             ->where('category_id', $model['category_id'])
             ->where('state', 1)
             ->order('id desc')
             ->find();
         $next_model = Xccmscontentinfo::field('id,title')
+            ->where('company_id',$this->company_id)
             ->where('id', '>', $id)
             ->where('category_id', $model['category_id'])
             ->where('state', 1)
             ->find();
 
         $category_model = Xccmscontentcategory::field('id,name')
+            ->where('company_id',$this->company_id)
             ->where('id', $model['category_id'])
             ->find();
 
@@ -467,6 +504,7 @@ class Index extends Controller
         }
 
         $model = Xccmsproductcategory::field('id,name,seo_title,seo_keywords,seo_description,createtime')
+            ->where('company_id',$this->company_id)
             ->where($where)
             ->where('state', 1)
             ->find();
@@ -478,6 +516,7 @@ class Index extends Controller
         $model['seo_title'] = $model['seo_title'] ? $model['seo_title'] : $model['name'];
 
         $product_category_list = Xccmsproductcategory::field('id,name')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('weigh desc')
             ->select();
@@ -489,12 +528,14 @@ class Index extends Controller
         foreach($product_category_list as $i=>$item)
         {
             $product_category_list[$i]['product_count'] = Xccmsproductinfo::field('id')
+                ->where('company_id',$this->company_id)
                 ->where('category_id', $item['id'])
                 ->where('state', 1)
                 ->count();
         }
 
         $product_list = Xccmsproductinfo::field('id,title,list_image,price,description')
+            ->where('company_id',$this->company_id)
             ->where('category_id', $model['id'])
             ->where('state', 1)
             ->order('weigh desc')
@@ -525,6 +566,7 @@ class Index extends Controller
         }
 
         $model = Xccmsproductinfo::field('id,category_id,title,description,banners,summary,price,content,visits,seo_title,seo_keywords,seo_description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('id', $id)
             ->where('state', 1)
             ->find();
@@ -559,6 +601,7 @@ class Index extends Controller
         }
 
         $model = Xccmspageinfo::field('id,title,content,visits,seo_title,seo_keywords,seo_description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('id', $id)
             ->where('state', 1)
             ->find();
@@ -585,6 +628,7 @@ class Index extends Controller
     {
         $this->page_code = 'partner';
         $partner_list = Xccmspartnerlink::field('id,name,url,list_image')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('weigh desc')
             ->select();
@@ -597,7 +641,7 @@ class Index extends Controller
         $this->view->assign('partner_list', $partner_list);
         return $this->view->fetch($this->site_config['theme'] . '/index/partner');
     }
-    
+
     public function about_us()
     {
         $this->page_code = 'aboutus';
@@ -605,7 +649,7 @@ class Index extends Controller
         $this->view->assign('page_id', $this->page_id);
         $this->view->assign('seo_title', '关于我们 - ' . $this->site_config['seo_title']);
         $this->view->assign('seo_keywords', '关于我们 - ' . $this->site_config['seo_keywords']);
-        $this->view->assign('seo_description', '关于我们 - ' . $this->site_config['seo_description']);        
+        $this->view->assign('seo_description', '关于我们 - ' . $this->site_config['seo_description']);
         return $this->view->fetch($this->site_config['theme'] . '/index/about_us');
     }
 
@@ -626,6 +670,7 @@ class Index extends Controller
         $page = input('page', 1);
 
         $job_list = Xccmsjobinfo::field('id,name,list_image,description,createtime')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('weigh desc, id desc')
             ->paginate(10,false,array('query'=>array()));
@@ -653,6 +698,7 @@ class Index extends Controller
         }
 
         $model = Xccmsjobinfo::field('id,name,content,visits,createtime')
+            ->where('company_id',$this->company_id)
             ->where('id', $id)
             ->where('state', 1)
             ->find();
@@ -664,8 +710,12 @@ class Index extends Controller
 
         $this->add_visits('job', $model['id'], $model['visits']);
 
-        $prev_model = Xccmsjobinfo::field('id,name')->where('id', '<', $id)->where('state', 1)->order('weigh desc, id desc')->find();
-        $next_model = Xccmsjobinfo::field('id,name')->where('id', '>', $id)->where('state', 1)->order('weigh desc')->find();
+        $prev_model = Xccmsjobinfo::field('id,name')
+            ->where('company_id',$this->company_id)
+            ->where('id', '<', $id)->where('state', 1)->order('weigh desc, id desc')->find();
+        $next_model = Xccmsjobinfo::field('id,name')
+            ->where('company_id',$this->company_id)
+            ->where('id', '>', $id)->where('state', 1)->order('weigh desc')->find();
 
         $this->view->assign('page_code', $this->page_code);
         $this->view->assign('page_id', $this->page_id);
@@ -698,6 +748,7 @@ class Index extends Controller
         $this->page_id = input('id', 0);
 
         $faq_list = Xccmsfaq::field('id,question,answer')
+            ->where('company_id',$this->company_id)
             ->where('state', 1)
             ->order('weigh desc, id desc')
             ->select();
@@ -782,6 +833,7 @@ class Index extends Controller
             }
 
             Xccmsguestbook::insert([
+                'company_id' => $this->company_id,
                 'guest_book_type'=>$page_code == 'info' ? 'content' : $page_code,
                 'resource_id'=>$res_id,
                 'realname'=>$realname,
