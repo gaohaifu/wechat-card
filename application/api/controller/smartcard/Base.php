@@ -40,7 +40,7 @@ class Base extends Api
     {
         parent::_initialize();
         $this->categoryModel=new Category;
-        $this->companyModel=new Company;
+        $this->companyModel=new \addons\myadmin\model\Company;
         $this->designModel=new Design;
         $this->casesModel=new Cases;
         $this->goodsModel=new Goods;
