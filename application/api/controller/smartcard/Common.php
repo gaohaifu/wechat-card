@@ -170,28 +170,28 @@ class Common extends Base
      **/
     public function smartcardfind(){
         $Staff = new Staff();
-        $staff_id = $this->user_id;
-        if($staff_id == ''){
+        $user_id = $this->user_id;
+        if($user_id == ''){
             $this->error('未找到相关员工信息');
         }
-        $config = get_addon_config('smartcard');
+//        $config = get_addon_config('smartcard');
         
         $staffres = $Staff
-            ->with(['user','smartcardcompany'])
-            ->where('user_id',$staff_id)
+//            ->with(['user','smartcardcompany'])
+            ->where('user_id',$user_id)
             ->select();
-          if($staffres){
-            $staffres=collection($staffres)->toArray();
-            if($this->is_url($staffres[0]['user']['avatar'])==0){
-                   //$staffres[0]['user']['avatarimage']=letter_avatar($staffres[0]['name']);
-                   $staffres[0]['user']['avatar']=letter_avatar($staffres[0]['name']);
-                  }
-            if($this->is_url($staffres[0]['user']['avatar'])==2){
-                  $staffres[0]['user']['avatar']=cdnUrl($staffres[0]['user']['avatar'],true);
-                  //$staffres[0]['user']['avatarimage']=cdnUrl($staffres[0]['user']['avatarimage'],true);
-              }
-             $staffres[0]['platform_status']=2;
-        }  
+//        if($staffres){
+//            $staffres=collection($staffres)->toArray();
+//            if($this->is_url($staffres[0]['user']['avatar'])==0){
+//                   //$staffres[0]['user']['avatarimage']=letter_avatar($staffres[0]['name']);
+//                   $staffres[0]['user']['avatar']=letter_avatar($staffres[0]['name']);
+//                  }
+//            if($this->is_url($staffres[0]['user']['avatar'])==2){
+//                  $staffres[0]['user']['avatar']=cdnUrl($staffres[0]['user']['avatar'],true);
+//                  //$staffres[0]['user']['avatarimage']=cdnUrl($staffres[0]['user']['avatarimage'],true);
+//              }
+//             $staffres[0]['platform_status']=2;
+//        }
         $this->success('查询成功',$staffres);  
     }
 

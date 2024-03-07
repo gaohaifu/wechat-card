@@ -47,12 +47,12 @@ class Staff extends Model
     {
         return $this->belongsTo('app\admin\model\User', 'user_id', 'id', [], 'LEFT')->setEagerlyType(0);
     }
-     public function smartcardtheme()
+    public function smartcardtheme()
     {
         return $this->belongsTo('app\admin\model\smartcard\Theme', 'theme_id', 'id', [], 'LEFT')->setEagerlyType(0);
     }
-     public function smartcardcompany()
+    public function smartcardcompany()
     {
-        return $this->belongsTo('app\admin\model\smartcard\Company', 'company_id', 'id', [], 'LEFT')->setEagerlyType(0);
+        return $this->belongsTo('\addons\myadmin\model\Company', 'company_id', 'id', [], 'LEFT')->setEagerlyType(0);
     }
 }
