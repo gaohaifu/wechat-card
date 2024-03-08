@@ -177,7 +177,9 @@ class Common extends Base
 //        $config = get_addon_config('smartcard');
         
         $staffres = $Staff
-//            ->with(['user','smartcardcompany'])
+            ->with(['smartcardcompany' => function($query) {
+                $query->withField('id,name,address_area');
+            }])
             ->where('user_id',$user_id)
             ->select();
 //        if($staffres){

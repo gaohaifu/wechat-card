@@ -224,9 +224,11 @@ class User extends Base
             $staffInfo=[];
             if($staffInfos){
                 $isStaff=1;
-                $staffInfo=$staffInfo;
+//                $staffInfo = $staffInfos;
             }
-            $data = ['userinfo' => $this->auth->getUserinfo(),'auth' => $this->auth->getUserinfo(),'isStaff'=>$isStaff,'staffInfo'=>$staffInfo];
+            $data = ['userinfo' => $this->auth->getUserinfo(),'isStaff'=>$isStaff,
+//                'staffInfo'=>$staffInfo
+            ];
             $this->success(__('登录成功'), $data);
         } else {
             $this->error($this->auth->getError());
@@ -282,8 +284,7 @@ class User extends Base
         $ret = $this->auth->register($username, $password, $email, $mobile, []);
         if ($ret) {
             $auth = $this->auth->getUserinfo();
-            $user = $this->getUserInfo($auth['user_id']);
-            $data = ['auth' => $auth, 'user' => $user];
+            $data = ['userinfo' => $auth];
             $this->success(__('注册成功'), $data);
         } else {
             $this->error($this->auth->getError());
@@ -311,6 +312,7 @@ class User extends Base
         $res = $company
             ->where($where)
             ->page($page,$limit)
+            ->field('id,name')
             ->select();
         $this->success('查询成功',$res);
     }
@@ -380,10 +382,8 @@ class User extends Base
     {
         //var_dump($this->auth->isLogin());exit;
         if ($this->auth->isLogin()) {
-            $user_id=$this->auth->id;
             $auth = $this->auth->getUserinfo();
-            $user = $this->getUserInfo($auth['user_id']);
-            $data = ['auth' => $auth, 'user' => $user];
+            $data = [ 'user' => $auth];
             $this->success(__('Refresh successful'), $data);
         } else {
             $this->error(__('请先登录'));

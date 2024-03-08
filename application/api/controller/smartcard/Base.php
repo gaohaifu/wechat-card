@@ -164,10 +164,14 @@ class Base extends Api
         if (!empty($staff_id)) {
             $where['staff.id'] = $staff_id;
             $staffInfo         = $this->staffModel
-                ->with(['smartcardcompany', 'smartcardtheme'])
+                ->with(['smartcardcompany' => function($query) {
+                    $query->withField('id,name,address_area');
+                }, 'smartcardtheme' => function($query) {
+                    $query->withField('id,colour,backgroundimage,name,cardimage,fontcolor');
+                }])
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
-                ->find();
+                ->find()->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
             if (!is_null($staffInfo)) {
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {
