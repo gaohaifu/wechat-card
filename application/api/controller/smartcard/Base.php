@@ -64,6 +64,14 @@ class Base extends Api
     public function staffData($staff_id = 0, $user_id = 0)
     {
         $data['usertype'] = 0;
+        if($user_id){
+            $editpower = $this->companyModel
+                ->where('id',$user_id)
+                ->select();
+            if($editpower){
+                $data['usertype'] = 1;
+            }
+        }
         $staffInfo = [];
         if ($staff_id == 0) {
             //如果员工id为空，默认显示当前登录用户对应的名片信息
@@ -77,43 +85,71 @@ class Base extends Api
             $staffInfo  = $this->myData($staff_id);
             if ($staffInfo) {
                 //访问类型:1=访问员工主页,2=访问企业主页,3=访问企业宣传册,4=访问案例,5=查看企业商品,6=查看企业动态,7=点赞员工,8=点赞其他备用,9=点赞其他备用2
-                //如果有登录信息，就记录一条登录记录
+                //如果登录信息与名片用户不一致，就记录一条登录记录
                 if ($user_id) {
-                    $wheres = [
-                        'staff_id' => $staff_id,
-                        'user_id'  => $user_id,
-                        'typedata' => 1,
-                    ];
-                    
-                    $datam = $this->visitorsModel->where($wheres)->find();
-                    if (!is_null($datam)) {
-                        $wheres['createtime'] = time();
+                    if ($staffInfo['user_id']!=$user_id) {
+                        $visitor = [
+                            'staff_id' => $staff_id,
+                            'user_id'  => $user_id,
+                            'typedata' => 1,
+                            'company_id' => $staffInfo['company_id'],
+                            'createtime' => time(),
+                        ];
                         //增加一条访问记录
-                        $res = $this->visitorsModel->save($wheres);
+                        $res = $this->visitorsModel->save($visitor);
                     }
                 }
                 //
-                $visitStaffNum = $this->visitorsModel
+                $allVisitNum = $this->visitorsModel
                     ->alias('A')
                     ->join('user B', 'A.user_id=B.id')
                     ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
                     ->group('A.user_id')
                     ->field('A.user_id')
                     ->count();
-                
+                $todayVisitNum = $this->visitorsModel
+                    ->alias('A')
+                    ->join('user B', 'A.user_id=B.id')
+                    ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+                    ->whereTime('A.createtime', 'today')
+                    ->group('A.user_id')
+                    ->field('A.user_id')
+                    ->count();
                 $visitStaffLists   = $this->visitorsModel
                     ->alias('A')
                     ->join('user B', 'A.user_id=B.id')
                     ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
-                    ->field('A.user_id')
-                    ->field("GROUP_CONCAT(concat_ws('#',A.id,A.user_id,A.id,A.createtime,B.avatar) separator'|') AS group_combo")
+                    ->field('A.user_id,B.avatar,A.createtime')
                     ->group('A.user_id')
                     ->limit(10)
-                    //->order('A.createtime','desc')
+                    ->order('A.createtime','desc')
                     ->select();
-                
+                $text = $staffInfo->smartcardcompany->name.'-'.$staffInfo->position;
+                foreach ($visitStaffLists as &$visitStaffList) {
+                    $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
+                    $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id])->find();
+                    if($staff){
+                        $visitStaffList->name = $staff['name'];
+                        $visitStaffList->position = $staff['position'];
+                        $visitStaffList->company = $staff->smartcardcompany->name;
+                    }else{
+                        $visitStaffList->name = null;
+                        $visitStaffList->position = null;
+                        $visitStaffList->company = null;
+                    }
+                    
+                    $VisitNum = $this->visitorsModel
+                        ->where(['staff_id' => $staff_id, 'typedata' => '1', 'user_id' => $visitStaffList->user_id])
+                        ->count();
+                    $visitStaffList->visitNum = $VisitNum;
+                    $visitStaffList->myCard = $text;
+                }
                 $data['staffInfo']             = $staffInfo;//员工基本信息
-                $data['visitStaffNum']         = $visitStaffNum;//访问员工主页数量
+                $data['myCardData'] = [
+                    'allVisitNum'=>$allVisitNum,
+                    'todayVisitNum'=>$todayVisitNum,
+                    'sendCardNum'=>1,
+                ];
                 $data['visitStaffLists']       = $visitStaffLists;//访问员工主页人员的记录信息，最多10条返回
                 return $data;
             } else {
@@ -171,7 +207,8 @@ class Base extends Api
                 }])
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
-                ->find()->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
+                ->find();
+                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
             if (!is_null($staffInfo)) {
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {

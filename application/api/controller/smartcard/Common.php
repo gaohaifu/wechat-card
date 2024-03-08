@@ -290,7 +290,6 @@ class Common extends Base
      * @param string $avatar 头像
      **/
     public function applyStaffAdd(){
-        $Company = new Company();
         $Staff = new Staff();        
         $data = $this->request->request();
         $login_id = $this->user_id;
