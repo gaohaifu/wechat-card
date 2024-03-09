@@ -1,6 +1,9 @@
 <?php
 
 namespace app\api\controller\smartcard;
+use addons\myadmin\model\Domain;
+use app\admin\model\Xccmsmenuinfo;
+use app\admin\model\Xccmssiteconfig;
 use app\common\controller\Api;
 use app\admin\model\smartcard\Category;
 use app\admin\model\smartcard\Company;
@@ -59,9 +62,9 @@ class Base extends Api
     /**
      * 获取首页数据
      *
-     * @param string $type 代表分类id
+     * @param string $type 代表分类id 0=首页 1=首页-分享
      */
-    public function staffData($staff_id = 0, $user_id = 0)
+    public function staffData($staff_id = 0, $user_id = 0, int $type = 0)
     {
         $data['usertype'] = 0;
         if($user_id){
@@ -84,6 +87,7 @@ class Base extends Api
         if ($staff_id != 0) {
             $staffInfo  = $this->myData($staff_id);
             if ($staffInfo) {
+                $data['staffInfo']             = $staffInfo;//员工基本信息
                 //访问类型:1=访问员工主页,2=访问企业主页,3=访问企业宣传册,4=访问案例,5=查看企业商品,6=查看企业动态,7=点赞员工,8=点赞其他备用,9=点赞其他备用2
                 //如果登录信息与名片用户不一致，就记录一条登录记录
                 if ($user_id) {
@@ -99,58 +103,80 @@ class Base extends Api
                         $res = $this->visitorsModel->save($visitor);
                     }
                 }
-                //
-                $allVisitNum = $this->visitorsModel
-                    ->alias('A')
-                    ->join('user B', 'A.user_id=B.id')
-                    ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
-                    ->group('A.user_id')
-                    ->field('A.user_id')
-                    ->count();
-                $todayVisitNum = $this->visitorsModel
-                    ->alias('A')
-                    ->join('user B', 'A.user_id=B.id')
-                    ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
-                    ->whereTime('A.createtime', 'today')
-                    ->group('A.user_id')
-                    ->field('A.user_id')
-                    ->count();
-                $visitStaffLists   = $this->visitorsModel
-                    ->alias('A')
-                    ->join('user B', 'A.user_id=B.id')
-                    ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
-                    ->field('A.user_id,B.avatar,A.createtime')
-                    ->group('A.user_id')
-                    ->limit(10)
-                    ->order('A.createtime','desc')
-                    ->select();
-                $text = $staffInfo->smartcardcompany->name.'-'.$staffInfo->position;
-                foreach ($visitStaffLists as &$visitStaffList) {
-                    $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
-                    $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id])->find();
-                    if($staff){
-                        $visitStaffList->name = $staff['name'];
-                        $visitStaffList->position = $staff['position'];
-                        $visitStaffList->company = $staff->smartcardcompany->name;
-                    }else{
-                        $visitStaffList->name = null;
-                        $visitStaffList->position = null;
-                        $visitStaffList->company = null;
+                //首页
+                if($type==0){
+                    $allVisitNum = $this->visitorsModel
+                        ->alias('A')
+                        ->join('user B', 'A.user_id=B.id')
+                        ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+//                    ->group('A.user_id')
+                        ->field('A.user_id')
+                        ->count();
+                    $todayVisitNum = $this->visitorsModel
+                        ->alias('A')
+                        ->join('user B', 'A.user_id=B.id')
+                        ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+                        ->whereTime('A.createtime', 'today')
+//                    ->group('A.user_id')
+                        ->field('A.user_id')
+                        ->count();
+                    $visitStaffLists   = $this->visitorsModel
+                        ->alias('A')
+                        ->join('user B', 'A.user_id=B.id')
+                        ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+                        ->field('A.user_id,B.avatar,A.createtime')
+                        ->group('A.user_id')
+                        ->limit(10)
+                        ->order('A.createtime','desc')
+                        ->select();
+                    $text = $staffInfo->smartcardcompany->name.'-'.$staffInfo->position;
+                    foreach ($visitStaffLists as &$visitStaffList) {
+                        $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
+                        $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id])->find();
+                        if($staff){
+                            $visitStaffList->name = $staff['name'];
+                            $visitStaffList->position = $staff['position'];
+                            $visitStaffList->company = $staff->smartcardcompany->name;
+                        }else{
+                            $visitStaffList->name = null;
+                            $visitStaffList->position = null;
+                            $visitStaffList->company = null;
+                        }
+        
+                        $VisitNum = $this->visitorsModel
+                            ->where(['staff_id' => $staff_id, 'typedata' => '1', 'user_id' => $visitStaffList->user_id])
+                            ->count();
+                        $visitStaffList->visitNum = $VisitNum;
+                        $visitStaffList->myCardText = $text;
                     }
                     
-                    $VisitNum = $this->visitorsModel
-                        ->where(['staff_id' => $staff_id, 'typedata' => '1', 'user_id' => $visitStaffList->user_id])
-                        ->count();
-                    $visitStaffList->visitNum = $VisitNum;
-                    $visitStaffList->myCard = $text;
+                    $data['myCardData'] = [
+                        'allVisitNum'=>$allVisitNum,
+                        'todayVisitNum'=>$todayVisitNum,
+                        'sendCardNum'=>1,
+                    ];
+                    $data['visitStaffLists']       = $visitStaffLists;//访问员工主页人员的记录信息，最多10条返回
                 }
-                $data['staffInfo']             = $staffInfo;//员工基本信息
-                $data['myCardData'] = [
-                    'allVisitNum'=>$allVisitNum,
-                    'todayVisitNum'=>$todayVisitNum,
-                    'sendCardNum'=>1,
-                ];
-                $data['visitStaffLists']       = $visitStaffLists;//访问员工主页人员的记录信息，最多10条返回
+                
+                $siteconfig = Xccmssiteconfig::where(['company_id'=>$staffInfo['company_id']])->value('json_data');
+                $siteconfigData = json_decode($siteconfig, true);
+                $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
+                $videofiles=[];
+                if(isset($siteconfigData['videofiles'])){
+                    $videofiles=explode(',',$siteconfigData['videofiles']);
+                    if($videofiles){
+                        foreach ($videofiles as &$videofile) {
+                            $videofile = cdnurl($videofile,true);
+                        }
+                        
+                    }
+                }
+                if($type==1){
+                    $data['services'] = $this->getMenu($staffInfo['company_id']);
+                }
+                
+                $data['videofiles'] = $videofiles;
+                $data['description'] = $siteconfigData['description'];
                 return $data;
             } else {
                 $this->error('没有该员工信息');
@@ -161,6 +187,109 @@ class Base extends Api
         }
         
         
+    }
+    
+    /**
+     * 获取官网菜单
+     */
+    public function getMenu($company_id)
+    {
+//        $domain = Domain::where(['company_id'=>$company_id])->value('name');
+        //菜单
+        $main_menu_list = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,parent_id,name,en_name,menu_type,menu_object_id,url')
+            ->where('parent_id', 0)
+            ->where('is_top_show', 1)
+            ->where('state', 1)
+            ->order('weigh desc')
+            ->select();
+        foreach($main_menu_list as $i=>$item)
+        {
+            $main_menu_item_url = 'javascript:;';
+            switch($item['menu_type'])
+            {
+                case 'index':
+                    $main_menu_item_url = addon_url('xccms/index/index',[],true,true);
+                    break;
+                case 'partner':
+                case 'job':
+                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type'],[],true,true);
+                    break;
+                case 'page':
+                    $main_menu_item_url = addon_url('xccms/index/page', [':id'=>$item['menu_object_id']],true,true);
+                    break;
+                case 'news':
+                    $main_menu_item_url = addon_url('xccms/index/news',[],true,true);
+                    break;
+                case 'link':
+                    $main_menu_item_url = $item['url'];
+                    break;
+                case 'product':
+                    $main_menu_item_url = addon_url('xccms/index/product', [':id'=>$item['menu_object_id']],true,true);
+                    break;
+                case 'content':
+                    $main_menu_item_url = addon_url('xccms/index/info', [':id'=>$item['menu_object_id']],true,true);
+                    break;
+                case 'aboutus':
+                    $main_menu_item_url = addon_url('xccms/index/about_us',[],true,true);
+                    break;
+                case 'contactus':
+                    $main_menu_item_url = addon_url('xccms/index/contact_us',[],true,true);
+                    break;
+                case 'faq':
+                    $main_menu_item_url = addon_url('xccms/index/faq',[],true,true);
+                    break;
+            }
+            $sub_menu = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,name,menu_type,menu_object_id,url')
+                ->where('parent_id', $item['id'])
+                ->where('is_top_show', 1)
+                ->where('state', 1)
+                ->order('weigh desc')
+                ->select();
+            foreach($sub_menu as $s=>$sitem)
+            {
+                $sub_menu_item_url = 'javascript:;';
+                switch($sitem['menu_type'])
+                {
+                    case 'index':
+                        $sub_menu_item_url = addon_url('xccms/index/index',[],true,true);
+                        break;
+                    case 'partner':
+                    case 'job':
+                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type'],[],true,true);
+                        break;
+                    case 'page':
+                        $sub_menu_item_url = addon_url('xccms/index/page', [':id'=>$sitem['menu_object_id']],true,true);
+                        break;
+                    case 'news':
+                        $sub_menu_item_url = addon_url('xccms/index/news',[],true,true);
+                    case 'link':
+                        $sub_menu_item_url = $item['url'];
+                        break;
+                    case 'product':
+                        $sub_menu_item_url = addon_url('xccms/index/product', [':id'=>$sitem['menu_object_id']],true,true);
+                        break;
+                    case 'content':
+                        $sub_menu_item_url = addon_url('xccms/index/info', [':id'=>$sitem['menu_object_id']],true,true);
+                        break;
+                    case 'aboutus':
+                        $sub_menu_item_url = addon_url('xccms/index/about_us',[],true,true);
+                        break;
+                    case 'contactus':
+                        $sub_menu_item_url = addon_url('xccms/index/contact_us',[],true,true);
+                        break;
+                    case 'faq':
+                        $sub_menu_item_url = addon_url('xccms/index/faq',[],true,true);
+                        break;
+                }
+                $sub_menu[$s]['url'] = $sub_menu_item_url;
+            }
+        
+            $main_menu_item_url = count($sub_menu) > 0 ? 'javascript:;' : $main_menu_item_url;
+        
+            $main_menu_list[$i]['url'] = $main_menu_item_url;
+            $main_menu_list[$i]['sub_menu'] = $sub_menu;
+        }
+        return $main_menu_list;
     }
 /**
 * 企业具体基本信息
@@ -201,14 +330,14 @@ class Base extends Api
             $where['staff.id'] = $staff_id;
             $staffInfo         = $this->staffModel
                 ->with(['smartcardcompany' => function($query) {
-                    $query->withField('id,name,address_area');
+                    $query->withField('id,name,address,longitude,latitude,is_authentication');
                 }, 'smartcardtheme' => function($query) {
                     $query->withField('id,colour,backgroundimage,name,cardimage,fontcolor');
                 }])
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
                 ->find();
-                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
+                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata','id_card_face','id_card_reverse']);
             if (!is_null($staffInfo)) {
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {
