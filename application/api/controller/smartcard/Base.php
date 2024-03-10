@@ -2,6 +2,7 @@
 
 namespace app\api\controller\smartcard;
 use addons\myadmin\model\Domain;
+use app\admin\model\smartcard\Su;
 use app\admin\model\Xccmsmenuinfo;
 use app\admin\model\Xccmssiteconfig;
 use app\common\controller\Api;
@@ -64,9 +65,10 @@ class Base extends Api
      *
      * @param string $type 代表分类id 0=首页 1=首页-分享
      */
-    public function staffData($staff_id = 0, $user_id = 0, int $type = 0)
+    public function staffData($staff_id = 0, $user_id = 0, int $type = 0,$origin=0)
     {
         $data['usertype'] = 0;
+        $data['save_status'] = 0;
         if($user_id){
             $editpower = $this->companyModel
                 ->where('id',$user_id)
@@ -91,11 +93,20 @@ class Base extends Api
                 //访问类型:1=访问员工主页,2=访问企业主页,3=访问企业宣传册,4=访问案例,5=查看企业商品,6=查看企业动态,7=点赞员工,8=点赞其他备用,9=点赞其他备用2
                 //如果登录信息与名片用户不一致，就记录一条登录记录
                 if ($user_id) {
+                    if($type==1){
+                        $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
+                        $data['save_status'] = 0;
+                        if($su) $data['save_status'] = $su['status'];
+                    }
                     if ($staffInfo['user_id']!=$user_id) {
+                        if ($origin == 0) {
+                            $this->error('访问来源不能为空');
+                        }
                         $visitor = [
                             'staff_id' => $staff_id,
                             'user_id'  => $user_id,
                             'typedata' => 1,
+                            'origin' => $origin,
                             'company_id' => $staffInfo['company_id'],
                             'createtime' => time(),
                         ];
@@ -124,7 +135,7 @@ class Base extends Api
                         ->alias('A')
                         ->join('user B', 'A.user_id=B.id')
                         ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
-                        ->field('A.user_id,B.avatar,A.createtime')
+                        ->field('A.user_id,B.avatar,A.createtime,A.origin')
                         ->group('A.user_id')
                         ->limit(10)
                         ->order('A.createtime','desc')
@@ -153,7 +164,7 @@ class Base extends Api
                     $data['myCardData'] = [
                         'allVisitNum'=>$allVisitNum,
                         'todayVisitNum'=>$todayVisitNum,
-                        'sendCardNum'=>1,
+                        'sendCardNum'=>$staffInfo['send_num'],
                     ];
                     $data['visitStaffLists']       = $visitStaffLists;//访问员工主页人员的记录信息，最多10条返回
                 }

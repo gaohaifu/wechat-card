@@ -1,6 +1,7 @@
 <?php
 
 namespace app\api\controller\smartcard;
+use app\admin\model\smartcard\Su;
 use app\common\controller\Api;
 use app\api\controller\smartcard\Base;
 use app\admin\model\smartcard\Goods;
@@ -60,8 +61,9 @@ class Common extends Base
     {   
         $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
         $user_id = $this->request->request("user_id");
+        $origin = $this->request->request("origin");
   
-        $list = $this->staffData($staff_id,$user_id,0);
+        $list = $this->staffData($staff_id,$user_id,0,$origin);
         $this->success('请求成功', $list);
     }
     
@@ -74,9 +76,140 @@ class Common extends Base
     {
         $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
         $user_id = $this->request->request("user_id");
+        $origin = $this->request->request("origin");
         
-        $list = $this->staffData($staff_id,$user_id,1);
+        $list = $this->staffData($staff_id,$user_id,1,$origin);
         $this->success('请求成功', $list);
+    }
+    
+    /**
+     * 发名片回调
+     * @param string $staff_id
+     *
+     */
+    public function sendCard()
+    {
+        $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
+        $Staff = new Staff();
+        if($staff_id == ''){
+            $this->success('staff_id不能为空');
+        }else{
+            $res = $Staff->where('id', $staff_id)->setInc('send_num');
+            if($res!==false){
+                //更新成功
+                $this->success('发送成功');
+            }else{
+                //更新失败
+                $this->error('发送失败');
+            }
+        }
+    }
+    
+    /**
+     * 保存名片
+     * @param string $staff_id
+     * @param string $user_id
+     *
+     */
+    public function saveCard()
+    {
+        $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
+        $user_id = $this->request->request("user_id");
+        
+        $Staff = new Staff();
+        if($staff_id == ''){
+            $this->success('staff_id不能为空');
+        }else{
+            $staff = $Staff->where('id', $staff_id)->find();
+            if($staff){
+                $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
+                if($su){
+                    $this->error('名片已保存');
+                }else{
+                    $Su = new Su();
+                    $staffdata = $Su->alias('s')->join('staff f', 's.staff_id=f.id')->
+                    where(['s.user_id'=>$staff['user_id'],
+                           'f.user_id'=>$user_id,
+                           'f.is_default'=>1,
+                           's.status'=>['in',[2,3]],
+                    ])->find();
+                    if($staffdata){
+                        $staffdata->status = 4;
+                        $staffdata->save();
+                        $Su->save([
+                            'user_id'=>$user_id,
+                            'staff_id'=>$staff_id,
+                            'status'=>4,
+                            'staff_user_id'=>$staff['user_id'],
+                        ]);
+                    }else{
+                        $Su->save([
+                            'user_id'=>$user_id,
+                            'staff_id'=>$staff_id,
+                            'status'=>2,
+                            'staff_user_id'=>$staff['user_id'],
+                        ]);
+                    }
+                }
+                $this->success('名片保存成功');
+            }else{
+                $this->error('名片不存在');
+            }
+        }
+    }
+    
+    /**
+     * 回递名片
+     * @param string $staff_id
+     * @param string $user_id
+     *
+     */
+    public function resendCard()
+    {
+        $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
+        $user_id = $this->request->request("user_id");
+        
+        $Staff = new Staff();
+        if($staff_id == ''){
+            $this->success('staff_id不能为空');
+        }else{
+            //对方名片信息
+            $staff = $Staff->where('id', $staff_id)->find();
+            //己方名片信息
+            $selfstaff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
+            if($staff){
+                //己方保存的名片
+                $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
+                if($su && $su['status']>=2){
+                    if($su['status']==3){
+                        $this->success('名片已回递');
+                    }
+                    //对方保存的名片
+                    $othersu = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$selfstaff['id']])->find();
+                    if($othersu){
+                        $othersu->status = 4;
+                        $othersu->save();
+                        $su->status = 4;
+                        $su->save();
+                    }else{
+                        $Su = new Su();
+                        $Su->save([
+                            'user_id'=>$staff['user_id'],
+                            'staff_id'=>$selfstaff['id'],
+                            'status'=>1,
+                            'staff_user_id'=>$user_id,
+                        ]);
+                        $su->status = 3;
+                        $su->save();
+                    }
+                    $this->success('名片已回递');
+                }else{
+                    $this->error('未保存名片，不能回递');
+                }
+            }else{
+                $this->error('名片不存在');
+            }
+        }
     }
     
     /**
