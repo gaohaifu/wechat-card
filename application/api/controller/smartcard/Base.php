@@ -81,7 +81,7 @@ class Base extends Api
         if ($staff_id == 0) {
             //如果员工id为空，默认显示当前登录用户对应的名片信息
             if ($user_id != 0) {
-                $staff_id = $this->staffModel->where(['user_id' => $user_id])->value('id');
+                $staff_id = $this->staffModel->where(['user_id' => $user_id,'is_default' => 1])->value('id');
             } else {
                 $this->error('未登录且无员工ID');
             }
@@ -131,6 +131,7 @@ class Base extends Api
 //                    ->group('A.user_id')
                         ->field('A.user_id')
                         ->count();
+
                     $visitStaffLists   = $this->visitorsModel
                         ->alias('A')
                         ->join('user B', 'A.user_id=B.id')
@@ -140,15 +141,17 @@ class Base extends Api
                         ->limit(10)
                         ->order('A.createtime','desc')
                         ->select();
-                    $text = $staffInfo->smartcardcompany->name.'-'.$staffInfo->position;
+
                     foreach ($visitStaffLists as &$visitStaffList) {
                         $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
-                        $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id])->find();
+                        $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
                         if($staff){
+                            $visitStaffList->staff_id = $staff['id'];
                             $visitStaffList->name = $staff['name'];
                             $visitStaffList->position = $staff['position'];
                             $visitStaffList->company = $staff->smartcardcompany->name;
                         }else{
+                            $visitStaffList->staff_id = null;
                             $visitStaffList->name = null;
                             $visitStaffList->position = null;
                             $visitStaffList->company = null;
@@ -157,8 +160,14 @@ class Base extends Api
                         $VisitNum = $this->visitorsModel
                             ->where(['staff_id' => $staff_id, 'typedata' => '1', 'user_id' => $visitStaffList->user_id])
                             ->count();
-                        $visitStaffList->visitNum = $VisitNum;
-                        $visitStaffList->myCardText = $text;
+                        $visitStaffList['interviewee'] = [
+                            'visitNum'=>$VisitNum,
+                            'companyname'=>$staffInfo->smartcardcompany->name,
+                            'position'=>$staffInfo->position,
+                            'staff_id'=>$staffInfo->id,
+                        ];
+//                        $visitStaffList['interviewee']['visitNum'] = $VisitNum;
+//                        $visitStaffList['interviewee']['myCardText'] = $text;
                     }
                     
                     $data['myCardData'] = [

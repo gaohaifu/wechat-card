@@ -115,7 +115,8 @@ class Common extends Base
     {
         $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
         $user_id = $this->request->request("user_id");
-        
+        $self_staff_id = $this->request->request("self_staff_id")?:0;
+
         $Staff = new Staff();
         if($staff_id == ''){
             $this->success('staff_id不能为空');
@@ -133,11 +134,15 @@ class Common extends Base
                            'f.is_default'=>1,
                            's.status'=>['in',[2,3]],
                     ])->find();
+                    if(!$self_staff_id){
+                        $self_staff_id = $Staff->where(['user_id'=>$user_id,'user_id'=>$user_id])->value('id');
+                    }
                     if($staffdata){
                         $staffdata->status = 4;
                         $staffdata->save();
                         $Su->save([
                             'user_id'=>$user_id,
+                            'self_staff_id'=>$self_staff_id,
                             'staff_id'=>$staff_id,
                             'status'=>4,
                             'staff_user_id'=>$staff['user_id'],
@@ -145,6 +150,7 @@ class Common extends Base
                     }else{
                         $Su->save([
                             'user_id'=>$user_id,
+                            'self_staff_id'=>$self_staff_id,
                             'staff_id'=>$staff_id,
                             'status'=>2,
                             'staff_user_id'=>$staff['user_id'],
@@ -211,7 +217,38 @@ class Common extends Base
             }
         }
     }
-    
+
+    /**
+     * 名片夹
+     *
+     */
+    public function cardHolder()
+    {
+        $user_id = $this->user_id;
+        $staff = new Staff();
+        $Su = new Su();
+        $allcards = $staff->alias('s')->join('su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>['gte',2]])
+            ->field('s.*')->select();
+
+
+        foreach($Themeres as $key => $var){
+            if($Themeres[$key]['id'] == $Userres['theme_id']){
+                $Themeres[$key]['status'] = 2;
+            }else{
+                $Themeres[$key]['status'] = 1;
+            }
+            if($Userres['theme_id'] == 1){
+                $Themeres[0]['status'] = 2;
+            }else{
+                $Themeres[0]['status'] = 1;
+            }
+        }
+
+        $this->success('请求成功', $Themeres);
+
+    }
+
     /**
      * 获取主题列表
      * 
