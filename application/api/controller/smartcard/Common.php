@@ -2,6 +2,7 @@
 
 namespace app\api\controller\smartcard;
 use app\admin\model\smartcard\Su;
+use app\admin\model\smartcard\Visitors;
 use app\common\controller\Api;
 use app\api\controller\smartcard\Base;
 use app\admin\model\smartcard\Goods;
@@ -92,7 +93,7 @@ class Common extends Base
         $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
         $Staff = new Staff();
         if($staff_id == ''){
-            $this->success('staff_id不能为空');
+            $this->error('staff_id不能为空');
         }else{
             $res = $Staff->where('id', $staff_id)->setInc('send_num');
             if($res!==false){
@@ -119,7 +120,7 @@ class Common extends Base
 
         $Staff = new Staff();
         if($staff_id == ''){
-            $this->success('staff_id不能为空');
+            $this->error('staff_id不能为空');
         }else{
             $staff = $Staff->where('id', $staff_id)->find();
             if($staff){
@@ -128,14 +129,14 @@ class Common extends Base
                     $this->error('名片已保存');
                 }else{
                     $Su = new Su();
-                    $staffdata = $Su->alias('s')->join('staff f', 's.staff_id=f.id')->
+                    $staffdata = $Su->alias('s')->join('smartcard_staff f', 's.staff_id=f.id')->
                     where(['s.user_id'=>$staff['user_id'],
                            'f.user_id'=>$user_id,
                            'f.is_default'=>1,
                            's.status'=>['in',[2,3]],
                     ])->find();
                     if(!$self_staff_id){
-                        $self_staff_id = $Staff->where(['user_id'=>$user_id,'user_id'=>$user_id])->value('id');
+                        $self_staff_id = $Staff->where(['user_id'=>$user_id,'is_default'=>1])->value('id');
                     }
                     if($staffdata){
                         $staffdata->status = 4;
@@ -177,7 +178,7 @@ class Common extends Base
         
         $Staff = new Staff();
         if($staff_id == ''){
-            $this->success('staff_id不能为空');
+            $this->error('staff_id不能为空');
         }else{
             //对方名片信息
             $staff = $Staff->where('id', $staff_id)->find();
@@ -201,6 +202,7 @@ class Common extends Base
                         $Su = new Su();
                         $Su->save([
                             'user_id'=>$staff['user_id'],
+                            'self_staff_id'=>$staff_id,
                             'staff_id'=>$selfstaff['id'],
                             'status'=>1,
                             'staff_user_id'=>$user_id,
@@ -226,29 +228,70 @@ class Common extends Base
     {
         $user_id = $this->user_id;
         $staff = new Staff();
-        $Su = new Su();
-        $allcards = $staff->alias('s')->join('su u','s.id = u.staff_id')
-            ->where(['u.user_id'=>$user_id,'u.status'=>['gte',2]])
-            ->field('s.*')->select();
-
-
-        foreach($Themeres as $key => $var){
-            if($Themeres[$key]['id'] == $Userres['theme_id']){
-                $Themeres[$key]['status'] = 2;
-            }else{
-                $Themeres[$key]['status'] = 1;
-            }
-            if($Userres['theme_id'] == 1){
-                $Themeres[0]['status'] = 2;
-            }else{
-                $Themeres[0]['status'] = 1;
-            }
+  
+        $exchangeCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>1])
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime,self_staff_id')->select();
+        foreach ($exchangeCards as &$exchangeCard) {
+            $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
+            $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
+            $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
+            $exchangeCard['mystaff'] = [
+                'companyname'=>$mystaff->smartcardcompany->name,
+                'position'=>$mystaff->position
+            ];
+            $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
         }
-
-        $this->success('请求成功', $Themeres);
+        
+        $allCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime')->select();
+        foreach ($allCards as &$allCard) {
+            $allCard['avatar'] = cdnurl(user::where(['id'=>$allCard->user_id])->value('avatar'),true);
+            $allCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$allCard->company_id])->value('name');
+        }
+        $data['exchangeCards'] = $exchangeCards;
+        $data['allCards'] = $allCards;
+        $this->success('请求成功', $data);
 
     }
-
+    
+    /**
+     * 同意交换名片
+     * @param string $staff_id
+     * @param string $user_id
+     *
+     */
+    public function agreeExchange()
+    {
+        $su_id = $this->request->request('su_id')?:'';
+        $user_id = $this->user_id;
+        
+        $Staff = new Staff();
+        if($su_id == ''){
+            $this->error('名片夹id不能为空');
+        }else{
+            //己方保存的名片
+            $su = Su::where(['id'=>$su_id,'user_id'=>$user_id])->find();
+            if($su){
+                //对方保存的名片
+                $othersu = Su::where(['user_id'=>$su['staff_user_id'],'staff_id'=>$su['self_staff_id']])->find();
+                if($othersu && $othersu['status']>=2){
+                    $othersu->status = 4;
+                    $othersu->save();
+                    $su->status = 4;
+                    $su->save();
+                }else{
+                    $su->status = 2;
+                    $su->save();
+                }
+                $this->success('名片交换成功');
+            }else{
+                $this->error('名片夹id非法');
+            }
+        }
+    }
+    
     /**
      * 获取主题列表
      * 

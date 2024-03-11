@@ -116,17 +116,25 @@ class Base extends Api
                 }
                 //首页
                 if($type==0){
+                    $staff_ids = $this->staffModel->where(['user_id' => $user_id])->column('id');
+                    if(count($staff_ids)>1){
+                        $wheredata = ['A.staff_id' => ['in',$staff_ids]];
+                    }else{
+                        $wheredata = ['A.staff_id' => $staff_id];
+                    }
                     $allVisitNum = $this->visitorsModel
                         ->alias('A')
                         ->join('user B', 'A.user_id=B.id')
-                        ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+                        ->where($wheredata)
+                        ->where(['A.typedata' => '1'])
 //                    ->group('A.user_id')
                         ->field('A.user_id')
                         ->count();
                     $todayVisitNum = $this->visitorsModel
                         ->alias('A')
                         ->join('user B', 'A.user_id=B.id')
-                        ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+                        ->where($wheredata)
+                        ->where(['A.typedata' => '1'])
                         ->whereTime('A.createtime', 'today')
 //                    ->group('A.user_id')
                         ->field('A.user_id')
@@ -135,7 +143,8 @@ class Base extends Api
                     $visitStaffLists   = $this->visitorsModel
                         ->alias('A')
                         ->join('user B', 'A.user_id=B.id')
-                        ->where(['A.staff_id' => $staff_id, 'A.typedata' => '1'])
+                        ->where($wheredata)
+                        ->where(['A.typedata' => '1'])
                         ->field('A.user_id,B.avatar,A.createtime,A.origin')
                         ->group('A.user_id')
                         ->limit(10)
@@ -166,8 +175,6 @@ class Base extends Api
                             'position'=>$staffInfo->position,
                             'staff_id'=>$staffInfo->id,
                         ];
-//                        $visitStaffList['interviewee']['visitNum'] = $VisitNum;
-//                        $visitStaffList['interviewee']['myCardText'] = $text;
                     }
                     
                     $data['myCardData'] = [
@@ -359,6 +366,7 @@ class Base extends Api
                 ->find();
                 if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata','id_card_face','id_card_reverse']);
             if (!is_null($staffInfo)) {
+                $staffInfo['avatar'] = cdnurl($staffInfo->user->avatar,true);
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {
                     $staffInfo['picimages'] = [];
