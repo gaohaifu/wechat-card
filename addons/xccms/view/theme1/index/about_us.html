@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {include file="theme1/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme1/common/header" /}
+    <div class="xccms-page-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active">关于我们</li>
+            </ol>
+            <div class="title">
+                <h1>关于我们</h1>
+                <hr class="my-4" />
+            </div>
+
+            <div class="content py-4">
+                {$site_config['summary']}
+            </div>
+        </div>
+    </div>
+    {include file="theme1/common/footer" /}
+</body>
+
+</html>

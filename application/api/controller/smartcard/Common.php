@@ -1,6 +1,8 @@
 <?php
 
 namespace app\api\controller\smartcard;
+use app\admin\model\smartcard\Su;
+use app\admin\model\smartcard\Visitors;
 use app\common\controller\Api;
 use app\api\controller\smartcard\Base;
 use app\admin\model\smartcard\Goods;
@@ -26,12 +28,12 @@ use think\Config;
 
 
 header('Access-Control-Allow-Origin:*');//允许跨域
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+/*if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     header('Access-Control-Allow-Headers:x-requested-with,content-type,token');
     //浏览器页面ajax跨域请求会请求2次，第一次会发送OPTIONS预请求,不进行处理，直接exit返回，但因为下次发送真正的请求头部有带token
     //所以这里设置允许下次请求头带token否者下次请求无法成功
     exit();
-}
+}*/
 
 /**
  * 基本类，初始化请求
@@ -42,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 class Common extends Base
 {
 
-    protected $noNeedLogin = ['index','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
+    protected $noNeedLogin = ['index','indexShare','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
     protected $noNeedRight = ['*'];
     public function _initialize()
     {
@@ -60,11 +62,236 @@ class Common extends Base
     {   
         $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
         $user_id = $this->request->request("user_id");
+        $origin = $this->request->request("origin");
   
-        $list = $this->staffData($staff_id,$user_id);
+        $list = $this->staffData($staff_id,$user_id,0,$origin);
         $this->success('请求成功', $list);
     }
+    
+    /**
+     * 获取分享首页数据
+     * @param string $staff_id     员工id
+     
+     */
+    public function indexShare()
+    {
+        $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
+        $user_id = $this->request->request("user_id");
+        $origin = $this->request->request("origin");
+        
+        $list = $this->staffData($staff_id,$user_id,1,$origin);
+        $this->success('请求成功', $list);
+    }
+    
+    /**
+     * 发名片回调
+     * @param string $staff_id
+     *
+     */
+    public function sendCard()
+    {
+        $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
+        $Staff = new Staff();
+        if($staff_id == ''){
+            $this->error('staff_id不能为空');
+        }else{
+            $res = $Staff->where('id', $staff_id)->setInc('send_num');
+            if($res!==false){
+                //更新成功
+                $this->success('发送成功');
+            }else{
+                //更新失败
+                $this->error('发送失败');
+            }
+        }
+    }
+    
+    /**
+     * 保存名片
+     * @param string $staff_id
+     * @param string $user_id
+     *
+     */
+    public function saveCard()
+    {
+        $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
+        $user_id = $this->request->request("user_id");
+        $self_staff_id = $this->request->request("self_staff_id")?:0;
 
+        $Staff = new Staff();
+        if($staff_id == ''){
+            $this->error('staff_id不能为空');
+        }else{
+            $staff = $Staff->where('id', $staff_id)->find();
+            if($staff){
+                $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
+                if($su){
+                    $this->error('名片已保存');
+                }else{
+                    $Su = new Su();
+                    $staffdata = $Su->alias('s')->join('smartcard_staff f', 's.staff_id=f.id')->
+                    where(['s.user_id'=>$staff['user_id'],
+                           'f.user_id'=>$user_id,
+                           'f.is_default'=>1,
+                           's.status'=>['in',[2,3]],
+                    ])->find();
+                    if(!$self_staff_id){
+                        $self_staff_id = $Staff->where(['user_id'=>$user_id,'is_default'=>1])->value('id');
+                    }
+                    if($staffdata){
+                        $staffdata->status = 4;
+                        $staffdata->save();
+                        $Su->save([
+                            'user_id'=>$user_id,
+                            'self_staff_id'=>$self_staff_id,
+                            'staff_id'=>$staff_id,
+                            'status'=>4,
+                            'staff_user_id'=>$staff['user_id'],
+                        ]);
+                    }else{
+                        $Su->save([
+                            'user_id'=>$user_id,
+                            'self_staff_id'=>$self_staff_id,
+                            'staff_id'=>$staff_id,
+                            'status'=>2,
+                            'staff_user_id'=>$staff['user_id'],
+                        ]);
+                    }
+                }
+                $this->success('名片保存成功');
+            }else{
+                $this->error('名片不存在');
+            }
+        }
+    }
+    
+    /**
+     * 回递名片
+     * @param string $staff_id
+     * @param string $user_id
+     *
+     */
+    public function resendCard()
+    {
+        $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
+        $user_id = $this->request->request("user_id");
+        
+        $Staff = new Staff();
+        if($staff_id == ''){
+            $this->error('staff_id不能为空');
+        }else{
+            //对方名片信息
+            $staff = $Staff->where('id', $staff_id)->find();
+            //己方名片信息
+            $selfstaff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
+            if($staff){
+                //己方保存的名片
+                $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
+                if($su && $su['status']>=2){
+                    if($su['status']==3){
+                        $this->success('名片已回递');
+                    }
+                    //对方保存的名片
+                    $othersu = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$selfstaff['id']])->find();
+                    if($othersu){
+                        $othersu->status = 4;
+                        $othersu->save();
+                        $su->status = 4;
+                        $su->save();
+                    }else{
+                        $Su = new Su();
+                        $Su->save([
+                            'user_id'=>$staff['user_id'],
+                            'self_staff_id'=>$staff_id,
+                            'staff_id'=>$selfstaff['id'],
+                            'status'=>1,
+                            'staff_user_id'=>$user_id,
+                        ]);
+                        $su->status = 3;
+                        $su->save();
+                    }
+                    $this->success('名片已回递');
+                }else{
+                    $this->error('未保存名片，不能回递');
+                }
+            }else{
+                $this->error('名片不存在');
+            }
+        }
+    }
+
+    /**
+     * 名片夹
+     *
+     */
+    public function cardHolder()
+    {
+        $user_id = $this->user_id;
+        $staff = new Staff();
+  
+        $exchangeCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>1])
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime,self_staff_id')->select();
+        foreach ($exchangeCards as &$exchangeCard) {
+            $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
+            $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
+            $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
+            $exchangeCard['mystaff'] = [
+                'companyname'=>$mystaff->smartcardcompany->name,
+                'position'=>$mystaff->position
+            ];
+            $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
+        }
+        
+        $allCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime')->select();
+        foreach ($allCards as &$allCard) {
+            $allCard['avatar'] = cdnurl(user::where(['id'=>$allCard->user_id])->value('avatar'),true);
+            $allCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$allCard->company_id])->value('name');
+        }
+        $data['exchangeCards'] = $exchangeCards;
+        $data['allCards'] = $allCards;
+        $this->success('请求成功', $data);
+
+    }
+    
+    /**
+     * 同意交换名片
+     * @param string $staff_id
+     * @param string $user_id
+     *
+     */
+    public function agreeExchange()
+    {
+        $su_id = $this->request->request('su_id')?:'';
+        $user_id = $this->user_id;
+        
+        $Staff = new Staff();
+        if($su_id == ''){
+            $this->error('名片夹id不能为空');
+        }else{
+            //己方保存的名片
+            $su = Su::where(['id'=>$su_id,'user_id'=>$user_id])->find();
+            if($su){
+                //对方保存的名片
+                $othersu = Su::where(['user_id'=>$su['staff_user_id'],'staff_id'=>$su['self_staff_id']])->find();
+                if($othersu && $othersu['status']>=2){
+                    $othersu->status = 4;
+                    $othersu->save();
+                    $su->status = 4;
+                    $su->save();
+                }else{
+                    $su->status = 2;
+                    $su->save();
+                }
+                $this->success('名片交换成功');
+            }else{
+                $this->error('名片夹id非法');
+            }
+        }
+    }
+    
     /**
      * 获取主题列表
      * 
@@ -170,28 +397,30 @@ class Common extends Base
      **/
     public function smartcardfind(){
         $Staff = new Staff();
-        $staff_id = $this->user_id;
-        if($staff_id == ''){
+        $user_id = $this->user_id;
+        if($user_id == ''){
             $this->error('未找到相关员工信息');
         }
-        $config = get_addon_config('smartcard');
+//        $config = get_addon_config('smartcard');
         
         $staffres = $Staff
-            ->with(['user','smartcardcompany'])
-            ->where('user_id',$staff_id)
+            ->with(['smartcardcompany' => function($query) {
+                $query->withField('id,name,address_area');
+            }])
+            ->where('user_id',$user_id)
             ->select();
-          if($staffres){
-            $staffres=collection($staffres)->toArray();
-            if($this->is_url($staffres[0]['user']['avatar'])==0){
-                   //$staffres[0]['user']['avatarimage']=letter_avatar($staffres[0]['name']);
-                   $staffres[0]['user']['avatar']=letter_avatar($staffres[0]['name']);
-                  }
-            if($this->is_url($staffres[0]['user']['avatar'])==2){
-                  $staffres[0]['user']['avatar']=cdnUrl($staffres[0]['user']['avatar'],true);
-                  //$staffres[0]['user']['avatarimage']=cdnUrl($staffres[0]['user']['avatarimage'],true);
-              }
-             $staffres[0]['platform_status']=2;
-        }  
+//        if($staffres){
+//            $staffres=collection($staffres)->toArray();
+//            if($this->is_url($staffres[0]['user']['avatar'])==0){
+//                   //$staffres[0]['user']['avatarimage']=letter_avatar($staffres[0]['name']);
+//                   $staffres[0]['user']['avatar']=letter_avatar($staffres[0]['name']);
+//                  }
+//            if($this->is_url($staffres[0]['user']['avatar'])==2){
+//                  $staffres[0]['user']['avatar']=cdnUrl($staffres[0]['user']['avatar'],true);
+//                  //$staffres[0]['user']['avatarimage']=cdnUrl($staffres[0]['user']['avatarimage'],true);
+//              }
+//             $staffres[0]['platform_status']=2;
+//        }
         $this->success('查询成功',$staffres);  
     }
 
@@ -288,7 +517,6 @@ class Common extends Base
      * @param string $avatar 头像
      **/
     public function applyStaffAdd(){
-        $Company = new Company();
         $Staff = new Staff();        
         $data = $this->request->request();
         $login_id = $this->user_id;

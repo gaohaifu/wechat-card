@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme3/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme3/common/header" /}
+
+    {if $theme_ext && isset($theme_ext['datareport']) && $theme_ext['datareport']['status'] == 1}
+    <div class="xccms-box xccms-box1 py-2 pb-5">
+        <div class="container">
+            <div class="header text-center py-5">
+                <h2 class="m-0 p-2">{$theme_ext['datareport']['title']}</h2>
+                <span>&nbsp;</span>
+                <h3 class="m-0 p-0">{$theme_ext['datareport']['sub_title']}</h3>
+            </div>
+            <div class="row body datareport-box">
+                {php}
+                $rows = json_decode($theme_ext['datareport']['rows'], true);
+                {/php}
+                {volist name="$rows" id="item"}
+                <div class="col-md-3 text-center">
+                    <dl class="px-4">
+                        <dt class="py-2" style="color: {$item['color']}"><span class="counter">{$item['num']}</span>{$item['unit']}</dt>
+                        <dd>{$item['desc']}</dd>
+                    </dl>
+                </div>
+                {/volist}
+                
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    {if $theme_ext && isset($theme_ext['services']) && $theme_ext['services']['status'] == 1}
+    <div class="xccms-box xccms-box2 py-2 pb-5">
+        <div class="container">
+            <div class="header text-center py-5">
+                <h2 class="m-0 p-2">{$theme_ext['services']['title']}</h2>
+                <span>&nbsp;</span>
+                <h3 class="m-0 p-0">{$theme_ext['services']['sub_title']}</h3>
+            </div>
+            <div class="row body">
+                <div class="col-md-5 wow bounceInLeft">
+                    <article>{$theme_ext['services']['description']}</article>
+                    <div class="text-center">
+                        <a href="{$theme_ext['services']['url']}" target="_blank" class="btn btn-default px-5 my-4 m-auto" title="查看更多">查看更多</a>
+                    </div>
+                </div>
+                <div class="col-md-7 wow bounceInRight">
+                    {php}
+                    $rows = json_decode($theme_ext['services']['rows'], true);
+                    {/php}
+                    {volist name="$rows" id="item"}
+                    <div class="col-md-4 mb-4">
+                        <div class="item p-2">
+                            <img src="{$item['image']}" class="p-2 m-2 img">
+                            <p>{$item['title']}</p>
+                        </div>
+                    </div>
+                    {/volist}
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    {if count($product_category_list) > 0}
+    <div class="xccms-box xccms-box3">
+        <div class="container">
+            <div class="header text-center">
+                <h2 class="m-0 p-2">产品中心</h2>
+                <span>&nbsp;</span>
+                <h3 class="m-0 p-0">PRODUCT CENTER</h3>
+            </div>
+            <div class="body">
+                <!-- Swiper -->
+                <div class="swiper productSwiper">
+                    <div class="swiper-wrapper">
+                        {volist name="product_category_list" id="item"}
+                        {volist name="$item['product_list']" id="pitem"}
+                        <div class="swiper-slide item">
+                            <a href="{:addon_url('xccms/index/product_detail', [':id'=>$pitem['id']])}" title="{$pitem['title']}">
+                                <div class="list-image-box">
+                                    <img src="{$pitem['list_image']}" class="list-image" alt="{$pitem['title']}" title="{$pitem['title']}" />
+                                </div>
+                                <dl>
+                                    <dt class="py-2">{$pitem['title']}</dt>
+                                    <dd>{$pitem['description']}</dd>
+                                </dl>
+                            </a>
+                        </div>
+                        {/volist}
+                        {/volist}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    {php}
+    $bg_image = '';
+    if($theme_ext && isset($theme_ext['aboutus']) && $theme_ext['aboutus']['status'] == 1)
+    {
+        $bg_image = isset($theme_ext['aboutus']['bg_image']) ? $theme_ext['aboutus']['bg_image'] : '';
+    }
+    {/php}
+    <div class="aboutus-box" style="background:url({$bg_image}) no-repeat center;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-offset-4 col-md-8 info">
+                    <div class="header text-center py-5">
+                        <h2>关于我们</h2>
+                        <span>&nbsp;</span>
+                        <h3 class="p-0 m-0">ABOUT US</h3>
+                    </div>
+                    <div class="body wow bounceInUp">
+                        <article>{$site_config['description']}</article>
+                        <div class="text-center py-3">
+                            <a href="{:addon_url('xccms/index/about_us')}" class="btn btn-default px-5" title="关于我们">查看更多</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="xccms-box xccms-box4 py-5">
+        <div class="container">
+            <div class="header text-center py-5">
+                <h2 class="m-0 p-2">新闻资讯</h2>
+                <span>&nbsp;</span>
+                <h3 class="m-0 p-0">NEWS</h3>
+            </div>
+            <div class="body">
+                <div class="swiper newsSwiper">
+                    <div class="swiper-wrapper">
+                        {volist name="news_list" id="item"}
+                        <div class="swiper-slide item">
+                            <div class="list-image-box">
+                                <a href="{:addon_url('xccms/index/news_detail', [':id'=>$item['id']])}" title="{$item['title']}">
+                                    <img src="{$item['list_image']}" class="list-image" alt="{$item['title']}" title="{$item['title']}">
+                                </a>
+                            </div>
+                            <div class="row py-1">
+                                <div class="col-md-9">
+                                    <dl>
+                                        <dt class="py-2">
+                                            <a href="{:addon_url('xccms/index/news_detail', [':id'=>$item['id']])}" title="{$item['title']}">
+                                                {$item['title']}
+                                            </a>
+                                        </dt>
+                                        <dd>{$item['description']}</dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-3 text-center date">
+                                    <b>{:date('d', $item['createtime'])}</b>
+                                    {:date('Y.m', $item['createtime'])}
+                                </div>
+                            </div>
+                        </div>
+                        {/volist}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {include file="theme3/common/footer" /}
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<style>
+    hr {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        border: 0;
+        border-top: 1px solid #eeeeee;
+    }
+</style>
+<h2 class="page-header">
+    {:__('提现记录')}
+    <a href="{:url('myadmin/withdrawapply')}"
+    class="btn btn-primary pull-right"><i class="fa fa-cny fa-fw"></i>
+    {:__('去提现')}</a>
+</h2>
+
+{volist name='moneyloglist' id='log'}
+<div class="row">
+    <div class="col-md-8">
+        <p class="text-muted" style="color: #000; font-size: 16px;">{$log.orderid}</p>
+        <p class="text-muted" style="color: #000; font-size: 14px; display: {:$log['memo']?'block':'none'};">{$log.memo}</p>
+        <p class="text-danger" style="color: #f00; font-size: 12px; display: {:$log['reply']?'block':'none'};">回复：{$log.reply}</p>
+        <p class="text-muted">{:__('Operate date')}：{$log.createtime|datetime}</p>
+        
+    </div>
+    <div class="col-md-4 text-right">
+        <h4 class="text-{$log.status=='successed'?'success':($log['status']=='rejected'?'text-muted':'danger')}">
+            {:__($log['status'])}：{$log.money}</p>
+        </h4>
+        <div>[{$log.company.name}]</div>
+    </div>
+</div>
+<hr>
+{/volist}
+{if $moneyloglist->isEmpty()}
+<p class="text-center">暂无记录</p>
+{/if}
+<div class="pager">{$moneyloglist->render()}</div>

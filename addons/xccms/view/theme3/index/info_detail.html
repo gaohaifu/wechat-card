@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme3/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme3/common/header" /}
+    <div class="xccms-page-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/info', [':id'=>$category_model['id']])}" title="{$category_model['name']}">{$category_model['name']}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{$model['title']}</li>
+            </ol>
+            <div class="title">
+                <h1>{$model['title']}</h1>
+                <p><svg class="iconpark-icon"><use href="#time"></use></svg> {:date('Y-m-d H:i', $model['createtime'])} &nbsp; <svg class="iconpark-icon"><use href="#preview-open"></use></svg> {$model['visits']}</p>
+                <hr class="my-4" />
+            </div>
+
+            <div class="content py-4">
+                {$model['content']}
+            </div>
+
+            <div class="py-2">
+                {if $prev_model}
+                <p>上一个：<a href="{:addon_url('xccms/index/info_detail', [':id'=>$prev_model['id']])}">{$prev_model['title']}</a></p>
+                {/if}
+
+                {if $next_model}
+                <p>下一个：<a href="{:addon_url('xccms/index/info_detail', [':id'=>$next_model['id']])}">{$next_model['title']}</a></p>
+                {/if}
+            </div>
+        </div>
+    </div>
+
+    {include file="theme3/common/footer" /}
+</body>
+
+</html>

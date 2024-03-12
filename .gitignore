@@ -1,1 +1,5 @@
 addons/smartcard/smartcard-uniapp/unpackage
+.idea
+.env
+runtime
+public/.user.ini

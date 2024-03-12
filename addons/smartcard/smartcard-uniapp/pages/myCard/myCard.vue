@@ -280,6 +280,7 @@
 			}
 		},
 		onShow() {
+			this.refreshUser()
 			// #ifdef MP-WEIXIN
 			this.wxLogin();
 			// #endif
@@ -287,6 +288,17 @@
 		methods: {
 			toggleCardBox(dataProp) {
 				this[dataProp] = !this[dataProp]
+			},
+			wxLogin(){
+				uni.login({
+					success:(res) => {
+						this.code = res.code;
+						console.log("res.code: ",res.code);
+					},
+					fail: function (error) {
+						console.log('login failed ' + error);
+					}
+				});
 			},
 			refreshUser(){
 				console.log('index调用onshow');

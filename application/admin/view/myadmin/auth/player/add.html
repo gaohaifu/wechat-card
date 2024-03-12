@@ -1,0 +1,127 @@
+<style>
+    .fieldlist .selectpicker {
+        width: 100% !important;
+        left: 0 !important;
+    }
+
+    .fieldlist.table tr td {
+        text-align: center;
+        padding: 8px 2px;
+    }
+
+    .fieldlist.table tr {
+        padding: 2px 0;
+    }
+
+    .table .td-img {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .td-img .image-thumb {
+        margin-right: 5px;
+        width: 32px;
+        height: 32px;
+        background-color: #ddd;
+    }
+
+    .td-img .image-thumb img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .plupload-preview li,
+    .faupload-preview li {
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="required" placeholder="请输入分组名称" class="form-control" name="row[name]"
+                type="text" value="">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Label')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-label" data-rule="required" placeholder="请输入分组标签，不可重复" class="form-control" name="row[label]"
+                type="text" value="">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Permission')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <span class="text-muted"><input type="checkbox" name="" id="checkall" /> <label
+                    for="checkall"><small>{:__('Check all')}</small></label></span>
+            <span class="text-muted"><input type="checkbox" name="" id="expandall" /> <label
+                    for="expandall"><small>{:__('Expand all')}</small></label></span>
+            <input type="hidden" name="row[rules]" />
+            <div id="treeview"></div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Icon')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-icon"></ul>
+            <div class="input-group">
+                <input id="c-icon" class="form-control" data-rule="" size="50" name="row[icon]" type="text"
+                    value="">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-icon" class="btn btn-danger faupload"
+                            data-input-id="c-icon" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                            data-multiple="false" data-preview-id="p-icon"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-icon" class="btn btn-primary fachoose"
+                            data-input-id="c-icon" data-mimetype="image/*" data-multiple="false"> <i
+                                class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-icon"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Content')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-content" class="form-control editor" rows="5" name="row[content]" cols="50"></textarea>
+            <div style="color: #ff0000;">【变量说明】 企业名称：COMPANY；角色名称：PLAYER；当前时间：NOWTIME；生效时间：STARTTIME；过期时间：EXPIREDTIME。</div>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Weigh')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-weigh" data-rule="required" class="form-control" name="row[weigh]" type="number" value="0">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                {foreach name="statusList" item="vo"}
+                <label for="row[status]-{$key}"><input id="row[status]-{$key}" name="row[status]" type="radio"
+                        value="{$key}" {in name="key" value="normal" }checked{/in} /> {$vo}</label> {/foreach}
+            </div>
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    var nodeData = {:json_encode($nodeList)};
+</script>

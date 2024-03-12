@@ -1,0 +1,120 @@
+<style>
+    .upload-image {
+        background: url('__CDN__/assets/addons/xccms/img/plus.png') no-repeat center center;
+        background-size: 30px 30px;
+        height: 30px;
+        width: 30px;
+        border: 1px solid #ccc;
+    }
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-info">
+                <div class="panel-heading">
+                    <div style="float:right;">
+                        <label class="control-label" style="float:left;padding-top: 3px;margin-right: 10px;">开启</label>
+                        <input id="c-datareport_status" name="row[datareport_status]" type="hidden" value="{$config_ext['datareport']['status']}">
+                        <a href="javascript:;" data-toggle="switcher" class="btn-switcher" data-input-id="c-datareport_status" data-yes="1" data-no="0">
+                            <i class="fa fa-toggle-on text-success {eq name=" $config_ext['datareport']['status']" value="0" }fa-flip-horizontal text-gray{/eq} fa-2x"></i>
+                        </a>
+                    </div>
+                    首页滚动数字模块
+                </div>
+                <div class="panel-body">
+                    <div class="form-group row">
+                        <div class="col-xs-12">
+                            <table class="table fieldlist" data-template="datareporttpl" data-name="row[datareport]" id="first-table">
+                                <tr>
+                                    <td>{:__('数值')}</td>
+                                    <td>{:__('单位/符号')}</td>
+                                    <td>{:__('描述')}</td>
+                                    <td width="100"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5"><a href="javascript:;" class="btn btn-sm btn-success btn-append"><i class="fa fa-plus"></i> {:__('Append')}</a></td>
+                                </tr>
+                            </table>
+                            <!--请注意实际开发中textarea应该添加个hidden进行隐藏-->
+                            <textarea name="row[datareport]" class="form-control hidden" cols="30" rows="5">{$config_ext['datareport']['rows']}</textarea>
+                            <script id="datareporttpl" type="text/html">
+                                <tr class="form-inline">
+                                    <td><input type="number" name="<%=name%>[<%=index%>][num]" class="form-control" value="<%=row.num%>" placeholder="数值"/></td>
+                                    <td><input type="text" name="<%=name%>[<%=index%>][unit]" class="form-control" value="<%=row.unit%>" placeholder="单位/符号"/></td>
+                                    <td><input type="text" name="<%=name%>[<%=index%>][desc]" class="form-control" value="<%=row.desc%>" placeholder="描述"/></td>
+                                    <td>
+                                        <!--下面的两个按钮务必保留-->
+                                        <span class="btn btn-sm btn-danger btn-remove"><i class="fa fa-times"></i></span>
+                                        <span class="btn btn-sm btn-primary btn-dragsort"><i class="fa fa-arrows"></i></span>
+                                    </td>
+                                </tr>
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="box box-success">
+                <div class="panel-heading">
+                    <div style="float:right;">
+                        <label class="control-label" style="float:left;padding-top: 3px;margin-right: 10px;">开启</label>
+                        <input id="c-services_status" name="row[services_status]" type="hidden" value="{$config_ext['services']['status']}">
+                        <a href="javascript:;" data-toggle="switcher" class="btn-switcher" data-input-id="c-services_status" data-yes="1" data-no="0">
+                            <i class="fa fa-toggle-on text-success {eq name=" $config_ext['services']['status']" value="0" }fa-flip-horizontal text-gray{/eq} fa-2x"></i>
+                        </a>
+                    </div>
+                    服务/优势/特色的罗列
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-2">{:__('Title')}:</label>
+                        <div class="col-xs-12 col-sm-8">
+                            <input id="c-services_title" class="form-control" name="row[services_title]" type="text" value="{$config_ext['services']['title']}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-12">
+                            <table class="table fieldlist" data-template="services_datatpl" data-name="row[services_data]" id="second-table">
+                                <tr>
+                                    <td>{:__('标题')}</td>
+                                    <td>{:__('描述')}</td>
+                                    <td>{:__('图片(60x60)')}</td>
+                                    <td width="100"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4"><a href="javascript:;" class="btn btn-sm btn-success btn-append"><i class="fa fa-plus"></i> {:__('Append')}</a></td>
+                                </tr>
+                            </table>
+
+                            <!--请注意实际开发中textarea应该添加个hidden进行隐藏-->
+                            <textarea name="row[services_data]" class="form-control hidden" cols="30" rows="5">{$config_ext['services']['rows']}</textarea>
+                            <script id="services_datatpl" type="text/html">
+                                <tr class="form-inline">
+                                    <td><input type="text" name="<%=name%>[<%=index%>][title]" class="form-control" data-field="title" value="<%=row.title%>" placeholder="标题"/></td>
+                                    <td><input type="text" name="<%=name%>[<%=index%>][desc]" class="form-control" value="<%=row.desc%>" placeholder="描述"/></td>
+                                    <td>
+                                        <input type="hidden" name="<%=name%>[<%=index%>][image]" id="c-image-<%=index%>" value="<%=row.image%>">
+                                        <!--@formatter:off-->
+                                        <button type="button" id="faupload-image" class="btn btn-danger faupload upload-image" data-input-id="c-image-<%=index%>" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" <%if(row.image){%>style="background-image: url('<%=Fast.api.cdnurl(row.image)%>')"<%}%>></button>
+                                        <!--@formatter:on-->
+                                    </td>
+                                    <td>
+                                        <!--下面的两个按钮务必保留-->
+                                        <span class="btn btn-sm btn-danger btn-remove"><i class="fa fa-times"></i></span>
+                                        <span class="btn btn-sm btn-primary btn-dragsort"><i class="fa fa-arrows"></i></span>
+                                    </td>
+                                </tr>
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

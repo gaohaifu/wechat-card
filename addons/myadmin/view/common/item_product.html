@@ -1,0 +1,29 @@
+<div class="col-sm-4 col-md-4 product-item">
+    <div class="card">
+        <div class="thumb">
+            <a href="{:addon_urls('/myadmin/web/product_detail',['id'=>$item.id])}" class="preview-link">
+                <div class="embed-responsive embed-responsive-4by3">
+                    <img src="{$item.cover}" alt="">
+                </div>
+            </a>
+            <a href="{:addon_urls('/myadmin/web/product_detail',['id'=>$item.id])}" class="quickview-link"><i class="fa fa-search"></i></a>
+        </div>
+        <div class="title">
+            <h2><a href="{:addon_urls('/myadmin/web/product_detail',['id'=>$item.id])}">{$item.title}</a></h2>
+        </div>
+        
+        <div class="operate">
+            <div class="pull-left text-gray">
+                <div class="mt-1">
+                    <span class="" style="color: #FF0000; font-size: 16px;">
+                        <i class="fa fa-cny"></i> {$item.price}
+                    </span>
+                </div>
+            </div>
+            <div class="pull-right">
+                <a href="{:addon_urls('/myadmin/web/product_detail', ['id'=>$item.id])}" class="btn btn-primary detail">{$item.labelname}</a>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>

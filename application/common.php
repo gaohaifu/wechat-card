@@ -560,3 +560,94 @@ EOT;
         return $icon;
     }
 }
+
+
+/**
+ * 获取顶级域名
+ */
+if (!function_exists('get_first_host')) {
+    /**
+     * 获取顶级域名
+     * @return [type]
+     * 比如reserve.applinzi.com返回applinzi.com
+     */
+    function get_first_host($to_virify_url = ''){
+
+        $url   = $to_virify_url ? $to_virify_url : $_SERVER['HTTP_HOST'];
+        $data = explode('.', $url);
+        $co_ta = count($data);
+
+        //判断是否是双后缀
+        $zi_tow = true;
+        $host_cn = 'com.cn,net.cn,org.cn,gov.cn';
+        $host_cn = explode(',', $host_cn);
+        foreach($host_cn as $host){
+            if(strpos($url,$host)){
+                $zi_tow = false;
+            }
+        }
+
+        //如果是返回FALSE ，如果不是返回true
+        if($zi_tow == true){
+
+            // 是否为当前域名
+            if($url == 'localhost'){
+                $host = $data[$co_ta-1];
+            }
+            else{
+                $host = $data[$co_ta-2].'.'.$data[$co_ta-1];
+            }
+
+        }
+        else{
+            $host = $data[$co_ta-3].'.'.$data[$co_ta-2].'.'.$data[$co_ta-1];
+        }
+
+        return $host;
+    }
+}
+
+if (!function_exists('microtime_float')) {
+    /**
+     * 获取毫秒和微秒
+     * @return float
+     */
+    function microtimeFloat()
+    {
+        list($usec, $sec) = explode(" ", microtime());
+        return ((float)$usec + (float)$sec);
+    }
+}
+if (!function_exists('search_arr')) {
+    /**
+     * 在数组中模糊搜索给定的值
+     * @param $data
+     * @param $keyword
+     * @return array
+     */
+    function searchArr($data,$keyword){
+        $arr = array();
+        foreach($data as $key=>$values){
+            if (strstr( $values , $keyword ) !== false ){
+                $arr[$key] = $values;
+            }
+        }
+        return $arr;
+    }
+}
+if (!function_exists('split_array')) {
+    /**
+     * 分割数组
+     * @param $data
+     * @param $keyword
+     * @return array
+     */
+    function split_array($arr, $size) {
+        $result = array();
+        $total = count($arr);
+        for ($i = 0; $i < $total; $i += $size) {
+            $result[] = array_slice($arr, $i, $size);
+        }
+        return $result;
+    }
+}

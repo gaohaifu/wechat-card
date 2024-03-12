@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme2/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme2/common/header" /}
+    <div class="xccms-list-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">在线招聘</li>
+            </ol>
+            <div class="title">
+                <h1>在线招聘</h1>
+                <hr class="my-4" />
+            </div>
+
+            <div class="list py-4">
+                {if count($job_list) == 0}<p align="center">没有找到信息</p>{/if}
+                {volist name="job_list" id="item"}
+                <div class="row item">
+                    <div class="col-md-3">
+                        <a href="{:addon_url('xccms/index/job_detail', [':id'=>$item['id']])}" class="list-image-box">
+                            <img src="{$item['list_image']}" class="list-image">
+                        </a>
+                    </div>
+                    <div class="col-md-9">
+                        <dl>
+                            <dt><a href="{:addon_url('xccms/index/job_detail', [':id'=>$item['id']])}">{$item['name']}</a></dt>
+                            <dd class="time"><svg class="iconpark-icon"><use href="#time"></use></svg> {:date('Y-m-d', $item['createtime'])}</dd>
+                            <dd>{$item['description']}</dd>
+                        </dl>
+                        <a href="{:addon_url('xccms/index/job_detail', [':id'=>$item['id']])}" class="btn btn-default">查看详情</a>
+                    </div>
+                </div>
+                {/volist}
+                <div class="text-center">
+                    {$pagenav}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {include file="theme2/common/footer" /}
+</body>
+
+</html>

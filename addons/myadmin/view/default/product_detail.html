@@ -1,0 +1,195 @@
+<style>
+    .swiper-container {
+        width: 100%;
+        height: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .swiper-slide {
+        background-size: cover;
+        background-position: center;
+    }
+
+    .gallery-top {
+        height: 80%;
+        width: 100%;
+    }
+
+    .gallery-thumbs {
+        height: 20%;
+        box-sizing: border-box;
+        padding: 10px 0;
+    }
+
+    .gallery-thumbs .swiper-slide {
+        width: 25%;
+        height: 100%;
+        opacity: 0.4;
+    }
+
+    .gallery-thumbs .swiper-slide-thumb-active {
+        opacity: 1;
+    }
+
+    .article-image {
+        height: 400px;
+    }
+
+    @media (max-width: 767px) {
+        .article-image {
+            height: 400px;
+        }
+    }
+
+    .description {
+        font-size: 16px;
+        background-color: #FCFCFC;
+        border: 1px solid #b0d6ff;
+        border-radius: 6px;
+        margin: 20px 0px;
+        padding: 10px 15px;
+        min-height: 50px;
+    }
+
+    .video-box {
+        max-height: 500px;
+        background-color: #000000;
+    }
+</style>
+
+<div class="container container-body">
+    <div class="panel panel-default">
+
+    </div>
+    <div class="row">
+        <div class="col-lg-9 col-md-9 col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <span>{$row['name']}</span>
+                    </h3>
+                </div>
+
+                <div class="panel-body" style="min-height: 500px;">
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-xs-12">
+                            {if isset($row['images']) && $row['images'] && is_array($row['images'])}
+                            <div class="article-image">
+                                <div class="swiper-container gallery-top">
+                                    <div class="swiper-wrapper">
+                                        {volist name="$row.images" id="image"}
+                                        <div class="swiper-slide" data-src="{$image|cdnurl}"
+                                            style="background-image:url({$image|cdnurl})"></div>
+                                        {/volist}
+                                    </div>
+                                    <div class="swiper-button-next swiper-button-white"></div>
+                                    <div class="swiper-button-prev swiper-button-white"></div>
+                                </div>
+                                <div class="swiper-container gallery-thumbs">
+                                    <div class="swiper-wrapper">
+                                        {volist name="$row.images" id="image"}
+                                        <div class="swiper-slide" style="background-image:url({$image|cdnurl})"></div>
+                                        {/volist}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {else}
+                            <div class="embed-responsive embed-responsive-4by3">
+                                <img src="{$row.cover}" alt="">
+                            </div>
+                            {/if}
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-xs-12">
+                            <div class="article-metas" style="padding-bottom: 20px;">
+                                <h1 class="metas-title">
+                                    {$row['title']}
+                                </h1>
+                                <div class="description">{$row['description']}</div>
+                                <div class="metas-body">
+                                    <span class="views-num" style="font-size: 26px; color: #FF0000;">
+                                        <i class="fa fa-cny"></i> {$row['price']}
+                                    </span>
+                                    <span class="comment-num">{$row['unitnum']} {$row['unitname']}</span>
+                                </div>
+                                <div class="metas-body">
+                                    <span class="views-num">
+                                        <i class="fa fa-eye"></i> {$row['views']}
+                                    </span>
+                                    <span class="comment-num">
+                                        <i class="fa fa-clock-o"></i>{:date("Y年m月d日",$row['createtime'])}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {if isset($row['video']) && $row['video']}
+                    <video class="video-box" width="100%" src="{$row['video']}" controls="controls" autoplay="autoplay">
+                    </video>
+                    {/if}
+                    <div class="article-text" style="font-size: 16px; margin-top: 10px; line-height: 180%;">
+                        {$row['content']}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-3 col-xs-12">
+            <div class="sidebar-toggle"><i class="fa fa-bars"></i></div>
+            <div class="sidenav" id="sidebar-nav">
+                <ul class="list-group">
+                    <li class="list-group-item {:check_nav_active('myadmin/web/product')}" style="font-size: 16px;"><a
+                            href="{:addon_urls('/myadmin/web/product')}"><i class="fa fa-list fa-fw"></i>
+                            {:__('全部商品')}</a></li>
+                    {volist name='category' id='item'}
+                    <li class="list-group-item {:$item['id'] == $category_id?'active':''}"><a
+                            href="{:addon_urls('/myadmin/web/product', ['category_id'=>$item.id])}"><i
+                            class="fa fa-circle-o fa-fw"></i>{$item.name}</a></li>
+                    {/volist}
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script data-render="script">
+    var galleryThumbs = new Swiper('.gallery-thumbs', {
+        spaceBetween: 10,
+        slidesPerView: 5,
+        freeMode: true,
+        watchSlidesVisibility: true,
+        watchSlidesProgress: true,
+    });
+    var galleryTop = new Swiper('.gallery-top', {
+        spaceBetween: 10,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        thumbs: {
+            swiper: galleryThumbs
+        }
+    });
+    //点击放大
+    $(document).on("click", ".article-image .gallery-top .swiper-slide", function () {
+        var data = [];
+        $.each($(this).parent().children(), function (i, j) {
+            data.push({
+                "src": $(this).data("src")
+            });
+        });
+        var json = {
+            "title": "",
+            "start": $(this).index(),
+            "data": data
+        };
+        layer.photos(JSON.parse(JSON.stringify({ photos: json })));
+    });
+</script>

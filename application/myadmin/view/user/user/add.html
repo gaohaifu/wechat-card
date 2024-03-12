@@ -1,0 +1,81 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <input type="hidden" name="row[id]" value="">
+    <div class="form-group">
+        <label for="c-group_id" class="control-label col-xs-12 col-sm-2">{:__('Group')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            {$groupList}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Indexuser')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-user_id" data-rule="required" placeholder="请选择平台用户" data-source="common/user"
+                data-field="nickname" class="form-control selectpage" name="row[user_id]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-money" class="control-label col-xs-12 col-sm-2">{:__('Money')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-money" data-rule="required" class="form-control" name="row[money]" type="number"
+                value="{$row.money}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-score" class="control-label col-xs-12 col-sm-2">{:__('Score')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-score" data-rule="required" class="form-control" name="row[score]" type="number"
+                value="{$row.score}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-score" class="control-label col-xs-12 col-sm-2">{:__('HandRate')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <div class="row dingdian-box">
+                <div class="col-xs-12">
+                    <div class="input-group input-groupp-md">
+                        <input id="c-handrate" class="form-control" data-rule="required" step="0.1" name="row[handrate]"
+                            type="number" value="0.0">
+                        <div href="javascript:" class="btn-search-icon input-group-addon">%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="c-score" class="control-label col-xs-12 col-sm-2">{:__('TaxeRate')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <div class="row dingdian-box">
+                <div class="col-xs-12">
+                    <div class="input-group input-groupp-md">
+                        <input id="c-taxerate" class="form-control" data-rule="required" step="0.1" name="row[taxerate]"
+                            type="number" value="0.0">
+                        <div href="javascript:" class="btn-search-icon input-group-addon">%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="c-jointime" class="control-label col-xs-12 col-sm-2">{:__('Jointime')}:</label>
+        <div class="col-xs-12 col-sm-4">
+            <input id="c-jointime" data-rule="required" class="form-control datetimepicker"
+                data-date-format="YYYY-MM-DD HH:mm:ss" data-use-current="true" name="row[jointime]" type="text"
+                value="{:date('Y-m-d H:i:s')}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="content" class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['normal'=>__('Normal'), 'hidden'=>__('Hidden')], $row['status'])}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

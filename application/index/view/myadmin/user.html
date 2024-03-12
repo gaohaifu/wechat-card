@@ -1,0 +1,49 @@
+<style>
+    .page-header small {
+        margin-top: 15px;
+        font-size: 13px;
+    }
+</style>
+
+<h2 class="page-header"> {$title}
+
+    <span><small class="pull-right text-danger">
+
+            总余额：￥{$money}，总积分：{$score}
+
+        </small></span>
+
+</h2>
+<div class="row">
+    {volist name='userlist' id='record'}
+    <div class="col-md-6">
+        <div
+            style="background-color: #f7f7f7; border-radius: 6px; margin-bottom: 20px; padding: 10px; min-height: 100px;">
+            <div style="float: right; width: 80px;height: 80px; padding-top: 0px;">
+                <img class="profile-user-img img-responsive img-circle" style="border-radius:10px;height: 80px"
+                    src="{$record.company.logo|default='/assets/img/qrcode.png'|htmlentities|cdnurl}" alt="">
+            </div>
+            <div style="padding-top: 10px;padding-left: 5px;">
+                <h4 style="margin-top:0;">
+                    {$record.company.name}
+                </h4>
+                <div class="text-muted" style="">
+                    可用余额：￥ <a href="{:url('/index/myadmin/moneylog',['company_id'=>$record['company_id']])}"
+                        title="点击查看记录" style="font-size: 16px; font-weight: 500; color: #007bff;">{$record.money}</a>
+                        <a href="{:url('/index/myadmin/withdrawapply',['company_id'=>$record['company_id']])}"
+                            title="提现" style="font-size: 14px; font-weight: 500; color: #ff0000;">提现</a>
+                </div>
+                <div class="text-muted">
+                    剩余积分： <a href="{:url('/index/myadmin/scorelog',['company_id'=>$record['company_id']])}"
+                        title="点击查看记录" style="font-size: 16px;font-weight: 500;color: #007bff;">{$record.score}</a>
+                </div>
+                <div class="text-muted">企业地址：{$record.company.address}</div>
+            </div>
+        </div>
+    </div>
+    {/volist}
+</div>
+{if $userlist->isEmpty()}
+<p class="text-center">暂无记录</p>
+{/if}
+<div class="pager">{$userlist->render()}</div>

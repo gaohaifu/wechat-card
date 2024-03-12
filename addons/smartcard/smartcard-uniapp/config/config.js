@@ -1,4 +1,4 @@
-const Uri = 'http://smartcard.wanyq.com/'
+const Uri = 'http://beta.wechat-card.com/'
 // // 前端路径
 export const baseUrl = `${Uri}h5/smartcard/#`
 // api调用目录

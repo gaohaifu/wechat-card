@@ -1,0 +1,13 @@
+    {include file="theme3/common/nav" /}
+    <div class="swiper carouselSwiper">
+        <div class="swiper-wrapper">
+            {if count($carousel_list) == 0}<p align="center">请先添加轮播幻灯片</p>{/if}
+            {volist name="carousel_list" id="item"}
+            <div class="swiper-slide"><img src="{$item['list_image']}" alt="{$item['title']}" title="{$item['title']}" /></div>
+            {/volist}
+        </div>
+        <!-- Add Arrows -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>

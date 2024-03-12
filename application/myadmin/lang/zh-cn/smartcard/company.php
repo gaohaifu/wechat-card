@@ -1,0 +1,27 @@
+<?php
+
+return [
+    'Id'            => 'ID',
+    'Name'          => '企业名称',
+    'Url'           => '企业网址',
+    'Intro'         => '企业简介',
+    'Shortname'     => '企业简称',
+    'Begintime'     => '企业营业起始时间',
+    'Endtime'       => '企业营业结束时间',
+    'Licenseimage'  => '企业营业执执照',
+    'Licensenumber' => '企业营业执照号',
+    'Content'       => '企业详细介绍',
+    'Picimages'     => '企业照片集',
+    'Videofiles'    => '企业视频',
+    'Address'       => '联系地址',
+    'Phone'         => '联系电话',
+    'Province'      => '省',
+    'City'          => '市',
+    'District'      => '区',
+    'Lng'           => '经度',
+    'Lat'           => '纬度',
+    'Latlng'        => '经纬度',
+    'Partner'       => '合作伙伴',
+    'Administrators_ids'       => '企业负责人',
+    'Ckdadministrators.nickname'       => '企业负责人姓名',
+];

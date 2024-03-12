@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {include file="theme1/common/scripts" /}
+    <style>
+    html,
+    .swiper {
+        width: 100%;
+        height: 100%;
+    }
+
+    .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        background: #fff;
+
+        /* Center slide text vertically */
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
+
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+
+    .swiper {
+        width: 100%;
+        height: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .swiper-slide {
+        background-size: cover;
+        background-position: center;
+    }
+
+    .mySwiper2 {
+        height: 80%;
+        width: 100%;
+    }
+
+    .mySwiper {
+        height: 20%;
+        box-sizing: border-box;
+        padding: 10px 0;
+    }
+
+    .mySwiper .swiper-slide {
+        width: 25%;
+        height: 100%;
+        opacity: 0.4;
+    }
+
+    .mySwiper .swiper-slide-thumb-active {
+        opacity: 1;
+    }
+
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .summary {
+        background: #ccc;
+        margin: 0 auto;
+        margin-bottom: 10px;
+    }
+
+    .summary th,
+    .summary td {
+        background: #fff;
+        padding: 2px 5px;
+    }
+
+    .summary thead th {
+        background: #f5f5f5;
+        font-size: 1rem;
+    }
+
+    .price-box {
+        font-size: 1rem;
+    }
+
+    .price-box span {
+        color: #b61a29;
+        display: block;
+    }
+
+    .price-box b {
+        font-size: 2.5rem;
+    }
+    </style>
+</head>
+
+<body>
+    {include file="theme1/common/header" /}
+    <div class="xccms-page-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/product', [':id'=>$model['category_id']])}" title="产品中心">产品中心</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{$model['title']}</li>
+            </ol>
+            <div class="row content py-4">
+                <div class="col-md-5">
+                    <div style="--swiper-navigation-color: #fff; --swiper-pagination-color: #fff" class="swiper mySwiper2">
+                        <div class="swiper-wrapper">
+                            {volist name="$model['banners_list']" id="item"}
+                            <div class="swiper-slide">
+                                <img src="{$item}" />
+                            </div>
+                            {/volist}
+                        </div>
+                        {if count($model['banners_list']) > 1}
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        {/if}
+                    </div>
+                    <div thumbsSlider="" class="swiper mySwiper" {if count($model['banners_list']) <=1} style="display: none;" {/if}>
+                        <div class="swiper-wrapper">
+                            {volist name="$model['banners_list']" id="item"}
+                            <div class="swiper-slide">
+                                <img src="{$item}" />
+                            </div>
+                            {/volist}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h1 class="display-3">{$model['title']}</h1>
+                    <hr class="my-4">
+                    <p>{$model['description']}</p>
+                    {if $model['summary_json']}
+                    <dl>
+                        <dt>产品参数</dt>
+                        {volist name="$model['summary_json']" id="item"}
+                        <dd>{$item['key']}: {$item['value']}</dd>
+                        {/volist}
+                    </dl>
+                    {/if}
+                    <div class="price-box">参考价格<span>&yen;<b>{$model['price']}</b></span></div>
+                </div>
+                <div class="clearfix  py-4"></div>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page">产品详情</a>
+                    </li>
+                </ul>
+                <div class="product-content">
+                    {$model['content']}
+                </div>
+            </div>
+        </div>
+    </div>
+    {include file="theme1/common/footer" /}
+    <script>
+    var banners_count = {:count($model['banners_list']) > 4 ? 4 : count($model['banners_list']) };
+    var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        spaceBetween: 10,
+        slidesPerView: banners_count,
+        freeMode: true,
+        watchSlidesProgress: true,
+    });
+    var swiper2 = new Swiper(".mySwiper2", {
+        loop: true,
+        spaceBetween: 10,
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        thumbs: {
+            swiper: swiper,
+        },
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+<style>
+    hr {
+        margin-top: 8px;
+        margin-bottom: 8px;
+        border: 0;
+        border-top: 1px solid #eeeeee;
+    }
+</style>
+<h2 class="page-header">{:__('提现申请')}</h2>
+
+<form id="profile-form" class="form-horizontal" role="form" data-toggle="validator" method="POST"
+    action="{:url('index/myadmin/withdrawapply')}">
+
+    <div class="">
+
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('企业')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input id="c-company_id" data-rule="required" placeholder="请选择企业" data-source='{$company}'
+                    data-field="name" class="form-control selectpage" name="row[company_id]" type="text" value="{$default.id}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('提现金额')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="row dingdian-box">
+                    <div class="col-xs-12">
+                        <div class="input-group input-groupp-md">
+                            <input id="c-money" class="form-control" data-rule="required; settledmoney" step="0.01"
+                                name="row[money]" type="number" value="{$default.money}">
+
+                            <div href="javascript:" class="btn-search-icon input-group-addon">
+                                {:__('到账')}：<span class="text-danger" id="c-settledmoney">￥0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('提现费用')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="row dingdian-box">
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="input-group input-groupp-md">
+                            <div href="javascript:" class="btn-search-icon input-group-addon">{:__('手续费')}</div>
+                            <input id="c-handfee" class="form-control" readonly data-rule="required; settledmoney"
+                                step="0.1" name="row[handfee]" type="number" value="0.0">
+                            <div href="javascript:" class="btn-search-icon input-group-addon">费率 <span id="c-handrate">{$default.handrate}</span> %
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-6">
+                        <div class="input-group input-groupp-md">
+                            <div href="javascript:" class="btn-search-icon input-group-addon">{:__('税费')}</div>
+                            <input id="c-taxefee" class="form-control" readonly data-rule="required; settledmoney"
+                                step="0.1" name="row[taxefee]" type="number" value="0.0">
+
+                            <div href="javascript:" class="btn-search-icon input-group-addon">费率 <span id="c-taxerate">{$default.taxerate}</span> %
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('type')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="radio">
+                    {foreach name="typeList" item="vo"}
+                    <label for="row[type]-{$key}"><input id="row[type]-{$key}" name="row[type]" type="radio" value="{$key}"
+                            {in name="key" value="$default_type" }checked{/in} /> {$vo}</label> {/foreach}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('收款账号')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input id="c-account" data-rule="required; account" class="form-control" name="row[account]" type="text"
+                    value="{$info.account}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('姓名')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text" value="{$info.name}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-xs-12 col-sm-2">{:__('备注')}:</label>
+            <div class="col-xs-12 col-sm-8">
+                <input id="c-memo" class="form-control" name="row[memo]" type="text" value="{$info.memo}">
+            </div>
+        </div>
+        <input id="c-status" name="row[status]" type="hidden" value="created">
+
+        <div class="form-group normal-footer">
+            <label class="control-label col-xs-12 col-sm-2"></label>
+            <div class="col-xs-12 col-sm-8">
+                <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('Ok')}</button>
+                <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+            </div>
+        </div>
+
+    </div>
+</form>

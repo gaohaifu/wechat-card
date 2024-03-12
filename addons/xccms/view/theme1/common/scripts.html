@@ -1,0 +1,23 @@
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>{$seo_title}</title>
+    <meta name="keywords" content="{$seo_keywords}" />
+    <meta name="description" content="{$seo_description}" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="{$site_config['name']}">
+    <meta name="format-detection" content="telephone=no">
+    <link href="__ADDON__/css/theme1/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="__ADDON__/css/swiper-bundle.min.css" />
+    <link href="__ADDON__/css/animate.min.css" rel="stylesheet" />
+    <link href="__ADDON__/css/theme1/style.css" rel="stylesheet" />
+    {if (($site_config['site_grayscale'] == 1 && $page_code == 'index') || $site_config['site_grayscale'] == 2)}
+    <style>html {-webkit-filter: grayscale(100%);-moz-filter: grayscale(100%);-ms-filter: grayscale(100%);-o-filter: grayscale(100%);filter: grayscale(100%);filter: progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);}</style>
+    {/if}
+    <script src="__ADDON__/js/frontend/iconpark.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+    <script src="https://static.fastadmin.net/assets/js/html5shiv.js"></script>
+    <script src="https://static.fastadmin.net/assets/js/respond.min.js"></script>
+    <![endif]-->
+    {$site_config['analysis_code']}

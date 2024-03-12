@@ -1,0 +1,52 @@
+<style>
+    .page-header small {
+        margin-top: 15px;
+        font-size: 13px;
+    }
+</style>
+
+<h2 class="page-header" style="margin-bottom: 0px;"> {$title}<span><small class="pull-right text-danger">
+        </small></span>
+</h2>
+<div class="row">
+    <div class="panel-body" style="min-height: 500px;">
+        {volist name='list' id='item'}
+        <div class="product-list">
+            <div class="col-sm-4 col-md-4 product-item">
+                <div class="card">
+                    <div class="thumb">
+                        <a href="{$item.url}" class="preview-link">
+                            <div class="embed-responsive embed-responsive-4by3">
+                                <img src="{$item.cover}" alt="">
+                            </div>
+                        </a>
+                        <a href="{$item.url}" class="quickview-link"><i class="fa fa-search"></i></a>
+                    </div>
+                    <div class="title">
+                        <h2><a href="{$item.url}">{$item.title}</a>
+                        </h2>
+                    </div>
+                    <div class="operate">
+                        <div class="pull-left text-gray">
+                            <div class="mt-1">
+                                <span class="" style="color: #FF0000; font-size: 16px;">
+                                    <i class="fa fa-cny"></i> {$item.price}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <a href="{$item.url}" class="btn btn-primary detail">{$item.labelname}</a>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {/volist}
+    </div>
+</div>
+{if $list->isEmpty()}
+<p class="text-center">暂无记录</p>
+{/if}
+<div class="pager">{$list->render()}</div>

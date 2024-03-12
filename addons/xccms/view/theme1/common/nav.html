@@ -1,0 +1,47 @@
+    <header class="sticky-top">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{:addon_url('xccms/index/index')}">
+                        <img src="{$site_config['logo']}" alt="{$site_config['name']}logo" title="{$site_config['name']}">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            {volist name="menu_list" id="item"}
+                            {if $item['sub_menu']}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="{$item['url']}" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-hover="dropdown" title="{$item['name']}">
+                                    {$item['name']}
+                                    <small class="d-none d-lg-block">{$item['en_name']}</small>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    {volist name="$item['sub_menu']" id="sitem"}
+                                    <li><a class="dropdown-item" href="{$sitem['url']}"{if $sitem['menu_type'] == 'link'} target="_blank"{/if} title="{$sitem['name']}">{$sitem['name']}</a></li>
+                                    {/volist}
+                                </ul>
+                            </li>
+                            {else}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{$item['url']}"{if $item['menu_type'] == 'link'} target="_blank"{/if} title="{$item['name']}">
+                                    {$item['name']}
+                                    <small class="d-none d-lg-block">{$item['en_name']}</small>
+                                </a>
+                            </li>
+                            {/if}
+                            {/volist}
+                        </ul>
+                        <div class="d-flex">
+                            <a class="nav-link tel-box">
+                                <svg class="iconpark-icon"><use href="#phone-call"></use></svg>
+                                咨询电话
+                                <span class="tel">{$site_config['tel']}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>

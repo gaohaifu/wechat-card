@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    {include file="theme1/common/scripts" /}
+</head>
+
+<body>
+    {include file="theme1/common/header" /}
+    <div class="xccms-page-box bg-light py-4">
+        <div class="container">
+            <ol class="breadcrumb py-3">
+                <li>当前位置：</li>
+                <li class="breadcrumb-item"><a href="{:addon_url('xccms/index/index')}" title="首页">首页</a></li>
+                <li class="breadcrumb-item active">FAQ</li>
+            </ol>
+            <div class="title">
+                <h1>FAQ</h1>
+                <hr class="my-4" />
+            </div>
+            <div class="faq-list-box py-4">
+                <div class="accordion" id="accordionExample">
+                    {volist name="faq_list" id="item"}
+                    <div class="accordion-item mb-5">
+                        <h2 class="accordion-header" id="heading{$key}">
+                            <button class="accordion-button{if $key == 0} active{/if}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{$key}" aria-expanded="{if $key == 0}true{else}false{/if}" aria-controls="collapse{$key}">
+                                {$key + 1}. {$item['question']}
+                            </button>
+                        </h2>
+                        <div id="collapse{$key}" class="accordion-collapse collapse{if $key == 0} show{/if}" aria-labelledby="heading{$key}" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                {$item['answer']}
+                            </div>
+                        </div>
+                    </div>
+                    {/volist}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    {include file="theme1/common/footer" /}
+    <script>
+    $(function() {
+        $('.faq-list-box .accordion-button').click(function() {
+            var that = $(this);
+            $('.faq-list-box .accordion-button').removeClass('active');
+            that.addClass('active');
+        })
+    })
+    </script>
+</body>
+
+</html>
