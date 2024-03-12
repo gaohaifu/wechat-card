@@ -37,7 +37,9 @@
 		<view class="overall_padding contents">
 			<!-- 快捷工具 -->
 			<view class="flex_between tools">
-				<view class="flex flex-v flex-vc flex-hc tool-item" v-for="(item, inx) in tools" :key="inx">
+				<view class="flex flex-v flex-vc flex-hc tool-item"
+					v-for="(item, inx) in tools" :key="inx"
+					:class="{'disabled' : item.disabled}">
 					<text class="iconfont" :class="item.icon" :style="{color: item.color}"></text>
 					<text>{{item.label}}</text>
 				</view>
@@ -79,32 +81,33 @@
 				<view class="title2">
 					最近访问
 				</view>
-				<view class="flex visit-item">
-					<image class="avatar" src="../../static/images/img.jpg" mode="scaleToFill"></image>
+				<view class="flex visit-item" v-for="(item, index) in visitStaffLists" :key="index">
+					<image class="avatar" :src="item.avatar" mode="scaleToFill"></image>
 					<view class="flex-1 right-box">
 						<view class="flex flex-hsb flex-vc">
-							<text class="name">陈丽容</text>
-							<text class="time">今天 3:00</text>
+							<text class="name">{{item.name}}</text>
+							<text class="time">{{item.createtime}}</text>
 						</view>
 						<view class="company">
 							<!-- <text>it</text>
 							<text>|</text> -->
-							<text>it｜陈氏空间（厦门）设计装修工程</text>
+							<text>{{item.position}}｜{{item.company}}</text>
 						</view>
 						<view class="counts">
-							第 4 次查看了我的名片‘厦门八达尔科技有限公司—总经理’
+							第 {{item.visitNum}} 次查看了我的名片‘{{item.myCardText}}’
 						</view>
 						<view class="from">
-							来源：我向对方发出的名片
+							来源：{{item.origin || filterOrigin}}
 						</view>
 					</view>
 				</view>
-				<view class="flex flex-hc flex-vc more">
+				<view class="flex flex-hc flex-vc more" v-if="visitStaffLists.length > 0">
 					<text>更访客数据</text>
 					<text class="iconfont icon-Rightyou"></text>
 				</view>
 			</view>
-			<view class="card-box">
+			<!-- 企业视频 -->
+			<view class="card-box" v-if="videofiles.length > 0">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">企业视频</view>
 					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseVideo')">
@@ -116,7 +119,9 @@
 					</view>
 				</view>
 				<view class="video" v-show="showEnterpriseVideo">
-					
+					<video :src="item"
+					    @error="videoErrorCallback" controls
+						v-for="(item, index) in videofiles" :key="index"></video>
 				</view>
 			</view>
 			<!-- 企业简介 -->
@@ -137,8 +142,7 @@
 							销售分析
 						</view>
 						<text class="desc">
-							智能评定员工销售能力，销售排行情况一目了然
-							总览每月销售数据，制定销售目标得心应手
+							{{description}}
 						</text>
 					</view>
 				</view>
@@ -163,26 +167,36 @@
 				userStaff: false,
 				user_id: '',
 				tools: [{
+						id: 1,
+						disabled: false,
 						icon: 'icon-dadianhua',
 						color: '#0256FF',
 						label: '打电话'
 					},
 					{
+						id: 2,
+						disabled: false,
 						icon: 'icon-jiaweixin',
 						color: '#07C160',
 						label: '加微信'
 					},
 					{
+						id: 3,
+						disabled: false,
 						icon: 'icon-fayoujian',
 						color: '#FF4E20',
 						label: '发邮箱'
 					},
 					{
+						id: 4,
+						disabled: false,
 						icon: 'icon-dingwei',
 						color: '#02B7FF',
 						label: '定位'
 					},
 					{
+						id: 5,
+						disabled: false,
 						icon: 'icon-famingpian',
 						color: '#0256FF',
 						label: '发名片'
@@ -198,7 +212,7 @@
 					},
 					{
 						icon: 'icon-mingpianma',
-						label: '名片吗'
+						label: '名片码'
 					},
 					{
 						icon: 'icon-fenxiangshezhi',
@@ -207,15 +221,15 @@
 				],
 				visits: [{
 						label: '访问量(次)',
-						value: 324
+						value: 0
 					},
 					{
 						label: '今日访问量(次)',
-						value: 324
+						value: 0
 					},
 					{
 						label: '发名片(次)',
-						value: 324
+						value: 0
 					},
 				],
 				showEnterpriseVideo: true,
@@ -265,6 +279,15 @@
 		// 	  console.log(res.errCode);
 		// 	});
 		// },
+		filters: {
+			filterOrigin(vl) {
+				let ret = ''
+				if(vl === 1) ret = '我向对方发出了名片'
+				if(vl === 2) ret = '对方的名片夹'
+				if(vl === 3) ret = '对方的名片浏览记录'
+				return ret
+			}
+		},
 		onLoad(e) {
 			console.log('index调用onload',e); // 分享的？
 			var that=this;
@@ -316,7 +339,7 @@
 						this.isShowBottom=true
 						this.userStaff=false
 						this.user_id='';
-						this.getIndexShare();
+						// this.getIndexShare();
 						// #endif						
 					}
 					
@@ -441,6 +464,16 @@
 							staff_id:this.userData.id 
 						};
 						this.nickname=this.userData.name
+						this.statistics[0].value = this.myCardData.allVisitNum
+						this.statistics[1].value = this.myCardData.todayVisitNum
+						this.statistics[2].value = this.myCardData.sendCardNum
+						if(!this.staffInfo.mobile) this.tools.find(i => i.id === 1).disabled = true
+						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
+						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
+						if(!(this.staffInfo.smartcardcompany && (this.staffInfo.smartcardcompany.longitude && 
+							this.staffInfo.smartcardcompany.latitude || 
+							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
+						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
 					}else {
 						if(this.user_id!=0 || this.user_id!=''){
 							if(staff_id_c!=''){
