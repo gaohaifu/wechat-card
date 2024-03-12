@@ -144,13 +144,24 @@
 				</view>
 			</view>
 		</view>
+		<!--  #ifdef  MP-WEIXIN	 -->
+		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom"></bottomSheet>
+		<!--  #endif -->
 	</view>
 </template>
 
 <script>
+	import { doIndexShare } from '../../config/newApi.js'
+	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	export default {
+		components:{
+			bottomSheet
+		},
 		data() {
 			return {
+				isShowBottom : false,			//底部弹窗开关
+				userStaff: false,
+				user_id: '',
 				tools: [{
 						icon: 'icon-dadianhua',
 						color: '#0256FF',
@@ -208,24 +219,243 @@
 					},
 				],
 				showEnterpriseVideo: true,
-				showEnterpriseProfile: true
+				showEnterpriseProfile: true,
+				allData:'',
+				userData:{
+					nickname:'',
+					name:'',
+					avatar:'',
+					position:''
+				},
+				staffInfo: {}, // 名片信息
+				myCardData: {}, // 我的名片数据
+				visitStaffLists: [], // 访客列表
+				videofiles: {}, // 企业视频
+				description: '', // 企业简介
+				certificateStatus:true,
+				nickname:'',
+				transmit:{
+					company_id:'',
+					nickname:'',
+					position:'',
+					shortname:'',
+					avatar:'',
+					phone:''
+				},
+				staff_id: 0,
+				mystaff_id:0,
+				color: '',
+				backgroundImg: '',
+				cardimage: '',
+				fontcolor: '',
+				showGlance: false,
+				myselfstatus: false,
+				
 			}
 		},
-		mounted() {
-			const innerAudioContext = uni.createInnerAudioContext();
-			innerAudioContext.autoplay = true;
-			innerAudioContext.src = 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-hello-uniapp/2cc220e0-c27a-11ea-9dfb-6da8e309e0d8.mp3';
-			innerAudioContext.onPlay(() => {
-			  console.log('开始播放');
-			});
-			innerAudioContext.onError((res) => {
-			  console.log(res.errMsg);
-			  console.log(res.errCode);
-			});
+		// mounted() {
+		// 	const innerAudioContext = uni.createInnerAudioContext();
+		// 	innerAudioContext.autoplay = true;
+		// 	innerAudioContext.src = 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-hello-uniapp/2cc220e0-c27a-11ea-9dfb-6da8e309e0d8.mp3';
+		// 	innerAudioContext.onPlay(() => {
+		// 	  console.log('开始播放');
+		// 	});
+		// 	innerAudioContext.onError((res) => {
+		// 	  console.log(res.errMsg);
+		// 	  console.log(res.errCode);
+		// 	});
+		// },
+		onLoad(e) {
+			console.log('index调用onload',e); // 分享的？
+			var that=this;
+			if(typeof(e.staff_id)== "undefined" || e.staff_id=='' ||  e.staff_id==null || e.staff_id=='null'){
+				uni.showToast({
+					title:'无用户信息！',
+					icon:'none',
+					duration:2000
+				})
+			}else{
+				this.staff_id=e.staff_id;
+				uni.setStorageSync('staff_id',e.staff_id)
+			}
+		},
+		onShow() {
+			// #ifdef MP-WEIXIN
+			this.wxLogin();
+			// #endif
 		},
 		methods: {
 			toggleCardBox(dataProp) {
 				this[dataProp] = !this[dataProp]
+			},
+			refreshUser(){
+				console.log('index调用onshow');
+				this.$api.refreshUser(
+				 {},
+				data => {
+					console.log(data);
+					if(data.code==1){
+						this.user_id=data.data.user.id;
+						this.getIndexShare();
+					}else{
+						//微信小程序端
+						// #ifdef MP-WEIXIN
+						console.log("小程序: ",1);
+						this.isShowBottom=true
+						this.userStaff=false
+						this.user_id='';
+						this.getIndexShare();
+						// #endif						
+					}
+					
+				})
+			},
+			//改版后小程序登录规则
+			//小程序登录
+			onGetUserProfile() {
+				var platform='wechat';
+				var that=this;
+				var fid=uni.getStorageSync('parentid')?uni.getStorageSync('parentid'):''; 
+				uni.getUserProfile({
+					 desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+					success: res => {
+						console.log(res)
+						this.$api.third(
+							{
+								code: this.code,
+								platform:platform,
+								encrypted_data: res.encryptedData,
+								iv: res.iv,
+								raw_data: res.rawData,
+								signature: res.signature
+							},
+							data => {
+								console.log(data);
+								//console.log(data.data.userinfo) 
+								var res=data.data;
+								if (data.code == 1) {
+									this.userStaff=true
+									this.$common.successToShow('登录成功!');
+									try {
+										this.$db.set('upload',1)
+										this.$db.set('login', 1)
+										this.$db.set('auth',res.auth)
+										this.$db.set('user', res.userinfo)
+										this.user_id=res.userinfo.id
+										this.getIndexShare()
+									} catch (e) {
+										console.log("e: ",e);
+									}
+								}else{
+									this.wxLogin();
+								}
+							}
+						);
+					},
+					fail: (res) => {
+						console.log("res: ",res);
+						this.wxLogin();//重新获取登录code
+						uni.hideLoading()
+						if (res.errMsg == "getUserInfo:cancel" || res.errMsg == "getUserInfo:fail auth deny") {
+							uni.showModal({
+								title: '用户授权失败',
+								showCancel: false,
+								content: '请点击重新授权，如果未弹出授权，请尝试长按删除小程序，重新进入!',
+								success: function(res) {
+									if (res.confirm) {
+										console.log('用户点击确定')
+										//uni.navigateBack()
+										this.isShowBottom = true;
+									}
+								}
+							})
+						}	
+					}
+				})
+			},
+			//底部开关
+			closeBottom(){
+				this.isShowBottom = false;
+				this.onGetUserProfile()
+			},
+			getIndexShare() {
+				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || ''
+				const condition = {
+					staff_id: this.staff_id,
+					user_id: this.user_id
+				}
+				doIndexShare(condition, (res) => {
+					if(res.code === '1') {
+						this.allData=data.data
+						console.log(this.allData);
+						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
+						this.userData = this.staffInfo = res.staffInfo || {};
+						if(this.userData.statusdata!='1'){
+							this.certificateStatus=false;
+						}
+						this.myCardData = res.myCardData || {};
+						this.visitStaffLists = res.visitStaffLists || [];
+						this.videofiles = res.videofiles || [];
+						this.description = res.description || '';
+						this.updatetime=this.allData.newsTime
+						this.color=this.staffInfo?this.staffInfo.smartcardtheme.colour:''
+						this.backgroundImg=this.staffInfo?this.staffInfo.smartcardtheme.backgroundimage:''
+						this.cardimage=this.staffInfo?this.staffInfo.smartcardtheme.cardimage:''
+						this.fontcolor=this.staffInfo?this.staffInfo.smartcardtheme.fontcolor:''          
+						if(uni.getStorageSync('color')==this.color){
+							console.log('已有color');
+						}else{
+							uni.setStorageSync('color',this.color)
+						}
+						if(uni.getStorageSync('backgroundImg')==this.backgroundImg){
+							console.log('已有backgroundImg');
+						}else{
+							uni.setStorageSync('backgroundImg',this.backgroundImg)
+						}
+						this.showGlance=this.visitStaffLists.map(item=>{
+							return item.avatar
+						})
+						this.staff_id=this.staffInfo.id
+						this.mystaff_id= this.userInfo.staff_id || 0
+						this.myselfstatus = this.staff_id != this.mystaff_id
+						this.transmit={
+							company_id:this.companyInfo.id,
+							position:this.userData.position,
+							shortname:this.companyInfo.name,
+							avatar:this.userData.avatar,
+							phone:this.userData.mobile,
+							wxQRCodeimage:this.userData.wxQRCodeimage,
+							wechat:this.userData.wechat,
+							staff_id:this.userData.id 
+						};
+						this.nickname=this.userData.name
+					}else {
+						if(this.user_id!=0 || this.user_id!=''){
+							if(staff_id_c!=''){
+								uni.showToast({
+									title:'无此用户名片信息,即将跳转到个人名片主页...',
+									icon:'none',
+									duration:1500
+								})
+								setTimeout(()=>{
+									uni.navigateTo({
+										url:'pages/myCard/myCard'
+									})
+								},2000)
+								return false;
+						    }
+						}
+						this.$common.errorToShow(data.msg,function(){
+							if(staff_id_c==undefined || staff_id_c==null  ||  staff_id_c=='' || staff_id_c==0){
+								if(that.user_id!=0){
+										uni.navigateTo({
+											url:'pages/userInfo/userInfo'
+										})
+								}
+							}
+						})
+					}
+				})
 			}
 		}
 	}

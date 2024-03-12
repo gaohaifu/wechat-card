@@ -1,15 +1,37 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页,
-
-		
+	{
+		"path": "pages/myCard/myCard",
+		"style": {
+			"navigationBarTitleText": "Ta的名片",
+			"enablePullDownRefresh": false
+		}
+	
+	},
+	{
+		"path": "pages/index/index",
+		"style": {
+			"navigationBarTitleText": "首页",
+			//"enablePullDownRefresh": true
+			"navigationStyle": "custom"
+		}
+	},
 		{
-			"path": "pages/index/index",
+			"path": "pages/mycard-data/index",
 			"style": {
-				"navigationBarTitleText": "首页",
-				//"enablePullDownRefresh": true
-				"navigationStyle": "custom"
+				"navigationBarTitleText": "我的名片数据",
+				"enablePullDownRefresh": false,
+				"navigationBarBackgroundColor": "#0256FF"
 			}
 		},
+		{
+			"path": "pages/choose-card/index",
+			"style": {
+				"navigationBarTitleText": "邀请选择名片",
+				"enablePullDownRefresh": false
+			}
+		},		
+		
 		{
 			"path": "pages/change/change",
 			"style": {
