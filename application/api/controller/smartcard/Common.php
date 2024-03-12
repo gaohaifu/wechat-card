@@ -12,14 +12,6 @@ use app\admin\model\smartcard\Company;
 use app\admin\model\smartcard\Message;
 use app\admin\model\smartcard\Theme;
 
-use app\admin\model\obo\Commodity;
-use app\admin\model\obo\Commodityclass;
-use app\admin\model\obo\Myfollow;
-use app\admin\model\obo\Myrelease;
-use app\admin\model\obo\Order;
-use app\admin\model\obo\Orderdetails;
-use app\admin\model\obo\Shop;
-
 
 use app\common\model\User;
 
@@ -290,6 +282,144 @@ class Common extends Base
                 $this->error('名片夹id非法');
             }
         }
+    }
+    
+    /**
+     * 名片交换请求列表--全部请求
+     */
+    public function allCardApplyList()
+    {
+        $user_id = $this->user_id;
+        $page=$this->request->request('page')?:1;
+        $staff = new Staff();;
+        $exchangeCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>1])
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime,self_staff_id')
+            ->page($page,20)
+            ->select();
+        foreach ($exchangeCards as &$exchangeCard) {
+            $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
+            $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
+            $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
+            $exchangeCard['mystaff'] = [
+                'companyname'=>$mystaff->smartcardcompany->name,
+                'position'=>$mystaff->position
+            ];
+            $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
+        }
+        
+        $this->success('请求成功', $exchangeCards);
+        
+    }
+    
+    /**
+     * 我的名片数据--汇总
+     */
+    public function myCardVisit()
+    {
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $Visitors = new Visitors();
+        $Su = new Su();
+        $staff_ids = $Staff->where(['user_id' => $user_id])->column('id');
+        if(count($staff_ids)>1) {
+            $wheredata = ['A.staff_id' => ['in', $staff_ids]];
+        }elseif(count($staff_ids)==1){
+            $wheredata = ['A.staff_id' => $staff_ids[0]];
+        }else{
+            $this->error('请先创建名片');
+        }
+        $allVisitNum = $Visitors->alias('A')
+            ->join('user B', 'A.user_id=B.id')
+            ->where($wheredata)
+            ->where(['A.typedata' => '1'])
+            ->field('A.user_id')
+            ->count();
+        $todayVisitNum = $Visitors->alias('A')
+            ->join('user B', 'A.user_id=B.id')
+            ->where($wheredata)
+            ->where(['A.typedata' => '1'])
+            ->whereTime('A.createtime', 'today')
+            ->field('A.user_id')
+            ->count();
+        $allSendNum = $Staff->where(['user_id'=>$user_id])->sum('send_num');
+        $allExchangeNum = $Su->where(['user_id'=>$user_id,'status'=>4])->count();
+        $data['allVisitNum'] = $allVisitNum;
+        $data['todayVisitNum'] = $todayVisitNum;
+        $data['allSendNum'] = $allSendNum;
+        $data['allExchangeNum'] = $allExchangeNum;
+        $this->success('请求成功', $data);
+    }
+    
+    /**
+     * 我的名片数据列表
+     */
+    public function myCardList()
+    {
+        $user_id = $this->user_id;
+        $page=$this->request->request('page')?:1;
+        $type=$this->request->request('type')?:1;
+        $staff_id=$this->request->request('staff_id')?:0;
+        $Staff = new Staff();
+        $Visitors = new Visitors();
+        $Su = new Su();
+        if($type==1){
+            if($staff_id){
+                $wheredata = ['A.staff_id' => $staff_id];
+            }else{
+                $staff_ids = $Staff->where(['user_id' => $user_id])->column('id');
+                if(count($staff_ids)>1) {
+                    $wheredata = ['A.staff_id' => ['in', $staff_ids]];
+                }elseif(count($staff_ids)==1){
+                    $wheredata = ['A.staff_id' => $staff_ids[0]];
+                }else{
+                    $this->error('请先创建名片');
+                }
+            }
+            
+            $visitStaffLists   = $Visitors->alias('A')
+                ->join('user B', 'A.user_id=B.id')
+                ->where($wheredata)
+                ->where(['A.typedata' => '1'])
+                ->field('A.user_id,B.avatar,A.createtime,A.origin')
+                ->group('A.user_id')
+                ->page($page,10)
+                ->order('A.createtime','desc')
+                ->select();
+    
+            foreach ($visitStaffLists as &$visitStaffList) {
+                $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
+                $staff = $Staff->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
+                if($staff){
+                    $visitStaffList->staff_id = $staff['id'];
+                    $visitStaffList->name = $staff['name'];
+                    $visitStaffList->position = $staff['position'];
+                    $visitStaffList->company = $staff->smartcardcompany->name;
+                }else{
+                    $visitStaffList->staff_id = null;
+                    $visitStaffList->name = null;
+                    $visitStaffList->position = null;
+                    $visitStaffList->company = null;
+                }
+            }
+        }elseif ($type==2){
+            $wheredata = ['A.user_id' => $user_id];
+            $visitStaffLists   = $Visitors->alias('A')
+                ->join('smartcard_staff B', 'A.staff_id=B.id')
+                ->where($wheredata)
+                ->where(['A.typedata' => '1'])
+                ->field('B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin')
+                ->group('A.staff_id')
+                ->page($page,10)
+                ->order('A.createtime','desc')
+                ->select();
+    
+            foreach ($visitStaffLists as &$visitStaffList) {
+                $visitStaffList->avatar = cdnurl(user::where(['id'=>$visitStaffList->user_id])->value('avatar'),true);
+                $visitStaffList->company = \addons\myadmin\model\Company::where(['id'=>$visitStaffList->company_id])->value('name');
+            }
+        }
+        $this->success('请求成功', $visitStaffLists);
     }
     
     /**
