@@ -373,9 +373,11 @@ class Base extends Api
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
                 ->find();
-                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata','id_card_face','id_card_reverse']);
+                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
             if (!is_null($staffInfo)) {
-                $staffInfo['avatar'] = cdnurl(\app\common\model\User::where(['id' =>$staffInfo->user_id])->value('avatar'),true);
+                $user = \app\common\model\User::where(['id' =>$staffInfo->user_id])->find();
+                $staffInfo['avatar'] = cdnurl($user['avatar'],true);
+                $staffInfo['is_certified'] = $user['is_certified'];
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {
                     $staffInfo['picimages'] = [];

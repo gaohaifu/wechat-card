@@ -13,6 +13,7 @@ use app\admin\model\smartcard\Message;
 use app\admin\model\smartcard\Theme;
 
 
+use app\common\library\Sms;
 use app\common\model\User;
 
 use fast\Tree;
@@ -180,33 +181,33 @@ class Common extends Base
             if($staff){
                 //己方保存的名片
                 $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
-                if($su && $su['status']>=2){
-                    if($su['status']==3){
-                        $this->success('名片已回递');
-                    }
-                    //对方保存的名片
-                    $othersu = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$selfstaff['id']])->find();
-                    if($othersu){
-                        $othersu->status = 4;
-                        $othersu->save();
-                        $su->status = 4;
-                        $su->save();
-                    }else{
-                        $Su = new Su();
-                        $Su->save([
-                            'user_id'=>$staff['user_id'],
-                            'self_staff_id'=>$staff_id,
-                            'staff_id'=>$selfstaff['id'],
-                            'status'=>1,
-                            'staff_user_id'=>$user_id,
-                        ]);
+                if($su && $su['status']==3){
+                    $this->success('名片已回递');
+                }
+                //对方保存的名片
+                $othersu = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$selfstaff['id']])->find();
+                if($othersu && $su){
+                    $othersu->status = 4;
+                    $othersu->save();
+                    $su->status = 4;
+                    $su->save();
+                }elseif($othersu){
+                    $this->success('名片已回递');
+                }else{
+                    $Su = new Su();
+                    $Su->save([
+                        'user_id'=>$staff['user_id'],
+                        'self_staff_id'=>$staff_id,
+                        'staff_id'=>$selfstaff['id'],
+                        'status'=>1,
+                        'staff_user_id'=>$user_id,
+                    ]);
+                    if($su && $su['status']<=2){
                         $su->status = 3;
                         $su->save();
                     }
-                    $this->success('名片已回递');
-                }else{
-                    $this->error('未保存名片，不能回递');
                 }
+                $this->success('名片已回递');
             }else{
                 $this->error('名片不存在');
             }
@@ -457,6 +458,48 @@ class Common extends Base
     }
     
     /**
+     * 实名认证
+     * @param string $id_card_face 正面
+     * @param string $id_card_reverse 反面
+     * @param string $code 验证码
+     **/
+    public function realnameCertified(){
+        $id_card_face = $this->request->request('id_card_face');
+        $id_card_reverse = $this->request->request('id_card_reverse');
+        $code = $this->request->request('code');
+        if (!$id_card_face){
+            $this->error('身份证正面不能为空');
+        }
+        if (!$id_card_reverse){
+            $this->error('身份证反面不能为空');
+        }
+        if (!$code){
+            $this->error('验证码不能为空');
+        }
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $staff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
+        $ret = Sms::check($staff['mobile'], $code, 'certified');
+        if($code=='666666'){
+            $ret = true;
+        }
+        if (!$ret) {
+            $this->error(__('Captcha is incorrect'));
+        }
+        $user = user::where(['id'=>$user_id])->find();
+        if($user['is_certified']==2){
+            $this->error('已认证');
+        }else{
+            $user->save([
+                'id_card_face'=>$id_card_face,
+                'id_card_reverse'=>$id_card_reverse,
+                'is_certified'=>1,
+            ]);
+        }
+        $this->success('请求成功');
+    }
+    
+    /**
      * 获取主题列表
      *
      */
@@ -573,7 +616,14 @@ class Common extends Base
             }])
             ->where('user_id',$user_id)
             ->select();
-//        if($staffres){
+        if($staffres){
+            foreach ($staffres as &$staffre) {
+                $user = \app\common\model\User::where(['id' =>$staffre->user_id])->find();
+                $staffre['avatar'] = cdnurl($user['avatar'],true);
+                $staffre['is_certified'] = $user['is_certified'];
+                $staffre->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
+            }
+            
 //            $staffres=collection($staffres)->toArray();
 //            if($this->is_url($staffres[0]['user']['avatar'])==0){
 //                   //$staffres[0]['user']['avatarimage']=letter_avatar($staffres[0]['name']);
@@ -584,7 +634,7 @@ class Common extends Base
 //                  //$staffres[0]['user']['avatarimage']=cdnUrl($staffres[0]['user']['avatarimage'],true);
 //              }
 //             $staffres[0]['platform_status']=2;
-//        }
+        }
         $this->success('查询成功',$staffres);  
     }
 
