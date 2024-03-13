@@ -23,6 +23,7 @@ use app\admin\model\obo\Shop;
 
 use app\common\model\User;
 
+use fast\Tree;
 use think\Db;
 use think\Config;
 
@@ -291,10 +292,24 @@ class Common extends Base
             }
         }
     }
-    
+
+    /**
+     * 获取行业列表
+     *
+     */
+    public function industryCategoryList()
+    {
+        $tree = Tree::instance();
+        $tree->nbsp = '';
+        $IndustryCategory = new \app\admin\model\smartcard\IndustryCategory();
+        $tree->init(collection($IndustryCategory->select())->toArray(), 'parent_id');
+//        $categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
+        $this->success('请求成功', $tree->getTreeArray(0));
+    }
+
     /**
      * 获取主题列表
-     * 
+     *
      */
     public function themeList()
     {
@@ -321,7 +336,7 @@ class Common extends Base
                 $Themeres[0]['status'] = 1;
             }
         }
-        
+
         $this->success('请求成功', $Themeres);
 
     }
@@ -526,9 +541,7 @@ class Common extends Base
         if(!isset($data['company_id']) || $data['company_id']=='undefined'){
             $this->error('请选择所属公司');
         }
-		if(!is_null($userres)){
-			$this->error('已存在该用户的员工信息');
-		}
+
 		$user = $this->auth->getUser();
         if(isset($data['avatar'])){
           $avatar = $this->request->request('avatar', '', 'trim,strip_tags,htmlspecialchars');
@@ -536,6 +549,12 @@ class Common extends Base
           $user->save();
           unset($data['avatar']);
         }
+
+        if(!is_null($userres)){
+            $userres->allowField(true)->save($data);
+            $this->success('更新员工信息成功');
+        }
+
         $data['user_id']=$login_id;
         $data['statusdata']='2';
         $res = $Staff->isUpdate(false)->allowField(true)->save($data);
