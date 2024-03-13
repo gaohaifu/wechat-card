@@ -283,7 +283,7 @@
 					avatar:'',
 					phone:''
 				},
-				myselfstatus:false,
+				myselfstatus:true,
 				mystaff_id:0
 				
 			}
