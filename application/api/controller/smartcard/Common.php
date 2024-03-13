@@ -295,8 +295,7 @@ class Common extends Base
         $tree->nbsp = '';
         $IndustryCategory = new \app\admin\model\smartcard\IndustryCategory();
         $tree->init(collection($IndustryCategory->select())->toArray(), 'parent_id');
-//        $categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
-        $this->success('请求成功', $tree->getTreeArray(0));
+        $this->success('请求成功', $tree->getTreeArray(0,'','children'));
     }
 
     /**
@@ -409,12 +408,22 @@ class Common extends Base
                     $visitStaffList->staff_id = $staff['id'];
                     $visitStaffList->name = $staff['name'];
                     $visitStaffList->position = $staff['position'];
-                    $visitStaffList->company = $staff->smartcardcompany->name;
+                    $visitStaffList->companyname = $staff->smartcardcompany->name;
                 }else{
                     $visitStaffList->staff_id = null;
                     $visitStaffList->name = null;
                     $visitStaffList->position = null;
-                    $visitStaffList->company = null;
+                    $visitStaffList->companyname = null;
+                }
+                $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
+                if($su){
+                    if($su['status']==1){
+                        $visitStaffList->status = 2;
+                    }else{
+                        $visitStaffList->status = 3;
+                    }
+                }else{
+                    $visitStaffList->status = 1;
                 }
             }
         }elseif ($type==2){
@@ -431,7 +440,17 @@ class Common extends Base
     
             foreach ($visitStaffLists as &$visitStaffList) {
                 $visitStaffList->avatar = cdnurl(user::where(['id'=>$visitStaffList->user_id])->value('avatar'),true);
-                $visitStaffList->company = \addons\myadmin\model\Company::where(['id'=>$visitStaffList->company_id])->value('name');
+                $visitStaffList->companyname = \addons\myadmin\model\Company::where(['id'=>$visitStaffList->company_id])->value('name');
+                $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
+                if($su){
+                    if($su['status']==1){
+                        $visitStaffList->status = 2;
+                    }else{
+                        $visitStaffList->status = 3;
+                    }
+                }else{
+                    $visitStaffList->status = 1;
+                }
             }
         }
         $this->success('请求成功', $visitStaffLists);

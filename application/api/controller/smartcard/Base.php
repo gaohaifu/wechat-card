@@ -150,7 +150,7 @@ class Base extends Api
                         ->limit(10)
                         ->order('A.createtime','desc')
                         ->select();
-
+                    $Su = new Su();
                     foreach ($visitStaffLists as &$visitStaffList) {
                         $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
                         $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
@@ -165,7 +165,16 @@ class Base extends Api
                             $visitStaffList->position = null;
                             $visitStaffList->company = null;
                         }
-        
+                        $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
+                        if($su){
+                            if($su['status']==1){
+                                $visitStaffList->status = 2;
+                            }else{
+                                $visitStaffList->status = 3;
+                            }
+                        }else{
+                            $visitStaffList->status = 1;
+                        }
                         $VisitNum = $this->visitorsModel
                             ->where(['staff_id' => $staff_id, 'typedata' => '1', 'user_id' => $visitStaffList->user_id])
                             ->count();
@@ -366,7 +375,7 @@ class Base extends Api
                 ->find();
                 if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata','id_card_face','id_card_reverse']);
             if (!is_null($staffInfo)) {
-                $staffInfo['avatar'] = cdnurl($staffInfo->user->avatar,true);
+                $staffInfo['avatar'] = cdnurl(\app\common\model\User::where(['id' =>$staffInfo->user_id])->value('avatar'),true);
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {
                     $staffInfo['picimages'] = [];
