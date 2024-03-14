@@ -498,7 +498,35 @@ class Common extends Base
         }
         $this->success('请求成功');
     }
-    
+
+    /**
+     * 企业名片数据
+     */
+    public function myCompany()
+    {
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $Company = new \addons\myadmin\model\Company();
+        $staff = $Staff->where(['user_id'=>$user_id, 'company_id'=>$user_id])->find();
+        if(!$staff){
+            $this->error('您非企业主');
+        }
+        $data['companyInfo'] = [
+            'companyname'=>$staff->smartcardcompany->name,
+            'position'=>$staff->position,
+        ];
+        $data['memberInfo'] = [
+            'allNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>1])->count(),
+            'applyNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>2])->count(),
+            'activationNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>4])->count(),
+        ];
+        $data['memberList'] = $Staff->where(['company_id'=>$user_id, 'statusdata'=>1])->field('name,createtime')->limit(10)->order('createtime desc')->select();
+
+        $this->success('请求成功', $data);
+
+
+    }
+
     /**
      * 获取主题列表
      *
@@ -756,6 +784,7 @@ class Common extends Base
 
         $data['user_id']=$login_id;
         $data['statusdata']='2';
+        if($data['company_id']==$login_id) $data['statusdata']='1';
         $res = $Staff->isUpdate(false)->allowField(true)->save($data);
         if($res!==false){
                 $this->success('提交申请成功',$Staff->id);
