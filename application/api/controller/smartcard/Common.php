@@ -526,7 +526,87 @@ class Common extends Base
 
 
     }
+    
+    /**
+     * 成员列表
+     */
+    public function getMemberList()
+    {
+        $user_id = $this->user_id;
+        $page=$this->request->request('page')?:1;
+        $type=$this->request->request('type')?:1;
+        $Staff = new Staff();
+        if($type==1){
+            $statusdata = 1;
+        }elseif($type==2){
+            $statusdata = 2;
+        }elseif($type==3){
+            $statusdata = 4;
+        }
+        $staffs = $Staff->where(['company_id'=>$user_id, 'statusdata'=>$statusdata])->page($page,10)
+            ->field('id as staff_id,name,company_id,position,user_id')
+            ->select();
+        foreach ($staffs as $staff) {
+            $staff->avatar = cdnurl(\app\common\model\User::where(['id' =>$staff->user_id])->value('avatar'),true);
+            $staff->companyname = \addons\myadmin\model\Company::where(['id'=>$staff->company_id])->value('name');
+            $staff->is_owner = ($staff->user_id==$staff->company_id)?1:0;
+        }
+        $this->success('请求成功', $staffs);
+    }
+    
+    /**
+     * 企业认证
+     * @param string $licenseimage 企业营业执执照
+     * @param string $official_letter 公函
+     **/
+    public function enterpriseCertified(){
+        $licenseimage = $this->request->request('licenseimage');
+        $official_letter = $this->request->request('official_letter');
+        if (!$licenseimage){
+            $this->error('企业营业执执照不能为空');
+        }
+        if (!$official_letter){
+            $this->error('公函不能为空');
+        }
 
+        $user_id = $this->user_id;
+        $Company = new \addons\myadmin\model\Company();
+        $company = $Company->where(['id'=>$user_id])->find();
+       
+        if($company['is_authentication']==2){
+            $this->error('已认证');
+        }else{
+            $company->save([
+                'licenseimage'=>$licenseimage,
+                'official_letter'=>$official_letter,
+                'is_authentication'=>1,
+            ]);
+        }
+        $this->success('请求成功');
+    }
+    
+    /**
+     * 企业主同意申请
+     * @param string $staff_id
+     **/
+    public function agreeApply(){
+        $staff_id = $this->request->request('staff_id');
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $staff = $Staff->where(['company_id'=>$user_id,'id'=>$staff_id])->find();
+        if(!$staff){
+            $this->error('申请人id错误');
+        }else{
+            if($staff['statusdata']==1){
+                $this->success('请求成功');
+            }elseif($staff['statusdata']==2){
+                $staff->statusdata = 1;
+                $staff->save();
+            }
+            $this->success('请求成功');
+        }
+    }
+    
     /**
      * 获取主题列表
      *
@@ -649,7 +729,7 @@ class Common extends Base
                 $user = \app\common\model\User::where(['id' =>$staffre->user_id])->find();
                 $staffre['avatar'] = cdnurl($user['avatar'],true);
                 $staffre['is_certified'] = $user['is_certified'];
-                $staffre->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
+                $staffre->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh']);
             }
             
 //            $staffres=collection($staffres)->toArray();

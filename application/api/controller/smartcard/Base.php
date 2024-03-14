@@ -193,26 +193,30 @@ class Base extends Api
                     ];
                     $data['visitStaffLists']       = $visitStaffLists;//访问员工主页人员的记录信息，最多10条返回
                 }
-                
-                $siteconfig = Xccmssiteconfig::where(['company_id'=>$staffInfo['company_id']])->value('json_data');
-                $siteconfigData = json_decode($siteconfig, true);
-                $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
-                $videofiles=[];
-                if(isset($siteconfigData['videofiles'])){
-                    $videofiles=explode(',',$siteconfigData['videofiles']);
-                    if($videofiles){
-                        foreach ($videofiles as &$videofile) {
-                            $videofile = cdnurl($videofile,true);
-                        }
-                        
-                    }
-                }
+    
                 if($type==1){
                     $data['services'] = $this->getMenu($staffInfo['company_id']);
                 }
-                
-                $data['videofiles'] = $videofiles;
-                $data['description'] = $siteconfigData['description'];
+    
+                $data['videofiles'] = [];
+                $data['description'] = '';
+                $siteconfig = Xccmssiteconfig::where(['company_id'=>$staffInfo['company_id']])->value('json_data');
+                if($siteconfig){
+                    $siteconfigData = json_decode($siteconfig, true);
+                    $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
+                    $videofiles=[];
+                    if(isset($siteconfigData['videofiles'])){
+                        $videofiles=explode(',',$siteconfigData['videofiles']);
+                        if($videofiles){
+                            foreach ($videofiles as &$videofile) {
+                                $videofile = cdnurl($videofile,true);
+                            }
+            
+                        }
+                    }
+                    $data['videofiles'] = $videofiles;
+                    $data['description'] = $siteconfigData['description'];
+                }
                 return $data;
             } else {
                 $this->error('没有该员工信息');
@@ -373,7 +377,7 @@ class Base extends Api
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
                 ->find();
-                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata']);
+                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh']);
             if (!is_null($staffInfo)) {
                 $user = \app\common\model\User::where(['id' =>$staffInfo->user_id])->find();
                 $staffInfo['avatar'] = cdnurl($user['avatar'],true);
