@@ -155,7 +155,6 @@
 </template>
 
 <script>
-	import { doIndexShare } from '../../config/newApi.js'
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	export default {
 		components:{
@@ -290,7 +289,6 @@
 		},
 		onLoad(e) {
 			console.log('index调用onload',e); // 分享的？
-			var that=this;
 			if(typeof(e.staff_id)== "undefined" || e.staff_id=='' ||  e.staff_id==null || e.staff_id=='null'){
 				uni.showToast({
 					title:'无用户信息！',
@@ -331,7 +329,7 @@
 					console.log(data);
 					if(data.code==1){
 						this.user_id=data.data.user.id;
-						this.getIndexShare();
+						this.getIndex();
 					}else{
 						//微信小程序端
 						// #ifdef MP-WEIXIN
@@ -339,7 +337,7 @@
 						this.isShowBottom=true
 						this.userStaff=false
 						this.user_id='';
-						// this.getIndexShare();
+						// this.getIndex();
 						// #endif						
 					}
 					
@@ -349,7 +347,6 @@
 			//小程序登录
 			onGetUserProfile() {
 				var platform='wechat';
-				var that=this;
 				var fid=uni.getStorageSync('parentid')?uni.getStorageSync('parentid'):''; 
 				uni.getUserProfile({
 					 desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
@@ -377,7 +374,7 @@
 										this.$db.set('auth',res.auth)
 										this.$db.set('user', res.userinfo)
 										this.user_id=res.userinfo.id
-										this.getIndexShare()
+										this.getIndex()
 									} catch (e) {
 										console.log("e: ",e);
 									}
@@ -413,15 +410,15 @@
 				this.isShowBottom = false;
 				this.onGetUserProfile()
 			},
-			getIndexShare() {
+			getIndex() {
 				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || ''
 				const condition = {
 					staff_id: this.staff_id,
 					user_id: this.user_id
 				}
-				doIndexShare(condition, (res) => {
-					if(res.code === '1') {
-						this.allData=data.data
+				this.$api.doIndex(condition, (res) => {
+					if(res.code === 1) {
+						this.allData=res.data
 						console.log(this.allData);
 						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
 						this.userData = this.staffInfo = res.staffInfo || {};
@@ -484,18 +481,18 @@
 								})
 								setTimeout(()=>{
 									uni.navigateTo({
-										url:'pages/myCard/myCard'
+										url:'/pages/myCard/myCard'
 									})
 								},2000)
 								return false;
 						    }
 						}
-						this.$common.errorToShow(data.msg,function(){
+						this.$common.errorToShow(res.msg, () => {
 							if(staff_id_c==undefined || staff_id_c==null  ||  staff_id_c=='' || staff_id_c==0){
-								if(that.user_id!=0){
-										uni.navigateTo({
-											url:'pages/userInfo/userInfo'
-										})
+								if(this.user_id!=0){
+									uni.navigateTo({
+										url:'/pages/userInfo/userInfo'
+									})
 								}
 							}
 						})

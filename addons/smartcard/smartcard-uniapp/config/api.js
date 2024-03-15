@@ -35,7 +35,11 @@ const methodsToken = [
 	"themeEdit",
 	"companyStaffAdd",
 	'companyStaffEdit',
-	'logout'
+	'logout',
+	// ========================new apis
+	'doIndex',
+	'doIndexShare',
+	'industryCategoryList'
 ];
 const post = (method, data, callback,type) => {
 	let userToken = '';
@@ -363,3 +367,13 @@ export const themeList = (data, callback) => post('themeList', data, callback,'s
 export const themeEdit = (data, callback) => post('themeEdit', data, callback,'smartcard/Common');
 //新增用户信息
 export const applyStaffAdd = (data, callback) => post('applyStaffAdd', data, callback,'smartcard/Common');
+
+
+
+// ==============================New Apis========================================================================
+// 首页
+export const doIndex = (data, callback) => post('index', data, callback,'smartcard/Common');
+// 首页 - 分享
+export const doIndexShare = (data, callback) => post('indexShare', data, callback,'smartcard/Common');
+// 获取行业列表
+export const industryCategoryList = (data, callback) => post('industryCategoryList', data, callback,'smartcard/Common');

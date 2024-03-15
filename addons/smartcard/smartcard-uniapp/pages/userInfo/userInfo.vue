@@ -1,5 +1,5 @@
 <template>
-	<view class="overall_content">
+	<view class="overall_content user-info">
 		<view class="header_background" :style="{'background-image':'url('+smartcardBG.backgroundImg+')'}">
 			<cu-custom :bgColor="bgColor" :isBack="true" :backGround="backGround">
 				<block slot="backText">返回</block>
@@ -45,7 +45,9 @@
 				<view class="infoItem flex_layout">
 					<view class="left_title">公司<text style="color:#ff0000">*</text></view>
 					<view class="right_info" style="position: relative;">
-						<input type="text" v-model="companyname" @input="companyInput" placeholder="选择公司" />
+						<input type="text" placeholder="选择公司"
+							v-model="companyname" @input="companyInput"
+							 @blur="handleOnCampanyBlur"/>
 						<view class="companyContent" v-if="ifCompany">
 							<scroll-view class="hospital_body" scroll-y="true" @scrolltolower="bottomHospital">
 								<block v-if="companyList.length>0">
@@ -66,11 +68,16 @@
 						<text class="iconfont icon-zengjiatianjiajiahao"></text>
 					</view>
 				</view>
-				<view class="infoItem flex_layout">
+				<view class="infoItem flex_layout" style="flex-wrap: nowrap;">
 					<view class="left_title">行业<text style="color:#ff0000">*</text></view>
 					<view class="right_info">
-						<input type="text" v-model="business" placeholder="请填写行业" value="" />
-						<text class="iconfont icon-Rightyou"></text>
+						<!-- <input type="text" v-model="industry" placeholder="请填写行业" value="" /> -->
+						<uni-data-picker v-model="industry_id" placeholder="请选择行业" popup-title="所属行业"
+							:localdata="industryList" :map="{text: 'name', value: 'id'}"
+							@change="handleOnIndustryChange"
+							style="width: 100%;">
+						</uni-data-picker>
+						<!-- <text class="iconfont icon-Rightyou"></text> -->
 					</view>
 				</view>
 			</view>
@@ -108,7 +115,7 @@
 				<view class="infoItem flex_layout">
 					<view class="left_title">QQ</view>
 					<view class="right_info">
-						<input type="text" v-model="email" placeholder="请填写QQ" value="" />
+						<input type="text" v-model="qq" placeholder="请填写QQ" value="" />
 						<text class="iconfont icon-jianhao"></text>
 					</view>
 				</view>
@@ -121,7 +128,7 @@
 				<text class="iconfont icon-yulan"></text>
 				<text>预览名片</text>
 			</view>
-			<view class="flex-1 primary-btn">保存</view>
+			<view class="flex-1 primary-btn" @click="submit">保存</view>
 		</view>
 	</view>
 </template>
@@ -142,7 +149,7 @@
 		data() {
 			return {
 				smartcardBG: smartcardBG,
-				userInfo: '',
+				userInfo: {},
 				imgList: [],
 				avatar: '',
 				name: '',
@@ -153,20 +160,10 @@
 				mobile: '',
 				idcard: '',
 				email: '',
-				QQ: '',
-				titlesArray: [],
-				titlesIdArray: [],
-				departmentIdArray: [],
-				//titlesId:'',
-				departmentArray: [],
-				department: '请选择科室',
-				titles: '请选择职称',
-				title_id: '', //关联医生职称
-				department_id: '', //关联科室
-				departmentIndex: 0,
-				titleIndex: 0,
+				qq: '',
 				user_id: '',
-				company_id: '',
+				company_id: 0,
+				industry_id: '',
 				position: '',
 				introcontent: '',
 				color: '',
@@ -175,8 +172,9 @@
 				loadingStatus: true,
 				companyname: '',
 				companyList: [],
+				industryList: [],
 				ids: 0,
-				platform_status: 1
+				platform_status: 2 // 小程序？
 			}
 		},
 		onShow() {
@@ -192,14 +190,16 @@
 			})
 			this.user_id = options.user_id;
 			this.staff_id = options.staff_id
-			this.company_id = options.company_id;
-			this.company_id_s = options.company_id;
+			this.company_id_s = this.company_id = options.company_id;
+			// this.company_id_s = options.company_id;
 			this.smartcardfind();
+			this.getIndustryData();			
 		},
 		methods: {
 			getAllUserData(allData) {
 				console.info('@getAllUserData', allData)
 			},
+			// 输入公司名称
 			companyInput(e) {
 				page = 1;
 				reachbottom = false;
@@ -216,7 +216,7 @@
 					this.ifCompany = false
 				}
 			},
-			//医院列表
+			//企业列表
 			companylist(keywords) {
 				this.loadingStatus = false;
 				this.$api.companylist({
@@ -255,11 +255,13 @@
 						}
 					})
 			},
+			// 分页加载公司列表
 			bottomHospital(e) {
 				if (!reachbottom) {
 					this.companylist(this.keywords);
 				}
 			},
+			// 点击选择公司
 			selectCompany(id, name) {
 				this.company_id = id
 				this.companyname = name
@@ -267,6 +269,24 @@
 				this.companyList = []
 				this.ifCompany = false;
 			},
+			handleOnCampanyBlur() {
+				if(this.companyList.length === 0) this.ifCompany = false // 没有查询到公司列表也取消列表弹窗
+			},
+			// 获取行业列表
+			getIndustryData() {
+				this.$api.industryCategoryList({}, res => {
+					if(res.code === 1) {
+						this.industryList = res.data || []
+						// console.info(this.industryList, '===========1111')
+					}
+				})
+			},
+			// 选择行业后触发事件回调
+			handleOnIndustryChange({detail}) {
+				console.info('handleOnIndustryChange: ', detail, this.industry_id)
+				// this.industry_id = detail.value
+			},
+			// 选择地址
 			addressClick() {
 				console.log('address');
 				uni.chooseLocation({
@@ -276,38 +296,43 @@
 					}
 				});
 			},
+			// 选择头像
 			chooseFileTest(list, ulist) {
 				this.imgList = ulist
 				console.log(list)
 				this.avatar = list[0]
 			},
-			radioChange(e) {
-				this.gender = e.detail.value;
-			},
-			bindDateChange(e) {
-				this.birthday = e.detail.value
-			},
+			// 性别
+			// radioChange(e) {
+			// 	this.gender = e.detail.value;
+			// },
+			// 出生日期
+			// bindDateChange(e) {
+			// 	this.birthday = e.detail.value
+			// },
 			smartcardfind() {
 				this.$api.smartcardfind({},
 					data => {
 						if (data.code) {
 							this.maxCount = 1
-							this.userInfo = data.data
-							this.platform_status = data.data[0] ? data.data[0].platform_status : 2
-							this.name = data.data[0] ? data.data[0].name : '' //真实姓名
-							this.mobile = data.data[0] ? data.data[0].mobile : '' //手机号
-							this.email = data.data[0] ? data.data[0].email : '' //邮箱
-							this.address = data.data[0] ? data.data[0].address : '' //地址
-							this.wechat = data.data[0] ? data.data[0].wechat : '' //微信
-							this.position = data.data[0] ? data.data[0].position : '' //职位
-							this.companyname = data.data[0] ? data.data[0].smartcardcompany.name : ''
-							this.company_id = data.data[0] ? data.data[0].company_id : 0
-							this.introcontent = data.data[0] ? data.data[0].introcontent : ''
-							this.ids = data.data[0] ? data.data[0].id : 0
-							if (data.data[0]) {
-								this.imgList[0] = data.data[0].user.avatar; //头像
+							this.userInfo = data.data && data.data.length ? data.data[0] : []
+							this.platform_status = this.userInfo.platform_status || 2
+							this.name = this.userInfo.name || '' //真实姓名
+							this.mobile = this.userInfo.mobile || '' //手机号
+							this.email = this.userInfo.email || '' //邮箱
+							this.address = this.userInfo.address || '' //地址
+							this.wechat = this.userInfo.wechat || '' //微信
+							this.position = this.userInfo.position || '' //职位
+							this.companyname = this.userInfo.smartcardcompany.name || this.userInfo.companyname || ''
+							this.company_id = this.userInfo.company_id || 0
+							this.introcontent = this.userInfo.introcontent ||''
+							this.ids = this.userInfo.id || 0
+							this.industry_id = this.userInfo.industry_id
+							this.qq = this.userInfo.qq
+							if (this.userInfo) {
+								this.imgList[0] = this.userInfo.user.avatar; //头像
 								console.log(this.imgList);
-								this.avatar = data.data[0].user.avatar;
+								this.avatar = this.userInfo.user.avatar;
 							} else {
 								this.imgList = []
 							}
@@ -320,9 +345,9 @@
 			},
 			submit() {
 				var data = {};
-				var that = this;
 				data['user_id'] = this.user_id
-				data['company_id'] = this.company_id
+				data['company_id'] = this.company_id || 0 // 企业id 不存在的企业由后端自由生成新企业保存
+				data['companyname'] = this.companyname // 公司名称
 				data['name'] = this.name //真实姓名
 				data['wechat'] = this.wechat //微信号
 				data['mobile'] = this.mobile //手机号
@@ -331,18 +356,19 @@
 				data['address'] = this.address //地址
 				data['avatar'] = this.avatar //头像
 				data['introcontent'] = this.introcontent;
-				data['company_id'] = this.company_id //公司id
-				data['company_id_s'] = this.company_id_s
+				data['qq'] = this.qq
+				
+				// data['company_id_s'] = this.company_id_s
 				if (this.ids != 0) {
 					data['id'] = this.ids
 				}
-				if (this.avatar == '') {
-					uni.showToast({
-						title: '请上传头像',
-						icon: 'none'
-					})
-					return false;
-				}
+				// if (this.avatar == '') {
+				// 	uni.showToast({
+				// 		title: '请上传头像',
+				// 		icon: 'none'
+				// 	})
+				// 	return false;
+				// }
 				if (this.name == '') {
 					uni.showToast({
 						title: '请填写姓名',
@@ -350,9 +376,37 @@
 					})
 					return false;
 				}
-				if (this.company_id == '' || this.company_id == 0) {
+				// if (this.company_id == '' || this.company_id == 0) {
+				// 	uni.showToast({
+				// 		title: '请选择所在公司',
+				// 		icon: 'none'
+				// 	})
+				// 	return false;
+				// }
+				if(!this.companyname) {
 					uni.showToast({
-						title: '请选择所在公司',
+						title: '请填写所在公司',
+						icon: 'none'
+					})
+					return false;
+				}
+				if (this.position == '') {
+					uni.showToast({
+						title: '请填写职位',
+						icon: 'none'
+					})
+					return false;
+				}
+				if (this.industry == '') {
+					uni.showToast({
+						title: '请填写所在行业',
+						icon: 'none'
+					})
+					return false;
+				}
+				if (!this.$common.testString(this.mobile, 'mobile')) {
+					uni.showToast({
+						title: '请正确填写手机号',
 						icon: 'none'
 					})
 					return false;
@@ -363,15 +417,8 @@
 				// 		icon:'none'
 				// 	})
 				// 	return false;
-				// }
-				if (!this.$common.testString(this.mobile, 'mobile')) {
-					uni.showToast({
-						title: '请正确填写手机号',
-						icon: 'none'
-					})
-					return false;
-				}
-				if (!this.$common.testString(this.email, 'mail')) {
+				// }				
+				if (this.email && !this.$common.testString(this.email, 'mail')) {
 					uni.showToast({
 						icon: 'none',
 						position: 'bottom',
@@ -379,25 +426,18 @@
 					});
 					return false;
 				}
-				if (this.position == '') {
+				if(this.address==''){
 					uni.showToast({
-						title: '请填写职位',
-						icon: 'none'
+						title:'请选择地址',
+						icon:'none'
 					})
 					return false;
-				}
-				// if(this.address==''){
-				// 	uni.showToast({
-				// 		title:'请选择地址',
-				// 		icon:'none'
-				// 	})
-				// 	return false;
-				// }	
-				this.$api.staffEdit(
+				}	
+				this.$api.applyStaffAdd(
 					data,
 					data => {
 						if (data.code) {
-							that.$common.successToShow(data.msg, function() {
+							this.$common.successToShow(data.msg, function() {
 								uni.navigateBack()
 							})
 						}
@@ -412,14 +452,6 @@
 		background: #F6F7F9;
 	}
 
-	/* .header_background {
-		padding-top: 110rpx;
-		height: 460rpx;
-		background-repeat: no-repeat;
-		background-position: left top;
-		background-size: cover;
-	} */
-
 	.header_padding {
 		padding: 0 30rpx;
 	}
@@ -433,131 +465,6 @@
 		background-position: left top;
 		background-size: cover;
 	}
-
-	.grade {
-		text-align: right;
-		font-size: 26rpx;
-		margin-top: 20rpx;
-	}
-
-	.header_message {
-		position: relative;
-		height: 360rpx;
-		box-sizing: border-box;
-		background-repeat: no-repeat;
-		background-position: left top;
-		background-size: cover;
-		padding: 40rpx 40rpx;
-		margin-top: 30rpx;
-		border-radius: 15px;
-		color: #e1d27e;
-		box-shadow: 0 0 10px #999;
-		position: relative;
-	}
-
-	.userImg {
-		position: relative;
-		padding-bottom: 20rpx;
-		border-bottom: 1rpx solid #D2E7FF;
-		margin-bottom: 16rpx;
-	}
-
-	.userImg::after {
-		content: '';
-		position: absolute;
-		bottom: -2rpx;
-		left: 0;
-		width: 100%;
-		border-bottom: solid 1rpx #FAFDFF;
-		height: 0;
-	}
-
-	.userImg image {
-		display: block;
-		width: 130rpx;
-		height: 130rpx;
-		border-radius: 50%;
-	}
-
-	.cert-status {
-		position: absolute;
-		right: -4rpx;
-		top: 40rpx;
-		width: 106rpx;
-		height: 44rpx;
-		line-height: 44rpx;
-		font-size: 20rpx;
-		font-weight: 400;
-		text-align: center;
-		box-sizing: border-box;
-		background-repeat: no-repeat;
-		background-position: left top;
-		background-size: cover;
-	}
-
-	.cert-status.waitOp {
-		color: #8897AD;
-	}
-
-	.cert-status.op {
-		color: #fff;
-	}
-	.extra { font-size: 24rpx;}
-	.extra > view {
-		margin-bottom: 8rpx;
-	}
-	.extra .iconfont {
-		width: 30rpx;
-		height: 30rpx;
-		background: #3658FF;
-		border-radius: 50%;
-		font-size: 20rpx;
-		line-height: 32rpx;
-		text-align: center;
-		color: #fff;
-		margin-right: 8rpx;
-	}
-
-	.name_position {
-		padding-left: 30rpx;
-		width: 400rpx;
-	}
-
-	.name_position view {
-		font-size: 42rpx;
-		width: 100%;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-
-	.name_position text {
-		display: block;
-		font-size: 26rpx;
-		margin-top: 10rpx;
-		width: 100%;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-	.isHC-box {
-		position: absolute;
-		bottom: 1rpx;
-		right: 1rpx;
-		border-radius: 40rpx;
-		width: 172rpx;
-		height: 66rpx;
-	}
-	.isHC-box .bg {
-		width: 100%;
-		height: 100%;
-		background-color: #163778;
-		transform: rotate(-45deg);
-		font-size: 28rpx;
-		color: #fff;
-		font-weight: 400;
-	}
-
 
 	/* 实体内容 */
 	.padding_content {
@@ -783,5 +690,9 @@
 		color: #fff;
 		background-color: #0256FF;
 		border: solid 1px #0256FF;
+	}
+	>>> .user-info .input-value-border { border: 0;}
+	>>> .user-info .arrow-area {
+		transform: rotate(-135deg);
 	}
 </style>
