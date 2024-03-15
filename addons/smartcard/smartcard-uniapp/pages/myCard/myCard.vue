@@ -125,7 +125,7 @@
 				</view>
 			</view>
 			<!-- 企业简介 -->
-			<view class="card-box">
+			<view class="card-box" v-if="description">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">企业简介</view>
 					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseProfile')">
@@ -138,9 +138,9 @@
 				</view>
 				<view class="" v-show="showEnterpriseProfile">
 					<view class="desc-box">
-						<view class="title">
+						<!-- <view class="title">
 							销售分析
-						</view>
+						</view> -->
 						<text class="desc">
 							{{description}}
 						</text>
@@ -421,16 +421,17 @@
 						this.allData=res.data
 						console.log(this.allData);
 						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
-						this.userData = this.staffInfo = res.staffInfo || {};
+						this.userData = this.staffInfo = this.allData.staffInfo || {};
 						if(this.userData.statusdata!='1'){
 							this.certificateStatus=false;
 						}
-						this.myCardData = res.myCardData || {};
-						this.visitStaffLists = res.visitStaffLists || [];
-						this.videofiles = res.videofiles || [];
-						this.description = res.description || '';
+						this.myCardData = this.allData.myCardData || {};
+						this.visitStaffLists = this.allData.visitStaffLists || [];
+						this.videofiles = this.allData.videofiles || [];
+						this.description = this.allData.description || '';
 						this.updatetime=this.allData.newsTime
-						this.color=this.staffInfo?this.staffInfo.smartcardtheme.colour:''
+						this.companyInfo = this.allData.smartcardcompany || {};
+						this.color=this.staffInfo?this.staffInfo.smartcardtheme.color:''
 						this.backgroundImg=this.staffInfo?this.staffInfo.smartcardtheme.backgroundimage:''
 						this.cardimage=this.staffInfo?this.staffInfo.smartcardtheme.cardimage:''
 						this.fontcolor=this.staffInfo?this.staffInfo.smartcardtheme.fontcolor:''          
@@ -448,7 +449,7 @@
 							return item.avatar
 						})
 						this.staff_id=this.staffInfo.id
-						this.mystaff_id= this.userInfo.staff_id || 0
+						// this.mystaff_id= this.userInfo.staff_id || 0
 						this.myselfstatus = this.staff_id != this.mystaff_id
 						this.transmit={
 							company_id:this.companyInfo.id,
@@ -461,9 +462,9 @@
 							staff_id:this.userData.id 
 						};
 						this.nickname=this.userData.name
-						this.statistics[0].value = this.myCardData.allVisitNum
-						this.statistics[1].value = this.myCardData.todayVisitNum
-						this.statistics[2].value = this.myCardData.sendCardNum
+						this.visits[0].value = this.myCardData.allVisitNum
+						this.visits[1].value = this.myCardData.todayVisitNum
+						this.visits[2].value = this.myCardData.sendCardNum
 						if(!this.staffInfo.mobile) this.tools.find(i => i.id === 1).disabled = true
 						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
 						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
@@ -471,6 +472,10 @@
 							this.staffInfo.smartcardcompany.latitude || 
 							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
+						this.tools.forEach(it => {
+							if(it.disabled) it.color = '#999';
+						})
+						console.info(this.tools, '====', !this.staffInfo.mobile, !this.staffInfo.email)
 					}else {
 						if(this.user_id!=0 || this.user_id!=''){
 							if(staff_id_c!=''){
@@ -607,6 +612,10 @@
 		font-size: 22rpx;
 		font-weight: 400;
 		color: #333;
+	}
+	.tools .tool-item.disabled {
+		color: #999;
+		cursor: not-allowed;
 	}
 
 	.tools .tool-item .iconfont {
