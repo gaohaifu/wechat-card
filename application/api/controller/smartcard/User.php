@@ -503,6 +503,7 @@ class User extends Base
         //事件列表
         $eventarr = [
             'register',
+            'certified',
             'resetpwd',
             'changemobile',
             'login',

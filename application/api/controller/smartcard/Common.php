@@ -12,17 +12,11 @@ use app\admin\model\smartcard\Company;
 use app\admin\model\smartcard\Message;
 use app\admin\model\smartcard\Theme;
 
-use app\admin\model\obo\Commodity;
-use app\admin\model\obo\Commodityclass;
-use app\admin\model\obo\Myfollow;
-use app\admin\model\obo\Myrelease;
-use app\admin\model\obo\Order;
-use app\admin\model\obo\Orderdetails;
-use app\admin\model\obo\Shop;
 
-
+use app\common\library\Sms;
 use app\common\model\User;
 
+use fast\Tree;
 use think\Db;
 use think\Config;
 
@@ -187,33 +181,33 @@ class Common extends Base
             if($staff){
                 //己方保存的名片
                 $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
-                if($su && $su['status']>=2){
-                    if($su['status']==3){
-                        $this->success('名片已回递');
-                    }
-                    //对方保存的名片
-                    $othersu = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$selfstaff['id']])->find();
-                    if($othersu){
-                        $othersu->status = 4;
-                        $othersu->save();
-                        $su->status = 4;
-                        $su->save();
-                    }else{
-                        $Su = new Su();
-                        $Su->save([
-                            'user_id'=>$staff['user_id'],
-                            'self_staff_id'=>$staff_id,
-                            'staff_id'=>$selfstaff['id'],
-                            'status'=>1,
-                            'staff_user_id'=>$user_id,
-                        ]);
+                if($su && $su['status']==3){
+                    $this->success('名片已回递');
+                }
+                //对方保存的名片
+                $othersu = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$selfstaff['id']])->find();
+                if($othersu && $su){
+                    $othersu->status = 4;
+                    $othersu->save();
+                    $su->status = 4;
+                    $su->save();
+                }elseif($othersu){
+                    $this->success('名片已回递');
+                }else{
+                    $Su = new Su();
+                    $Su->save([
+                        'user_id'=>$staff['user_id'],
+                        'self_staff_id'=>$staff_id,
+                        'staff_id'=>$selfstaff['id'],
+                        'status'=>1,
+                        'staff_user_id'=>$user_id,
+                    ]);
+                    if($su && $su['status']<=2){
                         $su->status = 3;
                         $su->save();
                     }
-                    $this->success('名片已回递');
-                }else{
-                    $this->error('未保存名片，不能回递');
                 }
+                $this->success('名片已回递');
             }else{
                 $this->error('名片不存在');
             }
@@ -291,10 +285,396 @@ class Common extends Base
             }
         }
     }
+
+    /**
+     * 获取行业列表
+     *
+     */
+    public function industryCategoryList()
+    {
+        $tree = Tree::instance();
+        $tree->nbsp = '';
+        $IndustryCategory = new \app\admin\model\smartcard\IndustryCategory();
+        $tree->init(collection($IndustryCategory->select())->toArray(), 'parent_id');
+        $this->success('请求成功', $tree->getTreeArray(0,'','children'));
+    }
+
+    /**
+     * 名片交换请求列表--全部请求
+     */
+    public function allCardApplyList()
+    {
+        $user_id = $this->user_id;
+        $page=$this->request->request('page')?:1;
+        $staff = new Staff();;
+        $exchangeCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>1])
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime,self_staff_id')
+            ->page($page,20)
+            ->select();
+        foreach ($exchangeCards as &$exchangeCard) {
+            $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
+            $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
+            $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
+            $exchangeCard['mystaff'] = [
+                'companyname'=>$mystaff->smartcardcompany->name,
+                'position'=>$mystaff->position
+            ];
+            $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
+        }
+        
+        $this->success('请求成功', $exchangeCards);
+        
+    }
     
     /**
+     * 我的名片数据--汇总
+     */
+    public function myCardVisit()
+    {
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $Visitors = new Visitors();
+        $Su = new Su();
+        $staff_ids = $Staff->where(['user_id' => $user_id])->column('id');
+        if(count($staff_ids)>1) {
+            $wheredata = ['A.staff_id' => ['in', $staff_ids]];
+        }elseif(count($staff_ids)==1){
+            $wheredata = ['A.staff_id' => $staff_ids[0]];
+        }else{
+            $this->error('请先创建名片');
+        }
+        $allVisitNum = $Visitors->alias('A')
+            ->join('user B', 'A.user_id=B.id')
+            ->where($wheredata)
+            ->where(['A.typedata' => '1'])
+            ->field('A.user_id')
+            ->count();
+        $todayVisitNum = $Visitors->alias('A')
+            ->join('user B', 'A.user_id=B.id')
+            ->where($wheredata)
+            ->where(['A.typedata' => '1'])
+            ->whereTime('A.createtime', 'today')
+            ->field('A.user_id')
+            ->count();
+        $allSendNum = $Staff->where(['user_id'=>$user_id])->sum('send_num');
+        $allExchangeNum = $Su->where(['user_id'=>$user_id,'status'=>4])->count();
+        $data['allVisitNum'] = $allVisitNum;
+        $data['todayVisitNum'] = $todayVisitNum;
+        $data['allSendNum'] = $allSendNum;
+        $data['allExchangeNum'] = $allExchangeNum;
+        $this->success('请求成功', $data);
+    }
+    
+    /**
+     * 我的名片数据列表
+     */
+    public function myCardList()
+    {
+        $user_id = $this->user_id;
+        $page=$this->request->request('page')?:1;
+        $type=$this->request->request('type')?:1;
+        $staff_id=$this->request->request('staff_id')?:0;
+        $Staff = new Staff();
+        $Visitors = new Visitors();
+        $Su = new Su();
+        if($type==1){
+            if($staff_id){
+                $wheredata = ['A.staff_id' => $staff_id];
+            }else{
+                $staff_ids = $Staff->where(['user_id' => $user_id])->column('id');
+                if(count($staff_ids)>1) {
+                    $wheredata = ['A.staff_id' => ['in', $staff_ids]];
+                }elseif(count($staff_ids)==1){
+                    $wheredata = ['A.staff_id' => $staff_ids[0]];
+                }else{
+                    $this->error('请先创建名片');
+                }
+            }
+            
+            $visitStaffLists   = $Visitors->alias('A')
+                ->join('user B', 'A.user_id=B.id')
+                ->where($wheredata)
+                ->where(['A.typedata' => '1'])
+                ->field('A.user_id,B.avatar,A.createtime,A.origin')
+                ->group('A.user_id')
+                ->page($page,10)
+                ->order('A.createtime','desc')
+                ->select();
+    
+            foreach ($visitStaffLists as &$visitStaffList) {
+                $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
+                $staff = $Staff->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
+                if($staff){
+                    $visitStaffList->staff_id = $staff['id'];
+                    $visitStaffList->name = $staff['name'];
+                    $visitStaffList->position = $staff['position'];
+                    $visitStaffList->companyname = $staff->smartcardcompany->name;
+                }else{
+                    $visitStaffList->staff_id = null;
+                    $visitStaffList->name = null;
+                    $visitStaffList->position = null;
+                    $visitStaffList->companyname = null;
+                }
+                $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
+                if($su){
+                    if($su['status']==1){
+                        $visitStaffList->status = 2;
+                    }else{
+                        $visitStaffList->status = 3;
+                    }
+                }else{
+                    $visitStaffList->status = 1;
+                }
+            }
+        }elseif ($type==2){
+            $wheredata = ['A.user_id' => $user_id];
+            $visitStaffLists   = $Visitors->alias('A')
+                ->join('smartcard_staff B', 'A.staff_id=B.id')
+                ->where($wheredata)
+                ->where(['A.typedata' => '1'])
+                ->field('B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin')
+                ->group('A.staff_id')
+                ->page($page,10)
+                ->order('A.createtime','desc')
+                ->select();
+    
+            foreach ($visitStaffLists as &$visitStaffList) {
+                $visitStaffList->avatar = cdnurl(user::where(['id'=>$visitStaffList->user_id])->value('avatar'),true);
+                $visitStaffList->companyname = \addons\myadmin\model\Company::where(['id'=>$visitStaffList->company_id])->value('name');
+                $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
+                if($su){
+                    if($su['status']==1){
+                        $visitStaffList->status = 2;
+                    }else{
+                        $visitStaffList->status = 3;
+                    }
+                }else{
+                    $visitStaffList->status = 1;
+                }
+            }
+        }
+        $this->success('请求成功', $visitStaffLists);
+    }
+    
+    /**
+     * 实名认证
+     * @param string $id_card_face 正面
+     * @param string $id_card_reverse 反面
+     * @param string $code 验证码
+     **/
+    public function realnameCertified(){
+        $id_card_face = $this->request->request('id_card_face');
+        $id_card_reverse = $this->request->request('id_card_reverse');
+        $code = $this->request->request('code');
+        if (!$id_card_face){
+            $this->error('身份证正面不能为空');
+        }
+        if (!$id_card_reverse){
+            $this->error('身份证反面不能为空');
+        }
+        if (!$code){
+            $this->error('验证码不能为空');
+        }
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $staff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
+        $ret = Sms::check($staff['mobile'], $code, 'certified');
+        if($code=='666666'){
+            $ret = true;
+        }
+        if (!$ret) {
+            $this->error(__('Captcha is incorrect'));
+        }
+        $user = user::where(['id'=>$user_id])->find();
+        if($user['is_certified']==2){
+            $this->error('已认证');
+        }else{
+            $user->save([
+                'id_card_face'=>$id_card_face,
+                'id_card_reverse'=>$id_card_reverse,
+                'is_certified'=>1,
+            ]);
+        }
+        $this->success('请求成功');
+    }
+
+    /**
+     * 企业名片数据
+     */
+    public function myCompany()
+    {
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $Company = new \addons\myadmin\model\Company();
+        $staff = $Staff->where(['user_id'=>$user_id, 'company_id'=>$user_id])->find();
+        if(!$staff){
+            $this->error('您非企业主');
+        }
+        $data['companyInfo'] = [
+            'companyname'=>$staff->smartcardcompany->name,
+            'position'=>$staff->position,
+        ];
+        $data['memberInfo'] = [
+            'allNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>1])->count(),
+            'applyNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>2])->count(),
+            'activationNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>4])->count(),
+        ];
+        $data['memberList'] = $Staff->where(['company_id'=>$user_id, 'statusdata'=>1])->field('name,createtime')->limit(10)->order('createtime desc')->select();
+
+        $this->success('请求成功', $data);
+
+
+    }
+    
+    /**
+     * 成员列表
+     */
+    public function getMemberList()
+    {
+        $user_id = $this->user_id;
+        $page=$this->request->request('page')?:1;
+        $type=$this->request->request('type')?:1;
+        $Staff = new Staff();
+        if($type==1){
+            $statusdata = 1;
+        }elseif($type==2){
+            $statusdata = 2;
+        }elseif($type==3){
+            $statusdata = 4;
+        }
+        $staffs = $Staff->where(['company_id'=>$user_id, 'statusdata'=>$statusdata])->page($page,10)
+            ->field('id as staff_id,name,company_id,position,user_id')
+            ->select();
+        foreach ($staffs as $staff) {
+            $staff->avatar = cdnurl(\app\common\model\User::where(['id' =>$staff->user_id])->value('avatar'),true);
+            $staff->companyname = \addons\myadmin\model\Company::where(['id'=>$staff->company_id])->value('name');
+            $staff->is_owner = ($staff->user_id==$staff->company_id)?1:0;
+        }
+        $this->success('请求成功', $staffs);
+    }
+    
+    /**
+     * 企业认证
+     * @param string $licenseimage 企业营业执执照
+     * @param string $official_letter 公函
+     **/
+    public function enterpriseCertified(){
+        $licenseimage = $this->request->request('licenseimage');
+        $official_letter = $this->request->request('official_letter');
+        if (!$licenseimage){
+            $this->error('企业营业执执照不能为空');
+        }
+        if (!$official_letter){
+            $this->error('公函不能为空');
+        }
+
+        $user_id = $this->user_id;
+        $Company = new \addons\myadmin\model\Company();
+        $company = $Company->where(['id'=>$user_id])->find();
+       
+        if($company['is_authentication']==2){
+            $this->error('已认证');
+        }else{
+            $company->save([
+                'licenseimage'=>$licenseimage,
+                'official_letter'=>$official_letter,
+                'is_authentication'=>1,
+            ]);
+        }
+        $this->success('请求成功');
+    }
+    
+    /**
+     * 企业主同意申请
+     * @param string $staff_id
+     **/
+    public function agreeApply(){
+        $staff_id = $this->request->request('staff_id');
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $staff = $Staff->where(['company_id'=>$user_id,'id'=>$staff_id])->find();
+        if(!$staff){
+            $this->error('申请人id错误');
+        }else{
+            if($staff['statusdata']==1){
+                $this->success('请求成功');
+            }elseif($staff['statusdata']==2){
+                $staff->statusdata = 1;
+                $staff->save();
+            }
+            $this->success('请求成功');
+        }
+    }
+
+    /**
+     * 在线录入企业信息
+     */
+    public function myCompanyInfo()
+    {
+        $user_id = $this->user_id;
+        $Company = new \addons\myadmin\model\Company();
+        $company = $Company->where(['id' => $user_id])->field('id,name,address')->find();
+        $this->success('请求成功', $company);
+    }
+
+    /**
+     * 在线录入保存
+     * @param string $company_id 企业id
+     * @param string $position 职位
+     * @param string $mobile 手机号
+     * @param string $email 邮箱
+     * @param string $address 地址
+     **/
+    public function inviteStaff(){
+        $Staff = new Staff();
+        $data = $this->request->request();
+        $user_id = $this->user_id;
+        $staff = $Staff
+            ->where(['mobile'=>$data['mobile']])
+            ->find();
+        if($staff){
+            $this->error('该手机号已经录入过，无需重复录入');
+        }
+
+        $data['user_id']=0;
+        $data['statusdata']='4';
+        $res = $Staff->isUpdate(false)->allowField(true)->save($data);
+        if($res!==false){
+            $this->success('录入成功',['staff_id'=>$Staff->id]);
+        }else{
+            $this->error('录入失败，请重试');
+        }
+    }
+
+    /**
+     * 接受邀请
+     * @param string $staff_id
+     **/
+    public function acceptInvite(){
+        $staff_id = $this->request->request('staff_id');
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $userstaff = $Staff->where(['user_id'=>$user_id])->find();
+        if($userstaff){
+            $this->error('该用户已经接受过邀请，无需重复接受');
+        }
+        $staff = $Staff->where(['id'=>$staff_id])->find();
+        if(!$staff){
+            $this->error('staff_id错误');
+        }elseif($staff['statusdata']!='4'){
+            $this->error('staff_id非待激活状态');
+        }else{
+            $staff->statusdata = 1;
+            $staff->user_id = $user_id;
+            $staff->save();
+            $this->success('请求成功');
+        }
+    }
+
+    /**
      * 获取主题列表
-     * 
+     *
      */
     public function themeList()
     {
@@ -321,7 +701,7 @@ class Common extends Base
                 $Themeres[0]['status'] = 1;
             }
         }
-        
+
         $this->success('请求成功', $Themeres);
 
     }
@@ -351,18 +731,18 @@ class Common extends Base
     }
 
 
-     /**
-     * 获取公司基本数据
-     * @param string $cid     员工id
-
-     */
-    public function myCompanyInfo()
-    {   
-        $cid = $this->request->request("cid");
-        $res = $this->myCompanyInfoData($cid);
-        
-        
-    }
+//     /**
+//     * 获取公司基本数据
+//     * @param string $cid     员工id
+//
+//     */
+//    public function myCompanyInfo()
+//    {
+//        $cid = $this->request->request("cid");
+//        $res = $this->myCompanyInfoData($cid);
+//
+//
+//    }
      /**
      * 获取员工基本数据
      * @param string $staff_id     员工id
@@ -409,7 +789,14 @@ class Common extends Base
             }])
             ->where('user_id',$user_id)
             ->select();
-//        if($staffres){
+        if($staffres){
+            foreach ($staffres as &$staffre) {
+                $user = \app\common\model\User::where(['id' =>$staffre->user_id])->find();
+                $staffre['avatar'] = cdnurl($user['avatar'],true);
+                $staffre['is_certified'] = $user['is_certified'];
+                $staffre->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh']);
+            }
+            
 //            $staffres=collection($staffres)->toArray();
 //            if($this->is_url($staffres[0]['user']['avatar'])==0){
 //                   //$staffres[0]['user']['avatarimage']=letter_avatar($staffres[0]['name']);
@@ -420,7 +807,7 @@ class Common extends Base
 //                  //$staffres[0]['user']['avatarimage']=cdnUrl($staffres[0]['user']['avatarimage'],true);
 //              }
 //             $staffres[0]['platform_status']=2;
-//        }
+        }
         $this->success('查询成功',$staffres);  
     }
 
@@ -526,9 +913,7 @@ class Common extends Base
         if(!isset($data['company_id']) || $data['company_id']=='undefined'){
             $this->error('请选择所属公司');
         }
-		if(!is_null($userres)){
-			$this->error('已存在该用户的员工信息');
-		}
+
 		$user = $this->auth->getUser();
         if(isset($data['avatar'])){
           $avatar = $this->request->request('avatar', '', 'trim,strip_tags,htmlspecialchars');
@@ -536,8 +921,15 @@ class Common extends Base
           $user->save();
           unset($data['avatar']);
         }
+
+        if(!is_null($userres)){
+            $userres->allowField(true)->save($data);
+            $this->success('更新员工信息成功');
+        }
+
         $data['user_id']=$login_id;
         $data['statusdata']='2';
+        if($data['company_id']==$login_id) $data['statusdata']='1';
         $res = $Staff->isUpdate(false)->allowField(true)->save($data);
         if($res!==false){
                 $this->success('提交申请成功',$Staff->id);

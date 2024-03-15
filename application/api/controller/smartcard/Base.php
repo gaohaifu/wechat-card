@@ -150,7 +150,7 @@ class Base extends Api
                         ->limit(10)
                         ->order('A.createtime','desc')
                         ->select();
-
+                    $Su = new Su();
                     foreach ($visitStaffLists as &$visitStaffList) {
                         $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
                         $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
@@ -165,7 +165,16 @@ class Base extends Api
                             $visitStaffList->position = null;
                             $visitStaffList->company = null;
                         }
-        
+                        $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
+                        if($su){
+                            if($su['status']==1){
+                                $visitStaffList->status = 2;
+                            }else{
+                                $visitStaffList->status = 3;
+                            }
+                        }else{
+                            $visitStaffList->status = 1;
+                        }
                         $VisitNum = $this->visitorsModel
                             ->where(['staff_id' => $staff_id, 'typedata' => '1', 'user_id' => $visitStaffList->user_id])
                             ->count();
@@ -184,26 +193,30 @@ class Base extends Api
                     ];
                     $data['visitStaffLists']       = $visitStaffLists;//访问员工主页人员的记录信息，最多10条返回
                 }
-                
-                $siteconfig = Xccmssiteconfig::where(['company_id'=>$staffInfo['company_id']])->value('json_data');
-                $siteconfigData = json_decode($siteconfig, true);
-                $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
-                $videofiles=[];
-                if(isset($siteconfigData['videofiles'])){
-                    $videofiles=explode(',',$siteconfigData['videofiles']);
-                    if($videofiles){
-                        foreach ($videofiles as &$videofile) {
-                            $videofile = cdnurl($videofile,true);
-                        }
-                        
-                    }
-                }
+    
                 if($type==1){
                     $data['services'] = $this->getMenu($staffInfo['company_id']);
                 }
-                
-                $data['videofiles'] = $videofiles;
-                $data['description'] = $siteconfigData['description'];
+    
+                $data['videofiles'] = [];
+                $data['description'] = '';
+                $siteconfig = Xccmssiteconfig::where(['company_id'=>$staffInfo['company_id']])->value('json_data');
+                if($siteconfig){
+                    $siteconfigData = json_decode($siteconfig, true);
+                    $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
+                    $videofiles=[];
+                    if(isset($siteconfigData['videofiles'])){
+                        $videofiles=explode(',',$siteconfigData['videofiles']);
+                        if($videofiles){
+                            foreach ($videofiles as &$videofile) {
+                                $videofile = cdnurl($videofile,true);
+                            }
+            
+                        }
+                    }
+                    $data['videofiles'] = $videofiles;
+                    $data['description'] = $siteconfigData['description'];
+                }
                 return $data;
             } else {
                 $this->error('没有该员工信息');
@@ -364,9 +377,11 @@ class Base extends Api
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
                 ->find();
-                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh','statusdata','id_card_face','id_card_reverse']);
+                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh']);
             if (!is_null($staffInfo)) {
-                $staffInfo['avatar'] = cdnurl($staffInfo->user->avatar,true);
+                $user = \app\common\model\User::where(['id' =>$staffInfo->user_id])->find();
+                $staffInfo['avatar'] = cdnurl($user['avatar'],true);
+                $staffInfo['is_certified'] = $user['is_certified'];
                 $staffInfo['picimages'] = explode(',', $staffInfo['picimages']);
                 if ($staffInfo['picimages'][0] == '') {
                     $staffInfo['picimages'] = [];

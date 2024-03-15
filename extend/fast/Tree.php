@@ -384,7 +384,7 @@ class Tree
      * @param string $itemprefix 前缀
      * @return array
      */
-    public function getTreeArray($myid, $itemprefix = '')
+    public function getTreeArray($myid, $itemprefix = '',$childkey = 'childlist')
     {
         $childs = $this->getChild($myid);
         $n = 0;
@@ -404,7 +404,7 @@ class Tree
                 $spacer = $itemprefix ? $itemprefix . $j : '';
                 $value['spacer'] = $spacer;
                 $data[$n] = $value;
-                $data[$n]['childlist'] = $this->getTreeArray($id, $itemprefix . $k . $this->nbsp);
+                $data[$n][$childkey] = $this->getTreeArray($id, $itemprefix . $k . $this->nbsp,$childkey);
                 $n++;
                 $number++;
             }
