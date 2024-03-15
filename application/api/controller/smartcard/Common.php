@@ -606,7 +606,72 @@ class Common extends Base
             $this->success('请求成功');
         }
     }
-    
+
+    /**
+     * 在线录入企业信息
+     */
+    public function myCompanyInfo()
+    {
+        $user_id = $this->user_id;
+        $Company = new \addons\myadmin\model\Company();
+        $company = $Company->where(['id' => $user_id])->field('id,name,address')->find();
+        $this->success('请求成功', $company);
+    }
+
+    /**
+     * 在线录入保存
+     * @param string $company_id 企业id
+     * @param string $position 职位
+     * @param string $mobile 手机号
+     * @param string $email 邮箱
+     * @param string $address 地址
+     **/
+    public function inviteStaff(){
+        $Staff = new Staff();
+        $data = $this->request->request();
+        $user_id = $this->user_id;
+        $staff = $Staff
+            ->where(['mobile'=>$data['mobile']])
+            ->find();
+        if($staff){
+            $this->error('该手机号已经录入过，无需重复录入');
+        }
+
+        $data['user_id']=0;
+        $data['statusdata']='4';
+        $res = $Staff->isUpdate(false)->allowField(true)->save($data);
+        if($res!==false){
+            $this->success('录入成功',['staff_id'=>$Staff->id]);
+        }else{
+            $this->error('录入失败，请重试');
+        }
+    }
+
+    /**
+     * 接受邀请
+     * @param string $staff_id
+     **/
+    public function acceptInvite(){
+        $staff_id = $this->request->request('staff_id');
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $userstaff = $Staff->where(['user_id'=>$user_id])->find();
+        if($userstaff){
+            $this->error('该用户已经接受过邀请，无需重复接受');
+        }
+        $staff = $Staff->where(['id'=>$staff_id])->find();
+        if(!$staff){
+            $this->error('staff_id错误');
+        }elseif($staff['statusdata']!='4'){
+            $this->error('staff_id非待激活状态');
+        }else{
+            $staff->statusdata = 1;
+            $staff->user_id = $user_id;
+            $staff->save();
+            $this->success('请求成功');
+        }
+    }
+
     /**
      * 获取主题列表
      *
@@ -666,18 +731,18 @@ class Common extends Base
     }
 
 
-     /**
-     * 获取公司基本数据
-     * @param string $cid     员工id
-
-     */
-    public function myCompanyInfo()
-    {   
-        $cid = $this->request->request("cid");
-        $res = $this->myCompanyInfoData($cid);
-        
-        
-    }
+//     /**
+//     * 获取公司基本数据
+//     * @param string $cid     员工id
+//
+//     */
+//    public function myCompanyInfo()
+//    {
+//        $cid = $this->request->request("cid");
+//        $res = $this->myCompanyInfoData($cid);
+//
+//
+//    }
      /**
      * 获取员工基本数据
      * @param string $staff_id     员工id
