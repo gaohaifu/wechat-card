@@ -119,6 +119,7 @@
 		color: #e1d27e;
 		box-shadow: 0 0 10px #999;
 		position: relative;
+		overflow: hidden;
 	}
 
 	.userImg {
@@ -214,19 +215,31 @@
 
 	.isHC-box {
 		position: absolute;
-		bottom: 1rpx;
-		right: 1rpx;
-		border-radius: 40rpx;
-		width: 172rpx;
-		height: 66rpx;
+		bottom: -1rpx;
+		right: -1rpx;
+		width: 100rpx;
+		height: 100rpx;
+	}
+	.isHC-box::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 0;
+		height: 0;
+		border-top: 0 solid skyblue;
+		border-bottom: 100rpx solid skyblue;
+		border-left: 100rpx solid transparent;
+		border-right: 0 solid transparent;
 	}
 
 	.isHC-box .bg {
-		width: 100%;
-		height: 100%;
-		background-color: #163778;
+		position: relative;
+		top: 41rpx;
+		z-index: 99;
+		left: 24rpx;
 		transform: rotate(-45deg);
-		font-size: 28rpx;
+		font-size: 24rpx;
 		color: #fff;
 		font-weight: 400;
 	}

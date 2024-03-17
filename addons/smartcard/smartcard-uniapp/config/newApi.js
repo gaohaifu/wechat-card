@@ -6,6 +6,9 @@ import * as common from './common.js' //引入common
 import * as db from './db.js' //引入common
 // 需要登陆的，都写到这里，否则就是不需要登陆的接口
 const methodsToken = [
+	'doIndex',
+	'doIndexShare',
+	'industryCategoryList'
 ];
 const post = (method, data, callback,type) => {
 	let userToken = '';
@@ -14,7 +17,6 @@ const post = (method, data, callback,type) => {
 	if (methodsToken.indexOf(method) >= 0) {
 		// 获取用户token
 		let auth = db.get("auth");
-		//console.log(auth);
 		let nowdate = (new Date()) / 1000; //当前时间戳
 		//新增用户判断是否登录逻辑begin
 		 common.isLogin();
@@ -191,3 +193,7 @@ const showError = error => {
 export const doIndex = (data, callback) => post('index', data, callback,'smartcard/Common');
 // 首页 - 分享
 export const doIndexShare = (data, callback) => post('indexShare', data, callback,'smartcard/Common');
+// 加入企业 - 编辑个人资料
+export const applyStaffAdd = (data, callback) => post('applyStaffAdd', data, callback,'smartcard/Common');
+// 获取行业列表
+export const industryCategoryList = (data, callback) => post('industryCategoryList', data, callback,'smartcard/Common');

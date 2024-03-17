@@ -4,6 +4,7 @@
 		"path": "pages/myCard/myCard",
 		"style": {
 			"navigationBarTitleText": "Ta的名片",
+			"navigationStyle": "custom",
 			"enablePullDownRefresh": false
 		}
 	
