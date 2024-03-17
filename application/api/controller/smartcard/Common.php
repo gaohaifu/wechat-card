@@ -162,13 +162,12 @@ class Common extends Base
     /**
      * 回递名片
      * @param string $staff_id
-     * @param string $user_id
      *
      */
     public function resendCard()
     {
         $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
-        $user_id = $this->request->request("user_id");
+        $user_id = $this->user_id;
         
         $Staff = new Staff();
         if($staff_id == ''){
@@ -429,7 +428,7 @@ class Common extends Base
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
                 ->field('A.user_id,B.avatar,A.createtime,A.origin')
-                ->group('A.user_id')
+//                ->group('A.user_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
                 ->select();
@@ -466,7 +465,7 @@ class Common extends Base
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
                 ->field('B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin')
-                ->group('A.staff_id')
+//                ->group('A.staff_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
                 ->select();
