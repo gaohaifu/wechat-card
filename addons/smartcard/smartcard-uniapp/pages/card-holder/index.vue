@@ -3,7 +3,7 @@
 		<view class="section-one">
 			<view class="search-box">
 				<image class="search-icon" src="../../static/images/search.png" />
-				<input placeholder="请输入姓名/公司/职位" />
+				<input placeholder="请输入姓名/公司/职位" @input="doSearch" />
 			</view>
 			<view class="wechart-card">
 				<view class="wechart-left">
@@ -22,44 +22,60 @@
 				</view>
 				<view class="wechart-right">
 					<text>全部请求</text>
-					<text class="exchange-num">5</text>
+					<text class="exchange-num">{{exchangeCardNum}}</text>
 					<image src="../../static/images/right.png" />
 				</view>
 			</view>
-			<view v-for="item in [1,2]" :key="item">
+			<view v-for="item in exchangeCards" :key="item">
 				<view class="card-item">
-					<image src="../../static/images/img.jpg"></image>
+					<image :src="item.avatar"></image>
 					<view class="card-content">
 						<view class="card-user">
-							<view>陈立荣</view>
-							<view class="exchange-btn">同意</view>
+							<view>{{item.name}}</view>
+							<view class="exchange-btn" @click="agreeExchange(item)">同意</view>
 						</view>
-						<view>总经理</view>
-						<view>厦门巴达尔科技有限公司</view>
+						<view>{{item.position}}</view>
+						<view>{{item.companyname}}</view>
 					</view>
 				</view>
 				<view class="exchange-content">
 					<view class="excontent-text">
-						对方发起与名片 <text>厦门八达尔科技有限公司｜总经理</text> 的交换
+						对方发起与名片 <text>{{item.myStaff.companyname}}｜{{item.myStaff.position}}</text> 的交换
 					</view>
 					<view class="excontent-text flex flex-hsb">
-						<view>来源：对方名片夹</view>
-						<view>2023/01/30</view>
+						<view>来源：{{item.origin}}</view>
+						<view>{{item.createtime}}</view>
 					</view>
 				</view>
 			</view>
+			<no-data v-if="exchangeCards.length === 0" />
 		</view>
-		<view class="section-two">
-			<view class="section-title">所有名片（2）</view>
-			<view class="card-item" v-for="item in [1,2,3]" :key="item">
-				<image src="../../static/images/img.jpg"></image>
+		<view class="section-two" v-show="searchList.length === 0">
+			<view class="section-title">所有名片（{{allCards.length}}）</view>
+			<view class="card-item" v-for="item in allCards" :key="item">
+				<image :src="item.avatar"></image>
 				<view class="card-content">
 					<view class="card-user">
-						<view>陈立荣</view>
-						<text>2024/01/30</text>
+						<view>{{item.name}}</view>
+						<text>{{item.createtime}}</text>
 					</view>
-					<view>总经理</view>
-					<view>厦门巴达尔科技有限公司</view>
+					<view>{{item.position}}</view>
+					<view>{{item.companyname}}</view>
+				</view>
+			</view>
+			<no-data v-if="allCards.length === 0" />
+		</view>
+		<view class="section-two" v-show="searchList.length > 0">
+			<view class="section-title">搜索结果</view>
+			<view class="card-item" v-for="item in searchList" :key="item">
+				<image :src="item.avatar"></image>
+				<view class="card-content">
+					<view class="card-user">
+						<view>{{item.name}}</view>
+						<text>{{item.createtime}}</text>
+					</view>
+					<view>{{item.position}}</view>
+					<view>{{item.companyname}}</view>
 				</view>
 			</view>
 		</view>
@@ -67,11 +83,71 @@
 </template>
 
 <script>
+	import NoData from '../../components/no-data/no-data.vue'
 	export default {
-		data() {
-			return {}
+		name: 'cardHolder',
+		components: {
+			NoData
 		},
-		methods: {}
+		data() {
+			return {
+				searchList: [],
+				exchangeCardNum: 0,
+				exchangeCards: [],
+				allCards: []
+			}
+		},
+		onShow() {
+			this.getData()
+		},
+		methods: {
+			getData() {
+				this.$api.cardHolder({}, res => {
+					(res.exchangeCards || []).forEach(it => {
+						it.myStaff = it.myStaff || [] // 识别不了...
+					})
+					this.exchangeCardNum = res.exchangeCardNum || 0
+					this.exchangeCards = res.exchangeCards || []
+					this.allCards = res.allCards || []
+				})
+			},
+			agreeExchange(row) {
+				this.$api.agreeExchange({su_id: row.id}, res => {
+					if(res.code === 1) {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg || '名片交换成功'
+						})
+					}else {
+						uni.showToast({
+							icon: 'none',
+							title: res.msg || '名片交换失败'
+						})
+					}
+				})
+			},
+			doSearch({detail}) {
+				setTimeout(() => {
+					if(detail.value) {
+						this.$api.myCardSearch({
+							keyword: detail.value
+						}, res => {
+							res.data = res.data || []
+							if(res.data.length === 0) {
+								uni.showToast({
+									icon: 'none',
+									title: '搜索不到数据'
+								})
+							} else {
+								this.searchList = res.data
+							}
+						})
+					} else {
+						this.searchList = []
+					}
+				}, 500)
+			}
+		}
 	}
 </script>
 

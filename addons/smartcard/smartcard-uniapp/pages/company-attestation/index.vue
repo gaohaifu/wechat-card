@@ -41,10 +41,22 @@
 
 <script>
 	export default {
+		name: 'coporationCert',
 		data() {
-			return {}
+			return {
+				companyname: ''
+			}
 		},
-		methods: {}
+		onLoad(options) {
+			this.companyname = options.companyname || '企业认证'
+		},
+		methods: {
+			linkTo() {
+				uni.navigateTo({
+					url: '/pages/company-attestation/attestation'
+				})
+			}
+		}
 	}
 </script>
 

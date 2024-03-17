@@ -17,6 +17,30 @@ export const smartcardBG = {
 	unCert: cdnUrl + 'uploads/20240313/8698ab6a90ba338e35481ea3fd87bc3a.png', // 未认证状态背景图
 }
 
+// 一些公共变量
+export const smartcardObj = {
+	// 名片夹来源
+	origin: {
+		'1': '我向对方发出了名片', 
+		'2': '对方的名片夹',
+		'3': '对方的名片浏览记录'
+	},
+	// 保存状态
+	save_status: {
+		'0': '未同意',
+		'1': '待同意',
+		'2': '已保存',
+		'3': '已回递',
+		'4': '已互存'
+	},
+	// 互相关注名片状态
+	status: {
+		'1': '交换名片',
+		'2': '等待同意',
+		'3': '已交换'
+	}
+}
+
 /**
  * 跳转登陆页面
  */
@@ -26,6 +50,11 @@ function toLogin() {
 		icon: 'loading',
 		duration: 2000,
 		success: function(res) {
+			// #ifdef MP-WEIXIN
+			uni.switchTab({
+				url: '/pages/myCard/myCard'
+			})
+			// #endif
 			// #ifdef H5 || APP-PLUS
 			uni.navigateTo({
 				url: '/pages/user/login'
@@ -50,19 +79,18 @@ function isLogin() {
 	//用户存在，不跳转，不存在直接跳转
 	if(user){
 		if(user.id){
-			// if(user.mobile==''){
-			// 	uni.navigateTo({
-			// 		url: '/pages/user/bind'
-			// 	})
-			// }	
-			
-	}else{
-		console.log("user: ",user);
-		db.del('user');
-		db.del('auth');
-		toLogin()
+				// if(user.mobile==''){
+				// 	uni.navigateTo({
+				// 		url: '/pages/user/bind'
+				// 	})
+				// }	
+		}else{
+			console.log("user: ",user);
+			db.del('user');
+			db.del('auth');
+			toLogin()
+		}
 	}
-  }
 }
 /**
  * 无图标提示

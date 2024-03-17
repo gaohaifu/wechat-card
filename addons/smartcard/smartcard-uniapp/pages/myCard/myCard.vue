@@ -97,7 +97,7 @@
 							第 {{item.visitNum}} 次查看了我的名片‘{{item.myCardText}}’
 						</view>
 						<view class="from">
-							来源：{{item.origin || filterOrigin}}
+							来源：{{smartcardObj.origin[`${item.origin}`]}}
 						</view>
 					</view>
 				</view>
@@ -156,12 +156,14 @@
 
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
+	import {smartcardObj} from '@/config/common.js'
 	export default {
 		components:{
 			bottomSheet
 		},
 		data() {
 			return {
+				smartcardObj: smartcardObj,
 				isShowBottom : false,			//底部弹窗开关
 				userStaff: false,
 				user_id: '',
@@ -278,15 +280,6 @@
 		// 	  console.log(res.errCode);
 		// 	});
 		// },
-		filters: {
-			filterOrigin(vl) {
-				let ret = ''
-				if(vl === 1) ret = '我向对方发出了名片'
-				if(vl === 2) ret = '对方的名片夹'
-				if(vl === 3) ret = '对方的名片浏览记录'
-				return ret
-			}
-		},
 		onLoad(e) {
 			console.log('index调用onload',e); // 分享的？
 			if(typeof(e.staff_id)== "undefined" || e.staff_id=='' ||  e.staff_id==null || e.staff_id=='null'){
@@ -474,6 +467,10 @@
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
 						this.tools.forEach(it => {
 							if(it.disabled) it.color = '#999';
+						})
+						uni.setStorage({
+							key: 'userData',
+							data: this.userData
 						})
 						console.info(this.tools, '====', !this.staffInfo.mobile, !this.staffInfo.email)
 					}else {
