@@ -427,7 +427,7 @@ class Common extends Base
                 ->join('user B', 'A.user_id=B.id')
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
-                ->field('A.user_id,B.avatar,A.createtime,A.origin')
+                ->field('A.id,A.user_id,B.avatar,A.createtime,A.origin,A.is_first,if((successions>=3 and TIMESTAMPDIFF(day, FROM_UNIXTIME(`B`.`logintime`,\'%Y-%m-%d\'),NOW())<=1) , 1 , 0 ) as is_active')
 //                ->group('A.user_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
@@ -464,14 +464,16 @@ class Common extends Base
                 ->join('smartcard_staff B', 'A.staff_id=B.id')
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
-                ->field('B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin')
+                ->field('A.id,B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin,A.is_first')
 //                ->group('A.staff_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
                 ->select();
     
             foreach ($visitStaffLists as &$visitStaffList) {
-                $visitStaffList->avatar = cdnurl(user::where(['id'=>$visitStaffList->user_id])->value('avatar'),true);
+                $user = user::where(['id'=>$visitStaffList->user_id])->field('avatar,logintime,successions')->find();
+                $visitStaffList->is_active = ($user->successions>=3 && floor((time()-$user->logintime)/86400)<=1)?1:0;
+                $visitStaffList->avatar = cdnurl($user->avatar,true);
                 $visitStaffList->companyname = \addons\myadmin\model\Company::where(['id'=>$visitStaffList->company_id])->value('name');
                 $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
                 if($su){
@@ -702,7 +704,23 @@ class Common extends Base
             $this->success('请求成功');
         }
     }
-
+    
+    /**
+     * 名片选择列表
+     *
+     */
+    public function staffList()
+    {
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $staff = $Staff->alias('s')->join('myadmin_company c','s.company_id=c.id')
+            ->where(['user_id'=>$user_id])
+            ->field('s.id,s.name,s.position,c.name as companyname')
+            ->select();
+        
+        $this->success('请求成功', $staff);
+    }
+    
     /**
      * 获取主题列表
      *
