@@ -236,6 +236,9 @@ class Common extends Base
             ];
             $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
         }
+        $exchangeCardNum = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>1])
+            ->count();
         
         $allCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
             ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
@@ -245,9 +248,38 @@ class Common extends Base
             $allCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$allCard->company_id])->value('name');
         }
         $data['exchangeCards'] = $exchangeCards;
+        $data['exchangeCardNum'] = $exchangeCardNum;
         $data['allCards'] = $allCards;
         $this->success('请求成功', $data);
 
+    }
+    
+    /**
+     * 名片夹--搜索
+     * @param string $keyword
+     *
+     */
+    public function myCardSearch()
+    {
+        $user_id = $this->user_id;
+        $keyword = $this->request->request("keyword");
+        if(!$keyword){
+            $this->error('关键词不能为空');
+        }
+        $staff = new Staff();
+        $allCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->join('myadmin_company c','s.company_id = c.id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
+            ->whereRaw("s.name like '%$keyword%' or position like '%$keyword%' or c.name like '%$keyword%'")
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime,c.name as companyname')->select();
+        
+        foreach ($allCards as &$allCard) {
+            $allCard['avatar'] = cdnurl(user::where(['id'=>$allCard->user_id])->value('avatar'),true);
+            $allCard['name'] = str_replace($keyword,"<span class='keyword'>".$keyword."</span>",$allCard['name']);
+            $allCard['position'] = str_replace($keyword,"<span class='keyword'>".$keyword."</span>",$allCard['position']);
+            $allCard['companyname'] = str_replace($keyword,"<span class='keyword'>".$keyword."</span>",$allCard['companyname']);
+        }
+        $this->success('请求成功', $allCards);
     }
     
     /**
