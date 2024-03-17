@@ -102,16 +102,21 @@ class Base extends Api
                         if ($origin == 0) {
                             $this->error('访问来源不能为空');
                         }
+                        $res = $this->visitorsModel->where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
+                        $is_first = 0;
+                        if($res) $is_first = 1;
+                        
                         $visitor = [
                             'staff_id' => $staff_id,
                             'user_id'  => $user_id,
                             'typedata' => 1,
+                            'is_first' => $is_first,
                             'origin' => $origin,
                             'company_id' => $staffInfo['company_id'],
                             'createtime' => time(),
                         ];
                         //增加一条访问记录
-                        $res = $this->visitorsModel->save($visitor);
+                        $this->visitorsModel->save($visitor);
                     }
                 }
                 //首页
