@@ -38,7 +38,7 @@ header('Access-Control-Allow-Origin:*');//允许跨域
 class Common extends Base
 {
 
-    protected $noNeedLogin = ['index','indexShare','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
+    protected $noNeedLogin = ['indexShare','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
     protected $noNeedRight = ['*'];
     public function _initialize()
     {
@@ -55,10 +55,9 @@ class Common extends Base
     public function index()
     {   
         $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
-        $user_id = $this->request->request("user_id");
-        $origin = $this->request->request("origin");
+        $user_id = $this->user_id;
   
-        $list = $this->staffData($staff_id,$user_id,0,$origin);
+        $list = $this->staffData($staff_id,$user_id,0,0);
         $this->success('请求成功', $list);
     }
     
