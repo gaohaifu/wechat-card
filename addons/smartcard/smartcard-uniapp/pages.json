@@ -4,16 +4,16 @@
 		"path": "pages/myCard/myCard",
 		"style": {
 			"navigationBarTitleText": "Ta的名片",
+			"navigationStyle": "custom",
 			"enablePullDownRefresh": false
 		}
-	
 	},
 	{
-		"path": "pages/index/index",
+		"path": "pages/card-holder/index",
 		"style": {
-			"navigationBarTitleText": "首页",
-			//"enablePullDownRefresh": true
-			"navigationStyle": "custom"
+			"navigationBarTitleText": "名片夹",
+			"navigationBarTextStyle": "#333",
+			"enablePullDownRefresh": false
 		}
 	},
 		{
@@ -72,14 +72,6 @@
 			}
 		},
 		{
-			"path": "pages/corpCert1/corpCert1",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		
-		},
-		{
 			"path": "pages/corpCard/corpCard",
 			"style": {
 				"navigationBarTitleText": "",
@@ -103,160 +95,12 @@
 				"enablePullDownRefresh": false
 			}
 		
-		},
-		{
-			"path": "pages/index/message",
-			"style": {
-				"navigationBarTitleText": "个人简介"
-			}
-		},
-		{
-			"path": "pages/index/video",
-			"style": {
-				"navigationBarTitleText": "我的视频"
-			}
-		},
-		{
-			"path": "pages/index/img",
-			"style": {
-				"navigationBarTitleText": "我的相册"
-			}
-		},
-		{
-			"path": "pages/index/contentUs",
-			"style": {
-				"navigationBarTitleText": "企业介绍"
-			}
-		},
-		{
-			"path": "pages/index/brochure",
-			"style": {
-				"navigationBarTitleText": "企业宣传册"
-			}
-		},
-		{
-			"path": "pages/index/case",
-			"style": {
-				"navigationBarTitleText": "成功案例"
-			}
-		},
-		{
-			"path": "pages/index/goods",
-			"style": {
-				"navigationBarTitleText": "热销商品"
-			}
-		},
-		{
-			"path": "pages/index/trends",
-			"style": {
-				"navigationBarTitleText": "企业动态"
-			}
-		},
-		{
-			"path": "pages/index/detail",
-			"style": {
-				"navigationBarTitleText": "详情"
-			}
-		},
-		{
-			"path": "pages/index/report",
-			"style": {
-				"navigationBarTitleText": "企业宣传册"
-			}
-		},
-		{
-			"path": "pages/user/login",
-
-			"style": {
-				"navigationStyle": "custom"
-			}
-		},
-		{
-			"path": "pages/user/register",
-
-			"style": {
-				"navigationStyle": "custom"
-			}
-		}
-
-		, {
-			"path": "pages/index/addCase",
-			"style": {
-				"navigationBarTitleText": "新增成功案例",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/addGoods",
-			"style": {
-				"navigationBarTitleText": "新增商品",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/addTrends",
-			"style": {
-				"navigationBarTitleText": "新增企业动态",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/user/userInfo",
-			"style": {
-				"navigationBarTitleText": "个人信息",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/user/addInfo",
-			"style": {
-				"navigationBarTitleText": "添加信息",
-				"enablePullDownRefresh": false
-			}
-
-		}
-
-		, {
-			"path": "pages/index/newsList",
-			"style": {
-				"navigationBarTitleText": "消息列表",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/colleague",
-			"style": {
-				"navigationBarTitleText": "员工列表",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/addColleague",
-			"style": {
-				"navigationBarTitleText": "添加员工",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
+		},{
 			"path": "pages/index/change",
 			"style": {
 				"navigationBarTitleText": "切换名片主题",
 				//"enablePullDownRefresh": false,
 				"navigationStyle": "custom"
-			}
-
-		}, {
-			"path": "pages/index/essay",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-
-		}, {
-			"path": "pages/index/addMypic/addMypic",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
 			}
 
 		}
@@ -272,32 +116,32 @@
 		"backgroundTextStyle": "light"
 		//"navigationStyle": "custom"
 	},
-	// "tabBar" : {
-	//     "color" : "#999999",
-	//     "selectedColor" : "#2562a1", 
-	//     "borderStyle" : "black",
-	//     "backgroundColor" : "#ffffff",
-	//     "list" : [
-	// 				{
-	// 					   "pagePath": "pages/index/index",
-	// 					   "iconPath": "static/images/tab1.png",
-	// 					   "selectedIconPath": "static/images/tab1-1.png",
-	// 					   "text": "首页"
-	// 				},
-	// 				{
-	// 					   "pagePath": "pages/user/plan",
-	// 					   "iconPath": "static/images/tab3.png",
-	// 					   "selectedIconPath": "static/images/tab3-1.png",
-	// 					   "text": "咨询|回复"
-	// 				},
-	// 				{
-	// 					   "pagePath": "pages/user/index",
-	// 					   "iconPath": "static/images/tab4.png",
-	// 					   "selectedIconPath": "static/images/tab4-1.png",
-	// 					   "text": "我的"
-	// 				}
-	//     ]
-	// },
+	"tabBar" : {
+	    "color" : "#999999",
+	    "selectedColor" : "#2562a1", 
+	    "borderStyle" : "black",
+	    "backgroundColor" : "#ffffff",
+	    "list" : [
+					{
+						   "pagePath": "pages/myCard/myCard",
+						   "iconPath": "static/images/menu/home.png",
+						   "selectedIconPath": "static/images/menu/home__selected.png",
+						   "text": "首页"
+					},
+					{
+						   "pagePath": "pages/card-holder/index",
+						   "iconPath": "static/images/menu/card.png",
+						   "selectedIconPath": "static/images/menu/card__selected.png",
+						   "text": "名片夹"
+					},
+					{
+						   "pagePath": "pages/mycard-data/index",
+						   "iconPath": "static/images/menu/my.png",
+						   "selectedIconPath": "static/images/menu/my__selected.png",
+						   "text": "我的"
+					}
+	    ]
+	},
 	"permission": {
 		"scope.userLocation": {
 			"desc": "你的位置信息将用于小程序位置接口的效果展示" // 高速公路行驶持续后台定位

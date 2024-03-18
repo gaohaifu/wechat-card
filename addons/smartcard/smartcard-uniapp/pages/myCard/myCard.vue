@@ -97,7 +97,7 @@
 							第 {{item.visitNum}} 次查看了我的名片‘{{item.myCardText}}’
 						</view>
 						<view class="from">
-							来源：{{item.origin || filterOrigin}}
+							来源：{{smartcardObj.origin[`${item.origin}`]}}
 						</view>
 					</view>
 				</view>
@@ -125,7 +125,7 @@
 				</view>
 			</view>
 			<!-- 企业简介 -->
-			<view class="card-box">
+			<view class="card-box" v-if="description">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">企业简介</view>
 					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseProfile')">
@@ -138,9 +138,9 @@
 				</view>
 				<view class="" v-show="showEnterpriseProfile">
 					<view class="desc-box">
-						<view class="title">
+						<!-- <view class="title">
 							销售分析
-						</view>
+						</view> -->
 						<text class="desc">
 							{{description}}
 						</text>
@@ -155,14 +155,15 @@
 </template>
 
 <script>
-	import { doIndexShare } from '../../config/newApi.js'
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
+	import {smartcardObj} from '@/config/common.js'
 	export default {
 		components:{
 			bottomSheet
 		},
 		data() {
 			return {
+				smartcardObj: smartcardObj,
 				isShowBottom : false,			//底部弹窗开关
 				userStaff: false,
 				user_id: '',
@@ -279,18 +280,8 @@
 		// 	  console.log(res.errCode);
 		// 	});
 		// },
-		filters: {
-			filterOrigin(vl) {
-				let ret = ''
-				if(vl === 1) ret = '我向对方发出了名片'
-				if(vl === 2) ret = '对方的名片夹'
-				if(vl === 3) ret = '对方的名片浏览记录'
-				return ret
-			}
-		},
 		onLoad(e) {
 			console.log('index调用onload',e); // 分享的？
-			var that=this;
 			if(typeof(e.staff_id)== "undefined" || e.staff_id=='' ||  e.staff_id==null || e.staff_id=='null'){
 				uni.showToast({
 					title:'无用户信息！',
@@ -331,7 +322,7 @@
 					console.log(data);
 					if(data.code==1){
 						this.user_id=data.data.user.id;
-						this.getIndexShare();
+						this.getIndex();
 					}else{
 						//微信小程序端
 						// #ifdef MP-WEIXIN
@@ -339,7 +330,7 @@
 						this.isShowBottom=true
 						this.userStaff=false
 						this.user_id='';
-						// this.getIndexShare();
+						// this.getIndex();
 						// #endif						
 					}
 					
@@ -349,7 +340,6 @@
 			//小程序登录
 			onGetUserProfile() {
 				var platform='wechat';
-				var that=this;
 				var fid=uni.getStorageSync('parentid')?uni.getStorageSync('parentid'):''; 
 				uni.getUserProfile({
 					 desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
@@ -377,7 +367,7 @@
 										this.$db.set('auth',res.auth)
 										this.$db.set('user', res.userinfo)
 										this.user_id=res.userinfo.id
-										this.getIndexShare()
+										this.getIndex()
 									} catch (e) {
 										console.log("e: ",e);
 									}
@@ -413,27 +403,28 @@
 				this.isShowBottom = false;
 				this.onGetUserProfile()
 			},
-			getIndexShare() {
+			getIndex() {
 				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || ''
 				const condition = {
 					staff_id: this.staff_id,
 					user_id: this.user_id
 				}
-				doIndexShare(condition, (res) => {
-					if(res.code === '1') {
-						this.allData=data.data
+				this.$api.doIndex(condition, (res) => {
+					if(res.code === 1) {
+						this.allData=res.data
 						console.log(this.allData);
 						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
-						this.userData = this.staffInfo = res.staffInfo || {};
+						this.userData = this.staffInfo = this.allData.staffInfo || {};
 						if(this.userData.statusdata!='1'){
 							this.certificateStatus=false;
 						}
-						this.myCardData = res.myCardData || {};
-						this.visitStaffLists = res.visitStaffLists || [];
-						this.videofiles = res.videofiles || [];
-						this.description = res.description || '';
+						this.myCardData = this.allData.myCardData || {};
+						this.visitStaffLists = this.allData.visitStaffLists || [];
+						this.videofiles = this.allData.videofiles || [];
+						this.description = this.allData.description || '';
 						this.updatetime=this.allData.newsTime
-						this.color=this.staffInfo?this.staffInfo.smartcardtheme.colour:''
+						this.companyInfo = this.allData.smartcardcompany || {};
+						this.color=this.staffInfo?this.staffInfo.smartcardtheme.color:''
 						this.backgroundImg=this.staffInfo?this.staffInfo.smartcardtheme.backgroundimage:''
 						this.cardimage=this.staffInfo?this.staffInfo.smartcardtheme.cardimage:''
 						this.fontcolor=this.staffInfo?this.staffInfo.smartcardtheme.fontcolor:''          
@@ -451,7 +442,7 @@
 							return item.avatar
 						})
 						this.staff_id=this.staffInfo.id
-						this.mystaff_id= this.userInfo.staff_id || 0
+						// this.mystaff_id= this.userInfo.staff_id || 0
 						this.myselfstatus = this.staff_id != this.mystaff_id
 						this.transmit={
 							company_id:this.companyInfo.id,
@@ -464,9 +455,9 @@
 							staff_id:this.userData.id 
 						};
 						this.nickname=this.userData.name
-						this.statistics[0].value = this.myCardData.allVisitNum
-						this.statistics[1].value = this.myCardData.todayVisitNum
-						this.statistics[2].value = this.myCardData.sendCardNum
+						this.visits[0].value = this.myCardData.allVisitNum
+						this.visits[1].value = this.myCardData.todayVisitNum
+						this.visits[2].value = this.myCardData.sendCardNum
 						if(!this.staffInfo.mobile) this.tools.find(i => i.id === 1).disabled = true
 						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
 						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
@@ -474,6 +465,14 @@
 							this.staffInfo.smartcardcompany.latitude || 
 							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
+						this.tools.forEach(it => {
+							if(it.disabled) it.color = '#999';
+						})
+						uni.setStorage({
+							key: 'userData',
+							data: this.userData
+						})
+						console.info(this.tools, '====', !this.staffInfo.mobile, !this.staffInfo.email)
 					}else {
 						if(this.user_id!=0 || this.user_id!=''){
 							if(staff_id_c!=''){
@@ -484,18 +483,18 @@
 								})
 								setTimeout(()=>{
 									uni.navigateTo({
-										url:'pages/myCard/myCard'
+										url:'/pages/myCard/myCard'
 									})
 								},2000)
 								return false;
 						    }
 						}
-						this.$common.errorToShow(data.msg,function(){
+						this.$common.errorToShow(res.msg, () => {
 							if(staff_id_c==undefined || staff_id_c==null  ||  staff_id_c=='' || staff_id_c==0){
-								if(that.user_id!=0){
-										uni.navigateTo({
-											url:'pages/userInfo/userInfo'
-										})
+								if(this.user_id!=0){
+									uni.navigateTo({
+										url:'/pages/userInfo/userInfo'
+									})
 								}
 							}
 						})
@@ -610,6 +609,10 @@
 		font-size: 22rpx;
 		font-weight: 400;
 		color: #333;
+	}
+	.tools .tool-item.disabled {
+		color: #999;
+		cursor: not-allowed;
 	}
 
 	.tools .tool-item .iconfont {

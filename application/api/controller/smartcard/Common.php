@@ -161,13 +161,12 @@ class Common extends Base
     /**
      * 回递名片
      * @param string $staff_id
-     * @param string $user_id
      *
      */
     public function resendCard()
     {
         $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
-        $user_id = $this->request->request("user_id");
+        $user_id = $this->user_id;
         
         $Staff = new Staff();
         if($staff_id == ''){
@@ -235,6 +234,9 @@ class Common extends Base
             ];
             $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
         }
+        $exchangeCardNum = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>1])
+            ->count();
         
         $allCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
             ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
@@ -244,9 +246,38 @@ class Common extends Base
             $allCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$allCard->company_id])->value('name');
         }
         $data['exchangeCards'] = $exchangeCards;
+        $data['exchangeCardNum'] = $exchangeCardNum;
         $data['allCards'] = $allCards;
         $this->success('请求成功', $data);
 
+    }
+    
+    /**
+     * 名片夹--搜索
+     * @param string $keyword
+     *
+     */
+    public function myCardSearch()
+    {
+        $user_id = $this->user_id;
+        $keyword = $this->request->request("keyword");
+        if(!$keyword){
+            $this->error('关键词不能为空');
+        }
+        $staff = new Staff();
+        $allCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
+            ->join('myadmin_company c','s.company_id = c.id')
+            ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
+            ->whereRaw("s.name like '%$keyword%' or position like '%$keyword%' or c.name like '%$keyword%'")
+            ->field('s.id,s.user_id,s.name,s.company_id,s.position,u.createtime,c.name as companyname')->select();
+        
+        foreach ($allCards as &$allCard) {
+            $allCard['avatar'] = cdnurl(user::where(['id'=>$allCard->user_id])->value('avatar'),true);
+            $allCard['name'] = str_replace($keyword,"<span class='keyword'>".$keyword."</span>",$allCard['name']);
+            $allCard['position'] = str_replace($keyword,"<span class='keyword'>".$keyword."</span>",$allCard['position']);
+            $allCard['companyname'] = str_replace($keyword,"<span class='keyword'>".$keyword."</span>",$allCard['companyname']);
+        }
+        $this->success('请求成功', $allCards);
     }
     
     /**
@@ -395,8 +426,8 @@ class Common extends Base
                 ->join('user B', 'A.user_id=B.id')
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
-                ->field('A.user_id,B.avatar,A.createtime,A.origin')
-                ->group('A.user_id')
+                ->field('A.id,A.user_id,B.avatar,A.createtime,A.origin,A.is_first,if((successions>=3 and TIMESTAMPDIFF(day, FROM_UNIXTIME(`B`.`logintime`,\'%Y-%m-%d\'),NOW())<=1) , 1 , 0 ) as is_active')
+//                ->group('A.user_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
                 ->select();
@@ -432,14 +463,16 @@ class Common extends Base
                 ->join('smartcard_staff B', 'A.staff_id=B.id')
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
-                ->field('B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin')
-                ->group('A.staff_id')
+                ->field('A.id,B.user_id,B.name,B.position,B.company_id,A.staff_id,A.createtime,A.origin,A.is_first')
+//                ->group('A.staff_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
                 ->select();
     
             foreach ($visitStaffLists as &$visitStaffList) {
-                $visitStaffList->avatar = cdnurl(user::where(['id'=>$visitStaffList->user_id])->value('avatar'),true);
+                $user = user::where(['id'=>$visitStaffList->user_id])->field('avatar,logintime,successions')->find();
+                $visitStaffList->is_active = ($user->successions>=3 && floor((time()-$user->logintime)/86400)<=1)?1:0;
+                $visitStaffList->avatar = cdnurl($user->avatar,true);
                 $visitStaffList->companyname = \addons\myadmin\model\Company::where(['id'=>$visitStaffList->company_id])->value('name');
                 $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
                 if($su){
@@ -670,7 +703,23 @@ class Common extends Base
             $this->success('请求成功');
         }
     }
-
+    
+    /**
+     * 名片选择列表
+     *
+     */
+    public function staffList()
+    {
+        $user_id = $this->user_id;
+        $Staff = new Staff();
+        $staff = $Staff->alias('s')->join('myadmin_company c','s.company_id=c.id')
+            ->where(['user_id'=>$user_id])
+            ->field('s.id,s.name,s.position,c.name as companyname')
+            ->select();
+        
+        $this->success('请求成功', $staff);
+    }
+    
     /**
      * 获取主题列表
      *

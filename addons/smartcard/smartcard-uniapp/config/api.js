@@ -35,19 +35,32 @@ const methodsToken = [
 	"themeEdit",
 	"companyStaffAdd",
 	'companyStaffEdit',
-	'logout'
+	'logout',
+	// ========================new apis
+	'doIndex',
+	'doIndexShare',
+	'industryCategoryList',
+	'cardHolder',
+	'agreeExchange',
+	'myCardVisit',
+	'myCardList',
+	'myCardSearch',
+	'resendCard'
 ];
-const post = (method, data, callback,type) => {
+const post = (method, data, callback,type, failCB) => {
 	let userToken = '';
 	let auth = '';
 	// 判断token是否存在
 	if (methodsToken.indexOf(method) >= 0) {
 		// 获取用户token
 		let auth = db.get("auth");
-		//console.log(auth);
+		// console.info(auth, '===----', db.get('user'));
 		let nowdate = (new Date()) / 1000; //当前时间戳
 		//新增用户判断是否登录逻辑begin
-		 common.isLogin();
+		common.isLogin()
+		// if (!common.isLogin()) {
+		// 	return;
+		// }
 		//新增用户判断是否登录逻辑end
 		//console.log('auth',auth);
 		// if (!auth || auth.createtime+auth.expires_in < nowdate) {
@@ -99,6 +112,7 @@ const post = (method, data, callback,type) => {
 			if (error && error.response) {
 				showError(error.response);
 			}
+			failCB && typeof failCB === 'function' && failCB(error)
 		},
 	});
 }
@@ -363,3 +377,25 @@ export const themeList = (data, callback) => post('themeList', data, callback,'s
 export const themeEdit = (data, callback) => post('themeEdit', data, callback,'smartcard/Common');
 //新增用户信息
 export const applyStaffAdd = (data, callback) => post('applyStaffAdd', data, callback,'smartcard/Common');
+
+
+
+// ==============================New Apis========================================================================
+// 首页
+export const doIndex = (data, callback) => post('index', data, callback,'smartcard/Common');
+// 首页 - 分享
+export const doIndexShare = (data, callback) => post('indexShare', data, callback,'smartcard/Common');
+// 获取行业列表
+export const industryCategoryList = (data, callback) => post('industryCategoryList', data, callback,'smartcard/Common');
+// 获取名片夹
+export const cardHolder = (data, callback) => post('cardHolder', data, callback,'smartcard/Common');
+// 同意交换名片
+export const agreeExchange = (data, callback) => post('agreeExchange', data, callback,'smartcard/Common');
+// 我的名片数据--汇总
+export const myCardVisit = (data, callback) => post('myCardVisit', data, callback,'smartcard/Common');
+// 我的名片数据列表
+export const myCardList = (data, callback, failCB) => post('myCardList', data, callback,'smartcard/Common', failCB);
+// 名片夹--搜索
+export const myCardSearch = (data, callback) => post('myCardSearch', data, callback,'smartcard/Common');
+// 回递名片
+export const resendCard = (data, callback) => post('resendCard', data, callback,'smartcard/Common');

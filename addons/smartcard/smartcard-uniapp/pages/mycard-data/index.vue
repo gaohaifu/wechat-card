@@ -4,85 +4,157 @@
 			<view class="card-count">
 				<view class="card-count-content">
 					<view>名片访问总量(次)</view>
-					<view class="card-count-num">22</view>
+					<view class="card-count-num">{{allVisitNum}}</view>
 				</view>
 				<view class="card-count-content">
 					<view>今日访问总量(次)</view>
-					<view class="card-count-num">0</view>
+					<view class="card-count-num">{{todayVisitNum}}</view>
 				</view>
 			</view>
 			<view class="send-count">
 				<view class="send-count-item">
 					<text>发出名片总量(次):</text>
-					<text>12</text>
+					<text>{{allSendNum}}</text>
 				</view>
 				<view class="send-count-item">
 					<text>我的靠谱总量:</text>
-					<text>12</text>
+					<text>{{allExchangeNum}}</text>
 				</view>
 			</view>
 		</view>
 		<view class="visit-section">
 			<view class="tab-box">
-				<view v-for="item in menus" :key="item.value" :class="{ active: current === item.value }" @click="tabHandle(item.value)">{{item.name}}</view>
+				<view v-for="item in menus" :key="item.value"
+					:class="{ active: current === item.value }"
+					@click="tabHandle(item.value)"
+					v-if="!item.hidden">{{item.name}}</view>
 			</view>
-			<view class="flex more-search-box" v-if="current === 0">
+			<view class="flex more-search-box" v-if="current === 1">
 				<view class="btn01">全部</view>
 				<view class="flex flex-vc btn02">按名片查看<text class="iconfont icon-down"></text></view>
 			</view>
-			<view class="flex more-search-box" v-if="current === 2">
+			<!-- <view class="flex more-search-box" v-if="current === 3">
 				<view class="btn01">待更新(0)</view>
 				<view class="flex flex-vc btn02">已更新(0)</view>
-			</view>
-			<view v-for="it in [3, 6]" :key="it">
-				<view class="card-date">2023/02/05</view>
-				<view class="card-item" v-for="item in [1,2]" :key="item">
+			</view> -->
+			<view v-for="(it, inx) in myCardList" :key="inx">
+				<view class="card-date">{{it.date}}</view>
+				<view class="card-item" v-for="(sit, sinx) in it.data" :key="sinx">
 					<view class="photo-box">
-						<image src="../../static/images/img.jpg"></image>
-						<view class="visit-first" v-if="it===3">首次访问</view>
-						<view class="visit-first lively" v-else>活跃</view>
+						<image :src="sit.avatar"></image>
+						<!-- <view class="visit-first" v-if="it===3">首次访问</view> -->
+						<!-- <view class="visit-first lively" v-else>活跃</view> -->
 					</view>
 					<view class="card-content">
 						<view class="flex-1">
-							<view class="card-user">陈立荣</view>
-							<view>总经理</view>
-							<view>厦门巴达尔科技有限公司</view>
-							<view class="card-source" v-if="it===3">来源 | 对方名片夹 16:22</view>
+							<view class="card-user">{{sit.name}}</view>
+							<view>{{sit.position}}</view>
+							<view>{{sit.companyname}}</view>
+							<view class="card-source">来源 | {{smartcardObj.origin[`${sit.origin}`]}} {{sit.time}}</view>
 						</view>
-						<view class="await-text" v-if="it===3">等待同意</view>
-						<view class="card-exchange" v-else>交换名片</view>
+						<view :class="{'card-exchange' : sit.status === 1, 'await-text': sit.status !== 1}"
+							 @click="resendCard(sit)">{{smartcardObj.status[`${sit.status}`]}}</view>
 					</view>
 				</view>
 			</view>
+			<uni-load-more :status="status"></uni-load-more>
 		</view>
 	</view>
 </template>
 
 <script>
+	import { formatDate } from "@/uni_modules/uni-dateformat/components/uni-dateformat/date-format.js";
+	import {smartcardObj} from '@/config/common.js'
 	export default {
 		data() {
 			return {
+				smartcardObj: smartcardObj,
 				current: 0,
+				allVisitNum: 0,
+				todayVisitNum: 0,
+				allSendNum: 0,
+				allExchangeNum: 0,
 				menus: [
 					{
 						name: '我的访客',
-						value: 0
-					},
-					{
-						name: '我看过的',
 						value: 1
 					},
 					{
-						name: '待更新名片',
+						name: '我看过的',
 						value: 2
+					},
+					{
+						name: '待更新名片',
+						value: 3,
+						hidden: true
 					}
-				]
+				],
+				myCardList: [],
+				status: 'more'
 			}
+		},
+		onReachBottom() {
+			++this.pageNum
+			this.getMyCardList()
 		},
 		methods: {
 			tabHandle(val) {
 				if (this.current === val) return
 				this.current = val
+			},
+			getStatistics() {
+				this.$api.myCardVisit({}, res => {
+					if(res.code === 1) {
+						this.allVisitNum = res.allVisitNum || 0
+						this.todayVisitNum = res.todayVisitNum || 0
+						this.allSendNum = res.allSendNum || 0
+						this.allExchangeNum = res.allExchangeNum || 0
+					}
+				})
+			},
+			getMyCardList() {
+				this.status = 'loading'
+				this.$api.myCardList({
+					page: this.pageNum,
+					type: this.current
+				}, res => {
+					if(res.code === 1) {
+						res.data = res.data || []
+						this.status = res.data.length < 10 ? 'noMore' : 'more' // nomore待处理
+						let result = {}
+						res.data.forEach(it => {
+							const date = formatDate(it.createtime,"yyyy/MM/dd");
+							it.time = formatDate(it.createtime,"hh:mm");
+							result.date = result.date ? result.date.push(it) : [it];
+						})
+						let temp = []
+						for(const key in result) {
+							temp.push({date: key, data: result[key]})
+						}
+						console.info('result....', result, 'temp list', temp)
+						this.myCardList = this.myCardList.concat(temp)
+					}else {
+						this.status = 'more'
+					}
+				}, err => {
+					this.status = 'more'
+				})
+			},
+			resendCard(row) {
+				if(row.status !== 1) return;
+				this.$api.resendCard({staff_id: row.user_id}, res => {
+					if(res.code === 1) {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg || '名片回递成功'
+						})
+					}else {
+						uni.showToast({
+							icon: 'none',
+							title: res.msg || '名片回递失败'
+						})
+					}
+				})
 			}
 		}
 	}

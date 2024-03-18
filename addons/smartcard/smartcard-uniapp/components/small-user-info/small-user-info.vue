@@ -1,25 +1,25 @@
 <template>
-	<view class="header_message" :style="{'background-image':'url('+smartcardBG.cardimage+')'}">
+	<view class="header_message" :style="{'background-image':'url('+theme.cardimage+')'}">
 		<view class="flex_layout userImg">
 			<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
 			<view class="name_position">
-				<view :style="{color:fontcolor}">{{userData.name?userData.name:''}}</view>
-				<text :style="{color:fontcolor}">{{userData.position}}</text>
-				<text :style="{color:fontcolor}">{{companyInfo.name}}</text>
+				<view :style="{color:theme.fontcolor}">{{userData.name?userData.name:''}}</view>
+				<text :style="{color:theme.fontcolor}">{{userData.position}}</text>
+				<text :style="{color:theme.fontcolor}">{{companyInfo.name}}</text>
 			</view>
 		</view>
 		<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-			:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')', color:fontcolor}">
+			:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')', color:theme.fontcolor}">
 			{{!certificateStatus? '未认证' : '未认证'}}
 		</view>
 		<view class="extra">
-			<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
-					:style="{color:fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
-			<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-youjian1"></i><text
-					:style="{color:fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
-			<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:fontcolor}"
+			<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-dianhua"></i><text
+					:style="{color:theme.fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
+			<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-youjian1"></i><text
+					:style="{color:theme.fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
+			<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:theme.fontcolor}"
 					class="iconfont icon-weizhi"></i><text
-					:style="{color:fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
+					:style="{color:theme.fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
 			</view>
 		</view>
 		<view class="isHC-box">
@@ -36,9 +36,23 @@
 	} from '../../config/common.js'
 	export default {
 		name: "small-user-info",
+		props: {
+			themeData: {
+				type: Object,
+				default() {
+					return {
+						backgroundimage: smartcardBG.backgroundimage, // 页面背景
+						cardimage: smartcardBG.cardimage, // 主题背景
+						fontcolor: '#333', // 字体颜色
+						color: '#333', // 主题颜色
+					}
+				}
+			}
+		},
 		data() {
 			return {
 				smartcardBG: smartcardBG,
+				theme: {},
 				userData: {
 					nickname: '',
 					name: '',
@@ -46,61 +60,28 @@
 					position: ''
 				},
 				allData: {},
-				certificateStatus: false
+				certificateStatus: true
 			};
 		},
+		watch: {
+			themeData: {
+				deep: true,
+				handler(vl) {
+					this.theme = vl
+				}
+			}
+		},
+		onShow() {
+			this.userData = uni.getStorageSync('userData') || {}
+			if(this.userData.statusdata!='1'){
+				this.certificateStatus=false;
+			}
+		},
+		onLoad() {
+			this.theme = this.themeData
+		},
 		methods: {
-			//首页全部信息接口（包含个人信息）
-			indexData() {
-				var staff_id_c = this.staff_id != 0 && this.staff_id != null ? this.staff_id : uni.getStorageSync(
-					'staff_id')
-				const parm = {
-					staff_id: staff_id_c,
-					user_id: this.user_id
-				};
-				var that = this;
-				this.$api.indexData(
-					parm,
-					data => {
-						if (data.code == 1) {
-							this.allData = data.data
-							this.$emit('@getAllUserData', this.allData)
-							console.log(this.allData);
-							// this.usertype = data.data.usertype; //是否是领导角色（0：不是  1：是）
-							this.userData = data.data.staffInfo
-							if (this.userData.statusdata != '1') {
-								this.certificateStatus = false;
-							}
-						} else {
-							if (this.user_id != 0 || this.user_id != '') {
-								if (staff_id_c != '') {
-									uni.showToast({
-										title: '无此用户名片信息,即将跳转到个人名片主页...',
-										icon: 'none',
-										duration: 1500
-									})
-									setTimeout(() => {
-										uni.navigateTo({
-											url: 'index'
-										})
-									}, 2000)
-									return false;
-								}
-							}
-							this.$common.errorToShow(data.msg, function() {
-								if (staff_id_c == undefined || staff_id_c == null || staff_id_c == '' ||
-									staff_id_c == 0) {
-									if (that.user_id != 0) {
-										uni.navigateTo({
-											url: '../user/addInfo'
-										})
-									}
-								}
-							})
-						}
-
-					})
-			},
+			
 		}
 	}
 </script>
@@ -119,6 +100,7 @@
 		color: #e1d27e;
 		box-shadow: 0 0 10px #999;
 		position: relative;
+		overflow: hidden;
 	}
 
 	.userImg {
@@ -214,19 +196,31 @@
 
 	.isHC-box {
 		position: absolute;
-		bottom: 1rpx;
-		right: 1rpx;
-		border-radius: 40rpx;
-		width: 172rpx;
-		height: 66rpx;
+		bottom: -1rpx;
+		right: -1rpx;
+		width: 100rpx;
+		height: 100rpx;
+	}
+	.isHC-box::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 0;
+		height: 0;
+		border-top: 0 solid skyblue;
+		border-bottom: 100rpx solid skyblue;
+		border-left: 100rpx solid transparent;
+		border-right: 0 solid transparent;
 	}
 
 	.isHC-box .bg {
-		width: 100%;
-		height: 100%;
-		background-color: #163778;
+		position: relative;
+		top: 41rpx;
+		z-index: 99;
+		left: 24rpx;
 		transform: rotate(-45deg);
-		font-size: 28rpx;
+		font-size: 24rpx;
 		color: #fff;
 		font-weight: 400;
 	}

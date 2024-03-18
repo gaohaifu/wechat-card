@@ -3,7 +3,7 @@
 		<view class="flex_layout company-box">
 			<image class="avatar" src="../../static/images/corp-icon.png" mode=""></image>
 			<view class="flex-1">
-				<view class="name">厦门八达尔科技有限公司</view>
+				<view class="name">{{companyname}}</view>
 				<view class="flex flex-vc flex-hc enterprise-cert">
 					<image src="../../static/images/enterprise-cert.png" mode=""></image>
 					<text>企业认证</text>
@@ -33,8 +33,8 @@
 			<view class="flex desc-box">
 				<view class="sn">02</view>
 				<view class="flex-1 flex flex-v">
-					<text>分享名片卡片</text>
-					<text>发名片时，分享卡片上显示企业认证标识</text>
+					<text>名片详情页</text>
+					<text>显示企业专属认证标识，增加名片可信度</text>
 				</view>
 			</view>
 			<view class="img-box">
@@ -43,7 +43,7 @@
 		</view>
 		
 		<view class="flex flex-vc footer">
-			<view class="flex-1 primary-btn">已回递</view>
+			<view class="flex-1 primary-btn" @click="linkTo">立即认证</view>
 		</view>
 	</view>
 </template>
@@ -52,12 +52,17 @@
 	export default {
 		data() {
 			return {
-				
+				companyname: ''
 			}
 		},
+		onLoad(options) {
+			this.companyname = options.companyname || '企业认证'
+		},
 		methods: {
-			doSearch() {
-
+			linkTo() {
+				uni.navigateTo({
+					url: '/pages/user/login'
+				})
 			}
 		}
 	}
