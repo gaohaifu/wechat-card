@@ -1,18 +1,14 @@
 <template>
 	<view class="overall_content user-info">
-		<view class="header_background" :style="{'background-image':'url('+smartcardBG.backgroundImg+')'}">
-			<cu-custom :bgColor="bgColor" :isBack="true" :backGround="backGround">
-				<block slot="backText">返回</block>
-				<block slot="content">编辑资料</block>
-			</cu-custom>
-			<view class="header_padding">
-				<smallUserInfo @getAllUserData="getAllUserData"></smallUserInfo>
-			</view>
-		</view>
+		<smallUserInfo page-title="编辑资料" 
+			:is-show="isShowSmallUserInfo"
+			:bg-color="bgColor"
+			:back-ground="backGround"
+			:is-back="true"></smallUserInfo>
 		<view class="padding_content">
 			<div class="flex flex-hsb flex-vc Inside_fast change-card-box">
 				<text class="title">名片样式</text>
-				<view class="flex flex-vc">
+				<view class="flex flex-vc" @click="linkToChange">
 					<text class="title2">更换名片背景</text>
 					<text class="iconfont icon-Rightyou"></text>
 				</view>
@@ -124,7 +120,7 @@
 		<!--提交按钮-->
 		<view style=" paddiing:20rpx; color:#ff0000;text-align:center">*如果修改了关联公司，账户将变为未认证状态，请谨慎操作</view>
 		<view class="flex flex-vc footer">
-			<view class="flex flex-v left-box">
+			<view class="flex flex-v flex-vc left-box">
 				<text class="iconfont icon-yulan"></text>
 				<text>预览名片</text>
 			</view>
@@ -148,6 +144,9 @@
 		},
 		data() {
 			return {
+				bgColor:'bg-gradual-custom',
+				backGround:'',
+				isShowSmallUserInfo: true,
 				smartcardBG: smartcardBG,
 				userInfo: {},
 				imgList: [],
@@ -178,10 +177,13 @@
 			}
 		},
 		onShow() {
-
+			this.isShowSmallUserInfo = true
+		},
+		onHide() {
+			this.isShowSmallUserInfo = false
 		},
 		onLoad(options) {
-			console.info(smartcardBG, '====smartcardBG')
+			console.info(smartcardBG, '====smartcardBG', options)
 			this.color = uni.getStorageSync('color')
 			//修改导航条背景颜色
 			uni.setNavigationBarColor({
@@ -194,6 +196,15 @@
 			// this.company_id_s = options.company_id;
 			this.smartcardfind();
 			this.getIndustryData();			
+		},
+		onPageScroll(e){
+			if(e.scrollTop>0){
+				this.bgColor='bg-gradual-white';
+				this.backGround=this.color
+			}else{
+				this.bgColor='bg-gradual-custom';
+				this.backGround='transparent'
+			}
 		},
 		methods: {
 			getAllUserData(allData) {
@@ -330,9 +341,8 @@
 							this.industry_id = this.userInfo.industry_id
 							this.qq = this.userInfo.qq
 							if (this.userInfo) {
-								this.imgList[0] = this.userInfo.user.avatar; //头像
-								console.log(this.imgList);
-								this.avatar = this.userInfo.user.avatar;
+								this.imgList[0] = this.userInfo.avatar; //头像
+								this.avatar = this.userInfo.avatar;
 							} else {
 								this.imgList = []
 							}
@@ -357,6 +367,7 @@
 				data['avatar'] = this.avatar //头像
 				data['introcontent'] = this.introcontent;
 				data['qq'] = this.qq
+				data['industry_id'] = this.industry_id
 				
 				// data['company_id_s'] = this.company_id_s
 				if (this.ids != 0) {
@@ -442,6 +453,11 @@
 							})
 						}
 					})
+			},
+			linkToChange() {
+				uni.navigateTo({
+					url: '/pages/change/change'
+				})
 			}
 		}
 	}
@@ -663,6 +679,7 @@
 		bottom: 0;
 		width: 100%;
 		background-color: #fff;
+		z-index: 999;
 	}
 
 	.footer .left-box {

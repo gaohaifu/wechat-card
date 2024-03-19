@@ -97,6 +97,10 @@
 			++this.pageNum
 			this.getMyCardList()
 		},
+		onShow() {
+			this.getStatistics()
+			this.getMyCardList()
+		},
 		methods: {
 			tabHandle(val) {
 				if (this.current === val) return

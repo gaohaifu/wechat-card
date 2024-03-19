@@ -36,6 +36,7 @@
 			"path": "pages/change/change",
 			"style": {
 				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
 		
@@ -83,30 +84,11 @@
 		{
 			"path": "pages/member/member",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "成员列表",
 				"enablePullDownRefresh": false
 			}
 		
-		},
-		{
-			"path": "pages/share/share",
-			"style": {
-				"navigationBarTitleText": "分享",
-				"enablePullDownRefresh": false
-			}
-		
-		},{
-			"path": "pages/index/change",
-			"style": {
-				"navigationBarTitleText": "切换名片主题",
-				//"enablePullDownRefresh": false,
-				"navigationStyle": "custom"
-			}
-
 		}
-
-
-
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",

@@ -1,30 +1,42 @@
 <template>
-	<view class="header_message" :style="{'background-image':'url('+theme.cardimage+')'}">
-		<view class="flex_layout userImg">
-			<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
-			<view class="name_position">
-				<view :style="{color:theme.fontcolor}">{{userData.name?userData.name:''}}</view>
-				<text :style="{color:theme.fontcolor}">{{userData.position}}</text>
-				<text :style="{color:theme.fontcolor}">{{companyInfo.name}}</text>
-			</view>
-		</view>
-		<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-			:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')', color:theme.fontcolor}">
-			{{!certificateStatus? '未认证' : '未认证'}}
-		</view>
-		<view class="extra">
-			<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-dianhua"></i><text
-					:style="{color:theme.fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
-			<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-youjian1"></i><text
-					:style="{color:theme.fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
-			<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:theme.fontcolor}"
-					class="iconfont icon-weizhi"></i><text
-					:style="{color:theme.fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
-			</view>
-		</view>
-		<view class="isHC-box">
-			<view class="bg">
-				已互存
+	<view class="header_background" :style="{'background-image':'url('+cdnUrl+theme.backgroundimage+')'}">
+		<cu-custom :bgColor="bgColor" :isBack="isBack" :backGround="backGround">
+			<block slot="backText">返回</block>
+			<block slot="content">{{pageTitle}}</block>
+		</cu-custom>
+		<view class="header_padding">
+			<view class="header_message" :style="{'background-image':'url('+cdnUrl + theme.cardimage+')'}">
+				<view class="flex_layout userImg">
+					<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
+					<view class="name_position">
+						<view :style="{color:theme.fontcolor}">{{userData.name?userData.name:''}}</view>
+						<text :style="{color:theme.fontcolor}">{{userData.position}}</text>
+						<text :style="{color:theme.fontcolor}">{{companyInfo.name}}</text>
+					</view>
+				</view>
+				<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
+					:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')', color:theme.fontcolor}">
+					{{!certificateStatus? '未认证' : '未认证'}}
+				</view>
+				<view class="extra">
+					<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-dianhua"></i><text
+							:style="{color:theme.fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
+					<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-youjian1"></i><text
+							:style="{color:theme.fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
+					<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:theme.fontcolor}"
+							class="iconfont icon-weizhi"></i><text
+							:style="{color:theme.fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
+					</view>
+				</view>
+				<!--切换按钮-->
+				<!-- <view class="change_tab flex_layout" v-if="user_id==userData.user_id" @click="changeTab">
+					<image src="../../static/images/change.png" mode=""></image><text>切换</text>
+				</view> -->
+				<view class="isHC-box" v-if="smartcardObj.save_status[userData.save_status]">
+					<view class="bg">
+						{{smartcardObj.save_status[userData.save_status]}}
+					</view>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -32,11 +44,36 @@
 
 <script>
 	import {
-		smartcardBG
+		smartcardBG,
+		smartcardObj
 	} from '../../config/common.js'
+	import {
+		cdnUrl
+	} from '@/config/config.js'
 	export default {
 		name: "small-user-info",
 		props: {
+			// 解决页面返回后导致保存模板的数据不生效问题
+			isShow: {
+				type: Boolean,
+				default: true
+			},
+			bgColor: {
+				type: String,
+				default: 'bg-gradual-custom'
+			},
+			backGround: {
+				type: String,
+				default: ''
+			},
+			isBack: {
+				type: Boolean,
+				default: false
+			},
+			pageTitle: {
+				type: String,
+				default: '标题'
+			},
 			themeData: {
 				type: Object,
 				default() {
@@ -51,11 +88,13 @@
 		},
 		data() {
 			return {
+				cdnUrl: cdnUrl,
 				smartcardBG: smartcardBG,
-				theme: {},
+				smartcardObj: smartcardObj,
+				theme: this.themeData || {},
 				userData: {
-					nickname: '',
-					name: '',
+					nickname: '微信昵称',
+					name: '微信昵称',
 					avatar: '',
 					position: ''
 				},
@@ -66,22 +105,28 @@
 		watch: {
 			themeData: {
 				deep: true,
-				handler(vl) {
-					this.theme = vl
+				handler(vl = {}) {
+					if(vl.cardimage) this.theme = vl
 				}
+			},
+			isShow(vl) {
+				if(vl) this.getSessionData()
 			}
 		},
-		onShow() {
-			this.userData = uni.getStorageSync('userData') || {}
-			if(this.userData.statusdata!='1'){
-				this.certificateStatus=false;
-			}
-		},
-		onLoad() {
-			this.theme = this.themeData
+		created() {
+			this.getSessionData()
+			console.info('----------small user info 回退是否会执行当前生命周期？？？', 
+				this.userData.save_status, this.smartcardObj.save_status[this.userData.save_status])
 		},
 		methods: {
-			
+			getSessionData() {
+				this.userData = uni.getStorageSync('userData') || {}
+				const themeData = uni.getStorageSync('themeData') || {}
+				if(themeData.cardimage) this.theme = themeData
+				if(this.userData.statusdata!='1'){
+					this.certificateStatus=false;
+				}
+			}
 		}
 	}
 </script>
@@ -167,7 +212,7 @@
 		font-size: 20rpx;
 		line-height: 32rpx;
 		text-align: center;
-		color: #fff;
+		color: #fff!important;
 		margin-right: 8rpx;
 	}
 

@@ -37,15 +37,21 @@ const methodsToken = [
 	'companyStaffEdit',
 	'logout',
 	// ========================new apis
-	'doIndex',
-	'doIndexShare',
+	'index',
+	'indexShare',
 	'industryCategoryList',
 	'cardHolder',
 	'agreeExchange',
 	'myCardVisit',
 	'myCardList',
 	'myCardSearch',
-	'resendCard'
+	'resendCard',
+	'myCompany',
+	'getMemberList',
+	'enterpriseCertified',
+	'realnameCertified',
+	'sendCard',
+	'saveCard'
 ];
 const post = (method, data, callback,type, failCB) => {
 	let userToken = '';
@@ -371,7 +377,6 @@ export const smartcardfind = (data, callback) => post('smartcardfind', data, cal
 export const messageList = (data, callback) => post('messageList', data, callback,'smartcard/Common');
 //同意或拒绝消息
 export const messageEdit = (data, callback) => post('messageEdit', data, callback,'smartcard/Common');
-//模板列表
 export const themeList = (data, callback) => post('themeList', data, callback,'smartcard/Common');
 //选择模板
 export const themeEdit = (data, callback) => post('themeEdit', data, callback,'smartcard/Common');
@@ -399,3 +404,17 @@ export const myCardList = (data, callback, failCB) => post('myCardList', data, c
 export const myCardSearch = (data, callback) => post('myCardSearch', data, callback,'smartcard/Common');
 // 回递名片
 export const resendCard = (data, callback) => post('resendCard', data, callback,'smartcard/Common');
+// 模板列表
+// export const themeList1 = (data, callback) => post('resendCard', data, callback,'smartcard/Common');
+// 企业名片
+export const myCompany = (data, callback) => post('myCompany', data, callback,'smartcard/Common');
+// 成员列表
+export const getMemberList = (data, callback, failCB) => post('getMemberList', data, callback, 'smartcard/Common', failCB)
+// 企业认证
+export const enterpriseCertified = (data, callback) => post('enterpriseCertified', data, callback, 'smartcard/Common')
+// 实名认证
+export const realnameCertified = (data, callback) => post('realnameCertified', data, callback, 'smartcard/Common')
+// 保存名片
+export const saveCard = (data, callback) => post('saveCard', data, callback, 'smartcard/Common')
+// 发名片
+export const sendCard = (data, callback) => post('sendCard', data, callback, 'smartcard/Common')

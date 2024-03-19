@@ -113,7 +113,6 @@
 	  },
       // 上传图片
       uploadImg() {
-				var that=this;
 				let userToken = '';
 				let auth = this.$db.get("auth");
 				userToken = auth.token;

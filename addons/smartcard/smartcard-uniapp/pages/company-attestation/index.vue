@@ -4,7 +4,7 @@
 			<view class="company-box">
 				<image class="company-icon" src="../../static/images/corp-icon.png" />
 				<view class="company-content">
-					<view class="company-name">厦门巴达尔科技有限公司</view>
+					<view class="company-name">{{ companyname }}</view>
 					<view class="attestation">
 						<image src="../../static/images/enterprise-cert.png" />
 						<text>企业认证</text>
@@ -34,12 +34,13 @@
 			<view class="equity-img"><image src="../../static/images/corp-cert-img01.png" /></view>
 		</view>
 		<view class="attestation-btn">
-			<view>立即认证</view>
+			<view @click="linkTo">立即认证</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import { navigateTo } from '@/config/common.js'
 	export default {
 		name: 'coporationCert',
 		data() {
@@ -52,9 +53,7 @@
 		},
 		methods: {
 			linkTo() {
-				uni.navigateTo({
-					url: '/pages/company-attestation/attestation'
-				})
+				navigateTo('/pages/company-attestation/attestation')
 			}
 		}
 	}

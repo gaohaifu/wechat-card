@@ -9,27 +9,9 @@
 			<view class="flex_between tools">
 				<view class="flex flex-v flex-vc flex-hc tool-item"
 					v-for="(item, inx) in tools" :key="inx"
-					:class="{'disabled' : item.disabled}"
-					@click="toolsClick(item)">
+					:class="{'disabled' : item.disabled}">
 					<text class="iconfont" :class="item.icon" :style="{color: item.color}"></text>
 					<text>{{item.label}}</text>
-				</view>
-			</view>
-			<!-- 认证状态 -->
-			<view class="flex flex-hsb flex-vc cert-box" v-if="isShare">
-				<view class="flex flex-vc left-box">
-					<image src="../../static/images/cert-status.png" mode=""></image>
-					<text>Ta的认证</text>
-				</view>
-				<view class="flex right-box">
-					<view class="flex flex-vc flex-hc enterprise-cert">
-						<image src="../../static/images/enterprise-cert.png" mode=""></image>
-						<text>企业认证</text>
-					</view>
-					<view class="flex flex-vc flex-hc personal-cert">
-						<image src="../../static/images/personal-cert.png" mode=""></image>
-						<text>个人认证</text>
-					</view>
 				</view>
 			</view>
 			<!-- 快捷服务 -->
@@ -138,23 +120,6 @@
 					</view>
 				</view>
 			</view>
-			<!-- 偷懒直接设置空的div块 -->
-			<view style="height: 110rpx;" v-if="isShare"></view>
-			<!-- 分享栏 -->
-			<view class="flex flex-vc share-box" v-if="isShare">
-				<view class="flex flex-v flex-vc left-box">
-					<text class="iconfont icon-daorutongxunlu"></text>
-					<text>导入通讯录</text>
-				</view>
-				<view class="flex-1 flex">
-					<view class="flex-1 primary-btn" @click="resendCard"
-						:class="{'disabled' : this.userData.save_status !== '0'}">
-						{{this.userData.save_status === '0' ? '回递名片' : '已回递'}}
-					</view>
-					<!-- <view class="flex-1 plain-btn" style="marign-right: 20rpx;">分享Ta的名片</view>
-					<view class="flex-1 primary-btn">已回递</view> -->
-				</view>
-			</view>
 		</view>
 		<!--  #ifdef  MP-WEIXIN	 -->
 		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom"></bottomSheet>
@@ -173,7 +138,6 @@
 		},
 		data() {
 			return {
-				isShare: false,
 				bgColor:'bg-gradual-custom',
 				backGround:'',
 				isShowSmallUserInfo: true,
@@ -186,51 +150,55 @@
 						disabled: false,
 						icon: 'icon-dadianhua',
 						color: '#0256FF',
-						label: '打电话',
-						shareCode: '2' // 是否分享页还是默认页独有 0 无 1有 2都有
+						label: '打电话'
 					},
 					{
 						id: 2,
 						disabled: false,
 						icon: 'icon-jiaweixin',
 						color: '#07C160',
-						label: '加微信',
-						shareCode: '2' // 是否分享页还是默认页独有 0 无 1有 2都有
+						label: '加微信'
 					},
 					{
 						id: 3,
 						disabled: false,
 						icon: 'icon-fayoujian',
 						color: '#FF4E20',
-						label: '发邮箱',
-						shareCode: '2' // 是否分享页还是默认页独有 0 无 1有 2都有
+						label: '发邮箱'
 					},
 					{
 						id: 4,
 						disabled: false,
 						icon: 'icon-dingwei',
 						color: '#02B7FF',
-						label: '定位',
-						shareCode: '2' // 是否分享页还是默认页独有 0 无 1有 2都有
+						label: '定位'
 					},
 					{
 						id: 5,
 						disabled: false,
 						icon: 'icon-famingpian',
 						color: '#0256FF',
-						label: '发名片',
-						shareCode: '0' // 是否分享页还是默认页独有 0 无 1有 2都有
-					},
-					{
-						id: 6,
-						disabled: false,
-						icon: 'icon-baocunmingpian',
-						color: '#0256FF',
-						label: '保存名片',
-						shareCode: '1' // 是否分享页还是默认页独有
+						label: '发名片'
 					},
 				],
-				services: [],
+				services: [{
+						icon: 'icon-ziliao',
+						label: '资料',
+						url: '/pages/userInfo/userInfo'
+					},
+					{
+						icon: 'icon-moban',
+						label: '模板'
+					},
+					{
+						icon: 'icon-mingpianma',
+						label: '名片码'
+					},
+					{
+						icon: 'icon-fenxiangshezhi',
+						label: '分享设置'
+					},
+				],
 				visits: [{
 						label: '访问量(次)',
 						value: 0
@@ -279,6 +247,18 @@
 				
 			}
 		},
+		// mounted() {
+		// 	const innerAudioContext = uni.createInnerAudioContext();
+		// 	innerAudioContext.autoplay = true;
+		// 	innerAudioContext.src = 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-hello-uniapp/2cc220e0-c27a-11ea-9dfb-6da8e309e0d8.mp3';
+		// 	innerAudioContext.onPlay(() => {
+		// 	  console.log('开始播放');
+		// 	});
+		// 	innerAudioContext.onError((res) => {
+		// 	  console.log(res.errMsg);
+		// 	  console.log(res.errCode);
+		// 	});
+		// },
 		onLoad(e) {
 			console.log('index调用onload',e); 
 			// 分享给别人的名片id 有可能是自己的也有可能是别人的
@@ -288,54 +268,8 @@
 					icon:'none',
 					duration:2000
 				})
-				this.tools = this.tools.filter(i => (i.shareCode === '0' || i.shareCode === '2'))
-				this.services = [{
-						icon: 'icon-ziliao',
-						label: '资料',
-						url: '/pages/userInfo/userInfo'
-					},
-					{
-						icon: 'icon-moban',
-						label: '模板'
-					},
-					{
-						icon: 'icon-mingpianma',
-						label: '名片码'
-					},
-					{
-						icon: 'icon-fenxiangshezhi',
-						label: '分享设置'
-					},
-				]
 			}else{
-				this.isShare = true
 				this.staff_id=e.staff_id;
-				this.tools = this.tools.filter(i => (i.shareCode === '1' || i.shareCode === '2'))
-				this.services = [{
-						icon: 'icon-qiyejianjie',
-						label: '企业简介'
-					},
-					{
-						icon: 'icon-xiangce',
-						label: '我的相册'
-					},
-					{
-						icon: 'icon-qiyedongtai',
-						label: '企业动态'
-					},
-					{
-						icon: 'icon-qiyexuanchuance',
-						label: '企业宣传册'
-					},
-					{
-						icon: 'icon-chenggonganli',
-						label: '成功案例'
-					},
-					{
-						icon: 'icon-rexiaoshangpin',
-						label: '热销商品'
-					},
-				]
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
 		},
@@ -359,33 +293,6 @@
 			}
 		},
 		methods: {
-			resendCard() {
-				if(this.userData.save_status !== '0') return
-				this.$api.resendCard({staff_id: this.staff_id}, res => {
-					if(res.code === 1) {
-						uni.showToast({
-							icon: 'success',
-							title: res.msg || '名片回递成功'
-						})
-					}else {
-						uni.showToast({
-							icon: 'none',
-							title: res.msg || '名片回递失败'
-						})
-					}
-				})
-			},
-			// 点击会计工具
-			toolsClick(row) {
-				// 打电话
-				if(row.id === 1 && this.staffInfo.mobile) {
-					uni.makePhoneCall({
-						phoneNumber: this.staffInfo.mobile //仅为示例
-					});
-				} else if(row.id === 2 && this.staffInfo.wechat) {
-					
-				}
-			},
 			toggleCardBox(dataProp) {
 				this[dataProp] = !this[dataProp]
 			},
@@ -701,8 +608,7 @@
 	.contents .tools,
 	.contents .services,
 	.contents .visits,
-	.contents .card-box,
-	.contents .cert-box{
+	.contents .card-box{
 		margin-top: 20rpx;
 		padding: 0rpx 20rpx 20rpx;
 		background-color: #fff;
@@ -733,39 +639,6 @@
 		height: 64rpx;
 		font-size: 64rpx;
 		text-align: center;
-	}
-	/* 认证状态 */
-	.contents .cert-box {
-		height: 84rpx;
-		padding: 0 32rpx;
-	}
-	.cert-box .left-box {
-		font-weight: 400;
-		font-size: 28rpx;
-		color: #333;
-	}
-	.cert-box .left-box image {
-		width: 32rpx;
-		height: 32rpx;
-		margin-right: 8rpx;
-	}
-	.cert-box .right-box {
-		font-weight: 400;
-		font-size: 20rpx;
-		color: #fff;
-	}
-	.cert-box .right-box .enterprise-cert,
-	.cert-box .right-box .personal-cert {
-		width: 132rpx;
-		height: 34rpx;
-		border-radius: 20px 20px 20px 20px;
-	}
-	.cert-box .right-box .enterprise-cert { background: #0256FF; margin-right: 8rpx;}
-	.cert-box .right-box .personal-cert { background: #EAB863;}
-	.cert-box .right-box image {
-		width: 24rpx;
-		height: 24rpx;
-		margin-right: 4rpx;
 	}
 	/* 快捷服务 */
 	.services .service-item {
@@ -879,52 +752,5 @@
 		width: 88%;
 		height: auto;
 		margin: 0 auto;
-	}
-	/* 底部栏 */
-	.share-box {
-		height: 108rpx;
-		padding: 0 32rpx;
-		position: fixed;
-		bottom: 0;
-		width: 100%;
-		background-color: #fff;
-	}
-	.share-box .left-box { 
-		margin-right: 20rpx; 
-		text-align: center;
-		font-size: 20rpx;
-		color: #666;
-		font-weight: 400;
-		}
-	.share-box .left-box .iconfont {
-		width: 48rpx;
-		height: 48rpx;
-		font-size: 48rpx;
-		text-align: center;
-		color: #0256FF;
-	}
-	.share-box .primary-btn,
-	.share-box .plain-btn{
-		height: 80rpx;
-		cursor: pointer;
-		text-align: center;
-		border-radius: 80rpx;
-		line-height: 80rpx;
-		font-size: 28rpx;
-		font-weight: 400;
-	}
-	.share-box .primary-btn {
-		color: #fff;
-		background-color: #0256FF;
-		border: solid 1px #0256FF;
-	}
-	.share-box .primary-btn.disabled {
-		background-color: #999;
-		border-color: #999;
-	}
-	.share-box .plain-btn {
-		color: #333;
-		background-color: #fff;
-		border: solid 1px #E6E6E6;
 	}
 </style>

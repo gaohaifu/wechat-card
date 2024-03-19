@@ -1,21 +1,17 @@
 <template>
-	<view class="overall_content">
-		<view class="header_background" :style="{'background-image':'url('+cdnUrl+backgroundImg+')'}">
-			<cu-custom :bgColor="bgColor" :isBack="true" :backGround="backGround">
-				<block slot="backText">返回</block>
-				<block slot="content">切换背景</block>
-			</cu-custom>
-			<view class="header_padding">
-				<smallUserInfo @getAllUserData="getAllUserData"></smallUserInfo>
-			</view>
-		</view>
+	<view class="overall_content fixed">
+		<smallUserInfo page-title="切换背景" :theme-data="theme"
+			:is-show="false"
+			bg-color="bg-gradual-custom"
+			back-ground="transparent"
+			:is-back="true"></smallUserInfo>
 		<view class="message_content">
 			<view class="message_item">
-				<view class="title">选择板式</view>
+				<view class="title">选择主题</view>
 				<view class="scroll">
 					<scroll-view class="scroll_view" scroll-x="true">
 						<view class="scroll-item" v-for="(item,index) in templet1" :key="index" @click="activeTab(index,item.id)">
-							<image :src="cdnUrl+item.backgroundimage" mode=""></image>
+							<image :src="cdnUrl+item.cardimage" mode=""></image>
 							<view class="zzc" v-if="item.status==2"></view>
 							<view class="active" v-if="item.status==2">
 								<view :style="{color:color}" class="iconfont icon-dui"></view>
@@ -24,12 +20,12 @@
 					</scroll-view>
 				</view>
 			</view>
-			<view class="message_item">
+			<!-- <view class="message_item">
 				<view class="title">选择背景</view>
 				<view class="scroll">
 					<scroll-view class="scroll_view" scroll-x="true">
-						<view class="scroll-item" v-for="(item,index) in templet2" :key="index" @click="activeTab1(index)">
-							<image :src="item.img" mode=""></image>
+						<view class="scroll-item" v-for="(item,index) in templet1" :key="index" @click="activeTab(index)">
+							<image :src="cdnUrl+item.cardimage" mode=""></image>
 							<view class="zzc" v-if="item.active"></view>
 							<view class="active" v-if="item.active">
 								<view :style="{color:color}" class="iconfont icon-dui"></view>
@@ -37,17 +33,20 @@
 						</view>
 					</scroll-view>
 				</view>
-			</view>
+			</view> -->
 		</view>
+		<view class="btn primary-btn" @click="doSave">保存</view>
 	</view>
 </template>
 
 <script>
 	import smallUserInfo from "../../components/small-user-info/small-user-info.vue"
 	import {
-		smartcardBG,
+		smartcardBG
+	} from '@/config/common.js'
+	import {
 		cdnUrl
-	} from '../../config/common.js'
+	} from '@/config/config.js'
 	export default {
 		components: {
 			smallUserInfo
@@ -57,73 +56,42 @@
 				smartcardBG: smartcardBG,
 				cdnUrl:cdnUrl,
 				bgColor:'bg-gradual-custom',
-				color:'',
-				backgroundImg:'',
-				backGround:'',
-				cardimage:'',
 				staff_id:'',
 				user_id:'',
 				userData:'',
 				templet1:[],
-				templet2:[],
-				color:'',
-				fontcolor:'',
-				companyInfo:[],
-				certificateStatus:true
+				theme: {
+					color: '',
+					fontcolor: '',
+					cardimage: '',
+					backgroundimage: ''
+				},
+				themeid: ''
 			}
 		},
 		onLoad(options) {
-			this.color=uni.getStorageSync('color')
-			this.backgroundImg=uni.getStorageSync('backgroundImg')
+			const themeData = uni.getStorageSync('themeData') || {}
+			if(themeData.cardimage) this.theme = themeData
 			//修改导航条背景颜色
 			uni.setNavigationBarColor({
 				frontColor:'#ffffff',
-				backgroundColor: this.color
+				backgroundColor: themeData.color
 			})
 			this.staff_id=options.staff_id
 			this.user_id=options.user_id
-			this.indexData();
 			this.themeList();
-		},
-		onPageScroll(e){
-			this.scrollTop=e.scrollTop
-			if(e.scrollTop>0){
-				this.bgColor='bg-gradual-white';
-				this.backGround=this.color
-			}else{
-				this.bgColor='bg-gradual-custom';
-				this.backGround='transparent'
-			}
 		},
 		methods: {
 			activeTab(index,id){
-				const parm={
-				  Theme_id:id
-				};
-				this.$api.themeEdit(
-				parm,
-				data => {
-					if(data.code==1){
-						for(var i=0; i<this.templet1.length; i++){
-							this.templet1[i].status=1
-						}
-						this.templet1[index].status=2
-						this.color=this.templet1[index].colour
-						this.backgroundImg=this.templet1[index].backgroundimage
-						this.cardimage=this.templet1[index].cardimage
-						this.fontcolor=this.templet1[index].fontcolor
-						uni.setStorageSync('color',this.color)
-					}else{
-						this.$common.errorToShow(data.msg,function(){
-						})
+				this.themeid = id
+				this.templet1 = this.templet1.map((i, inx) => {
+					i.status = 1
+					if(inx === index) {
+						i.status = 2
+						this.theme = i
 					}
+					return i
 				})
-			},
-			activeTab1(index){
-				for(var i=0; i<this.templet2.length; i++){
-					this.templet2[i].active=false
-				}
-				this.templet2[index].active=true
 			},
 			//主题列表
 			themeList(){
@@ -139,13 +107,13 @@
 								...item
 							}
 						})
-						for(var i=0; i<this.templet1.length; i++){
-							if(this.templet1[i].status==2){
-								this.color=this.templet1[i].colour
-								this.backgroundImg=this.templet1[i].backgroundimage
-								this.cardimage=this.templet1[i].cardimage
-								this.fontcolor=this.templet1[i].fontcolor
-								uni.setStorageSync('color',this.color)
+						const fi = this.templet1.find(i => i.status === 2)
+						if(fi) {
+							this.theme = {
+								color: fi.colour,
+								fontcolor: fi.fontcolor,
+								cardimage: fi.cardimage,
+								backgroundimage: fi.backgroundimage
 							}
 						}
 					}else{
@@ -154,33 +122,33 @@
 					}
 				})
 			},
-			//首页全部信息接口（包含个人信息）
-			indexData(){
+			doSave() {
+				if(!this.themeid) return;
 				const parm={
-					staff_id:this.staff_id,
-					user_id:this.user_id
+				  Theme_id: this.themeid
 				};
-				this.$api.indexData(
+				this.$api.themeEdit(
 				parm,
 				data => {
 					if(data.code==1){
-						this.allData=data.data
-						this.usertype=data.data.usertype;     //是否是领导角色（0：不是  1：是）
-						this.userData=data.data.staffInfo
-						if(this.userData.statusdata!='1'){
-							this.certificateStatus=false;
-						}
-						
-						this.companyInfo=data.data.companyInfo
-						this.showGlance=data.data.visitStaffLists.map(item=>{
-							return item.avatar
+						uni.showToast({
+							icon: 'none',
+							title: data.msg
+						})
+						const fi = this.templet1.find(i => i.status ===2)
+						uni.setStorageSync('color',fi.color)
+						uni.setStorageSync('themeData', {
+							color: fi.color,
+							fontcolor: fi.fontcolor,
+							backgroundimage: fi.backgroundimage,
+							cardimage: fi.cardimage
 						})
 					}else{
 						this.$common.errorToShow(data.msg,function(){
 						})
 					}
 				})
-			},
+			}
 		}
 	}
 </script>
@@ -207,4 +175,18 @@
 	.change_tab text{color: #fff; font-size: 24rpx; margin-left: 10rpx;}
 	.change_tab image{display: block; width: 30rpx; height: 30rpx;}
 	.waitOp{ position: absolute; right: 20rpx; top: 50rpx; }
+	.primary-btn {
+		width: 80%;
+		margin: 100rpx 10%;
+		height: 80rpx;
+		cursor: pointer;
+		text-align: center;
+		border-radius: 80rpx;
+		line-height: 80rpx;
+		font-size: 28rpx;
+		font-weight: 400;
+		color: #fff;
+		background-color: #0256FF;
+		border: solid 1px #0256FF;
+	}
 </style>

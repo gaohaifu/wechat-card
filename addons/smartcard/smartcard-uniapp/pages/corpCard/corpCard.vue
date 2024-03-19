@@ -3,8 +3,8 @@
 		<view class="flex_layout company-box">
 			<image class="avatar" src="../../static/images/corp-icon.png" mode=""></image>
 			<view class="flex-1">
-				<view class="name">厦门八达尔科技有限公司</view>
-				<view class="merito">运营·运营主管</view>
+				<view class="name">{{companyInfo.companyname}}</view>
+				<view class="merito">{{companyInfo.position}}</view>
 			</view>
 		</view>
 		<view class="flex menu-box">
@@ -16,7 +16,8 @@
 		<!-- 统计 + 按钮 -->
 		<view class="card-box">
 			<view class="flex statistics">
-				<view class="flex-1 flex flex-v flex-hc flex-vc" v-for="(item, inx) in cards" :key="inx">
+				<view class="flex-1 flex flex-v flex-hc flex-vc" v-for="(item, inx) in cards" :key="inx"
+					@click="linkTo(item)">
 					<view class="num">{{item.value}}</view>
 					<view class="flex flex-vc">
 						<text>{{item.label}}</text>
@@ -49,12 +50,12 @@
 				</view>
 			</view>
 			<view class="member-list">
-				<view class="flex_between">
+				<view class="flex_between" v-for="(it, inx) in memberList" :key="inx">
 					<view class="flex-1">
-						<text class="name">陈总</text>
+						<text class="name">{{it.name}}</text>
 						<text>加入了企业</text>
 					</view>
-					<text class="time">2023-01-23</text>
+					<text class="time">{{it.createtime}}</text>
 				</view>
 			</view>
 		</view>
@@ -76,24 +77,46 @@
 					},
 				],
 				cards: [{
+						id: 1,
 						label: '全部成员',
-						value: 324
+						value: 0
 					},
 					{
+						id: 2,
 						label: '申请加入',
-						value: 34
+						value: 0
 					},
 					{
+						id: 3,
 						label: '等待激活',
-						value: 4
+						value: 0
 					}
 				],
-				keyword: ''
+				keyword: '',
+				memberList: [],
+				companyInfo: {}
 			}
 		},
+		onLoad() {
+			this.getData()
+		},
 		methods: {
-			doSearch() {
-
+			getData() {
+				this.$api.myCompany({}, res => {
+					if(res.code === 1) {
+						const memberInfo = res.memberInfo || {}
+						this.cards.find(i => i.id === 1).value = memberInfo.allNum
+						this.cards.find(i => i.id === 2).value = memberInfo.applyNum
+						this.cards.find(i => i.id === 3).value = memberInfo.activationNum
+						this.memberList = res.memberList || []
+						this.companyInfo = res.companyInfo || {}
+					}
+				})
+			},
+			linkTo(row) {
+				uni.navigateTo({
+					url: '/pages/member/member?type=' + row.id
+				})
 			}
 		}
 	}

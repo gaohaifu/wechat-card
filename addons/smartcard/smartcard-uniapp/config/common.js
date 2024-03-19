@@ -21,7 +21,7 @@ export const smartcardBG = {
 export const smartcardObj = {
 	// 名片夹来源
 	origin: {
-		'1': '我向对方发出了名片', 
+		'1': '我向对方发出了名片',
 		'2': '对方的名片夹',
 		'3': '对方的名片浏览记录'
 	},
@@ -50,11 +50,6 @@ function toLogin() {
 		icon: 'loading',
 		duration: 2000,
 		success: function(res) {
-			// #ifdef MP-WEIXIN
-			uni.switchTab({
-				url: '/pages/myCard/myCard'
-			})
-			// #endif
 			// #ifdef H5 || APP-PLUS
 			uni.navigateTo({
 				url: '/pages/user/login'
@@ -78,18 +73,20 @@ function isLogin() {
 	let user = db.get('user');
 	//用户存在，不跳转，不存在直接跳转
 	if(user){
-		if(user.id){
-				// if(user.mobile==''){
-				// 	uni.navigateTo({
-				// 		url: '/pages/user/bind'
-				// 	})
-				// }	
-		}else{
-			console.log("user: ",user);
-			db.del('user');
-			db.del('auth');
-			toLogin()
-		}
+		// if(user.id){
+			// if(user.mobile==''){
+			// 	uni.navigateTo({
+			// 		url: '/pages/user/bind'
+			// 	})
+			// }	
+		// }
+		return true
+	}else{
+		console.log("user: ",user);
+		db.del('user');
+		db.del('auth');
+		toLogin()
+		return false
 	}
 }
 /**
@@ -621,6 +618,30 @@ function uploadImage(data = {}, callback = function() {}, num = 1, type) {
 
 }
 
+// 防抖
+function debounce(callback, delay) {
+	let timer = null
+	return function () {
+		clearTimeout(timer)
+		timer = setTimeout(() => {
+			callback.apply(this, arguments)
+		}, delay)
+	}
+}
+
+// 节流
+function throttle(callback, delay) {
+	let timer = null
+	return function () {
+		if (!timer) {
+			timer = setTimeout(() => {
+				callback.apply(this, arguments)
+				clearTimeout(timer)
+				timer = null
+			}, delay)
+		}
+	}
+}
 
 
 
@@ -651,5 +672,7 @@ export {
 	userInfo,
 	uploadImage,
 	checkEmail,
-	checkMobile
+	checkMobile,
+	debounce,
+	throttle,
 }

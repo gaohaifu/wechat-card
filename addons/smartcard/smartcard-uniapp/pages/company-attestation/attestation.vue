@@ -1,25 +1,23 @@
 <template>
 	<view class="page-wrap">
 		<view class="company-label">企业名称</view>
-		<view class="company-name">
-			<input v-model="company" placeholder="请输入企业名称" />
-		</view>
+		<view class="company-name">{{ companyname }}</view>
 		<view class="company-label">
-			<text>认证拆料</text>
-			<text class="example-text">上传拆料示例</text>
+			<text>认证材料</text>
+			<text class="example-text">上传材料示例</text>
 		</view>
 		<view class="up-box">
-			<image src="../../static/images/attestation01.png" />
+			<image :src="licenseImg? licenseImg : require('../../static/images/attestation01.png')" @click="upLicense('licenseImg')" />
 			<view>营业执照</view>
 			<view class="up-text">与企业名称保持一致</view>
 		</view>
 		<view class="company-label">
-			<text>认证拆料</text>
-			<text class="example-text">上传拆料示例</text>
+			<text>认证材料</text>
+			<text class="example-text">上传材料示例</text>
 		</view>
 		<view class="up-box">
-			<image src="../../static/images/attestation02.png" />
-			<view style="font-size: 24rpx;">营业执照</view>
+			<image :src="letterImg? letterImg : require('../../static/images/attestation02.png')" @click="upLicense('letterImg')" />
+			<view style="font-size: 24rpx;">公函</view>
 			<view class="up-text" style="color: #0256FF;">下载模板</view>
 		</view>
 		<view class="company-label">注明：</view>
@@ -33,22 +31,53 @@
 			<view>我已阅读并同意<text style="color: #0256FF;">《企业认证服务协议》</text></view>
 		</view>
 		<view class="attestation-btn">
-			<view>提交</view>
+			<view @click="submitFn">提交</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	import { normalToShow, errorToShow, successToShow, uploadImage } from '@/config/common.js'
 	export default {
+		name: 'coporationAttestation',
 		data() {
 			return {
-				company: '',
-				aggre: false,
+				companyname: '',
+				licenseImg: '',
+				letterImg: '',
+				aggre: false
 			}
+		},
+		onLoad(options) {
+			this.companyname = options.companyname || '企业认证'
 		},
 		methods: {
 			aggreFn() {
 				this.aggre = !this.aggre
+			},
+			upLicense (key) {
+				uploadImage({}, (url) => {
+					this[key] = url
+				})
+			},
+			submitFn() {
+				console.log('submit')
+				if (!this.licenseImg) {
+					return normalToShow('请上传营业执照')
+				} else if (!this.letterImg) {
+					return normalToShow('请上传公函')
+				} else if (!this.aggre) {
+					return normalToShow('请阅读并同意《企业认证服务协议》')
+				}
+				this.$api.enterpriseCertified({
+					licenseimage: this.licenseImg,
+					official_letter: this.letterImg
+				}, (res) =>{
+					console.log(res, '企业认证')
+					if (res.code == 1) {
+						successToShow(res.msg)
+					} else errorToShow(res.msg)
+				})
 			}
 		}
 	}
