@@ -1,3 +1,4 @@
+<!-- 切换名片主题 -->
 <template>
 	<view class="overall_content fixed">
 		<smallUserInfo page-title="切换背景" :theme-data="theme"

@@ -1,3 +1,4 @@
+<!-- 企业名片 -->
 <template>
 	<view>
 		<view class="flex_layout company-box">

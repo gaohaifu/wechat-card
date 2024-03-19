@@ -1,3 +1,4 @@
+<!-- 企业认证 - 中转- 静态 -->
 <template>
 	<view class="page-wrap">
 		<view class="attestation-box">

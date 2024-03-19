@@ -1,3 +1,4 @@
+<!-- 成员认证 -->
 <template>
 	<view class="page-wrap">
 		<view class="page-title">

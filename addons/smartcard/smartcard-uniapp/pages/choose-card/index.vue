@@ -1,3 +1,4 @@
+<!-- 邀请选择名片样式 -->
 <template>
 	<view class="page-wrap">
 		<view class="page-title">

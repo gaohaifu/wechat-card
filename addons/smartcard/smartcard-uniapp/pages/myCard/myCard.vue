@@ -3,7 +3,8 @@
 		<smallUserInfo page-title="首页" :is-back="false" 
 			:is-show="isShowSmallUserInfo"
 			:bg-color="bgColor"
-			:back-ground="backGround"></smallUserInfo>
+			:back-ground="backGround"
+			:theme-data="theme"></smallUserInfo>
 		<view class="overall_padding contents">
 			<!-- 快捷工具 -->
 			<view class="flex_between tools">
@@ -276,7 +277,7 @@
 				fontcolor: '',
 				showGlance: false,
 				myselfstatus: false,
-				
+				theme: {}
 			}
 		},
 		onLoad(e) {
@@ -384,6 +385,17 @@
 					});
 				} else if(row.id === 2 && this.staffInfo.wechat) {
 					
+				} else if(row.id === 5) { // 发名片
+					this.$api.sendCard({
+						staff_id: this.staff_id
+					}, res => {
+						if(res.code === 1) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg
+							})
+						}
+					})
 				}
 			},
 			toggleCardBox(dataProp) {
@@ -566,15 +578,17 @@
 							key: 'userData',
 							data: this.userData
 						})
+						this.theme = {
+							color: this.color,
+							backgroundimage: this.backgroundImg,
+							cardimage: this.cardimage,
+							fontcolor: this.fontcolor
+						}
 						uni.setStorage({
 							key: 'themeData',
-							data: {
-								color: this.color,
-								backgroundimage: this.backgroundImg,
-								cardimage: this.cardimage,
-								fontcolor: this.fontcolor
-							}
+							data: this.theme
 						})
+						
 						console.info(this.tools, '====', !this.staffInfo.mobile, !this.staffInfo.email)
 					}else {
 						// 这个是分享进来的 - 最好整合成一个页面
@@ -927,4 +941,5 @@
 		background-color: #fff;
 		border: solid 1px #E6E6E6;
 	}
+	.contents .video { text-align: center;}
 </style>

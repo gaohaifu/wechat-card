@@ -1,3 +1,4 @@
+<!-- 企业认证表单 -->
 <template>
 	<view class="page-wrap">
 		<view class="company-label">企业名称</view>
