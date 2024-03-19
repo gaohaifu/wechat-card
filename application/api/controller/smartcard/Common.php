@@ -38,7 +38,7 @@ header('Access-Control-Allow-Origin:*');//允许跨域
 class Common extends Base
 {
 
-    protected $noNeedLogin = ['index','indexShare','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
+    protected $noNeedLogin = ['indexShare','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
     protected $noNeedRight = ['*'];
     public function _initialize()
     {
@@ -55,10 +55,9 @@ class Common extends Base
     public function index()
     {   
         $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
-        $user_id = $this->request->request("user_id");
-        $origin = $this->request->request("origin");
+        $user_id = $this->user_id;
   
-        $list = $this->staffData($staff_id,$user_id,0,$origin);
+        $list = $this->staffData($staff_id,$user_id,0,0);
         $this->success('请求成功', $list);
     }
     
@@ -566,8 +565,10 @@ class Common extends Base
     public function getMemberList()
     {
         $user_id = $this->user_id;
-        $page=$this->request->request('page')?:1;
-        $type=$this->request->request('type')?:1;
+        $page=$this->request->request('page',1);
+        $type=$this->request->request('type',1);
+        $keyword = $this->request->request("keyword",'');
+        $theme_id = $this->request->request("theme_id",'');
         $Staff = new Staff();
         if($type==1){
             $statusdata = 1;
@@ -576,9 +577,19 @@ class Common extends Base
         }elseif($type==3){
             $statusdata = 4;
         }
-        $staffs = $Staff->where(['company_id'=>$user_id, 'statusdata'=>$statusdata])->page($page,10)
-            ->field('id as staff_id,name,company_id,position,user_id')
-            ->select();
+
+        if($keyword){
+            $whereRaw = "name like '%$keyword%' or position like '%$keyword%'";
+        }else{
+            $whereRaw = '1=1';
+        }
+        $where = ['company_id'=>$user_id, 'statusdata'=>$statusdata];
+        if($theme_id){
+            $where['theme_id'] = $theme_id;
+        }
+        $staffs = $Staff->where($where)->whereRaw($whereRaw)
+            ->page($page,10)->field('id as staff_id,name,company_id,position,user_id')->select();
+
         foreach ($staffs as $staff) {
             $staff->avatar = cdnurl(\app\common\model\User::where(['id' =>$staff->user_id])->value('avatar'),true);
             $staff->companyname = \addons\myadmin\model\Company::where(['id'=>$staff->company_id])->value('name');

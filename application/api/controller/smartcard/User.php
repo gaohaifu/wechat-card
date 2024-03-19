@@ -383,7 +383,12 @@ class User extends Base
         //var_dump($this->auth->isLogin());exit;
         if ($this->auth->isLogin()) {
             $auth = $this->auth->getUserinfo();
-            $data = [ 'user' => $auth];
+            $staffInfos=Db::name('smartcard_staff')->where(['user_id'=>$this->auth->id])->find();
+            $isStaff=0;
+            if($staffInfos){
+                $isStaff=1;
+            }
+            $data = [ 'user' => $auth,'isStaff'=>$isStaff];
             $this->success(__('Refresh successful'), $data);
         } else {
             $this->error(__('请先登录'));
