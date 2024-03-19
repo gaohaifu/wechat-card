@@ -749,16 +749,18 @@ class Common extends Base
             ->select();
         //var_dump($Themeres);exit;
 
-        foreach($Themeres as $key => $var){
-            if($Themeres[$key]['id'] == $Userres['theme_id']){
-                $Themeres[$key]['status'] = 2;
-            }else{
-                $Themeres[$key]['status'] = 1;
-            }
-            if($Userres['theme_id'] == 1){
-                $Themeres[0]['status'] = 2;
-            }else{
-                $Themeres[0]['status'] = 1;
+        if($Userres){
+            foreach($Themeres as $key => $var){
+                if($Themeres[$key]['id'] == $Userres['theme_id']){
+                    $Themeres[$key]['status'] = 2;
+                }else{
+                    $Themeres[$key]['status'] = 1;
+                }
+                if($Userres['theme_id'] == 1){
+                    $Themeres[0]['status'] = 2;
+                }else{
+                    $Themeres[0]['status'] = 1;
+                }
             }
         }
 
