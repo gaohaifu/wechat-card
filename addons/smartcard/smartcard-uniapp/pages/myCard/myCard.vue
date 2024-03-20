@@ -37,10 +37,10 @@
 			<view class="services">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">服务</view>
-					<view class="flex flex-vc more">
+					<!-- <view class="flex flex-vc more">
 						<text>查看详情</text>
 						<text class="iconfont icon-Rightyou"></text>
-					</view>
+					</view> -->
 				</view>
 				<view class="flex_between">
 					<view class="flex flex-v flex-vc flex-hc flex-wrap service-item"
@@ -233,18 +233,20 @@
 				],
 				services: [],
 				visits: [{
-						label: '访问量(次)',
-						value: 0
-					},
-					{
-						label: '今日访问量(次)',
-						value: 0
-					},
-					{
-						label: '发名片(次)',
-						value: 0
-					},
-				],
+					id: 1,
+					label: '访问量(次)',
+					value: 0
+				},
+				{
+					id: 2,
+					label: '今日访问量(次)',
+					value: 0
+				},
+				{
+					id: 3,
+					label: '发名片(次)',
+					value: 0
+				}],
 				showEnterpriseVideo: true,
 				showEnterpriseProfile: true,
 				allData:'',
@@ -259,7 +261,6 @@
 				visitStaffLists: [], // 访客列表
 				videofiles: {}, // 企业视频
 				description: '', // 企业简介
-				certificateStatus:true,
 				nickname:'',
 				transmit:{
 					company_id:'',
@@ -297,7 +298,8 @@
 					},
 					{
 						icon: 'icon-moban',
-						label: '模板'
+						label: '模板',
+						url: '/pages/change/change'
 					},
 					{
 						icon: 'icon-mingpianma',
@@ -305,7 +307,8 @@
 					},
 					{
 						icon: 'icon-fenxiangshezhi',
-						label: '分享设置'
+						label: '分享设置',
+						url: '/pages/share/setting'
 					},
 				]
 			}else{
@@ -361,20 +364,41 @@
 		},
 		methods: {
 			resendCard() {
-				if(this.userData.save_status !== '0') return
-				this.$api.resendCard({staff_id: this.staff_id}, res => {
-					if(res.code === 1) {
-						uni.showToast({
-							icon: 'success',
-							title: res.msg || '名片回递成功'
-						})
-					}else {
-						uni.showToast({
-							icon: 'none',
-							title: res.msg || '名片回递失败'
-						})
+				// if(this.userData.save_status !== '0') return
+				// this.$api.resendCard({staff_id: this.staff_id}, res => {
+				// 	if(res.code === 1) {
+				// 		uni.showToast({
+				// 			icon: 'success',
+				// 			title: res.msg || '名片回递成功'
+				// 		})
+				// 	}else {
+				// 		uni.showToast({
+				// 			icon: 'none',
+				// 			title: res.msg || '名片回递失败'
+				// 		})
+				// 	}
+				// })
+				uni.share({
+					provider: "weixin",
+					scene: "WXSceneSession",
+					type: 0,
+					// href: "http://uniapp.dcloud.io/",
+					miniProgram: {
+						id: smartcardObj.weixinId,
+						path: '/pages/myCard/myCard?staff_id'+this.staff_id,
+						type: 0,
+						webUrl: ''
+					},
+					title: this.companyInfo.name || "名片夹",
+					summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
+					imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
+					success: function (res) {
+						console.log("success:" + JSON.stringify(res));
+					},
+					fail: function (err) {
+						console.log("fail:" + JSON.stringify(err));
 					}
-				})
+				});
 			},
 			// 点击会计工具
 			toolsClick(row) {
@@ -394,6 +418,7 @@
 								icon: 'none',
 								title: res.msg
 							})
+							this.visits.find(i => i.id === 3).value++
 						}
 					})
 				}
@@ -520,9 +545,6 @@
 						console.log(this.allData);
 						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
 						this.userData = this.staffInfo = this.allData.staffInfo || {};
-						if(this.userData.statusdata!='1'){
-							this.certificateStatus=false;
-						}
 						this.myCardData = this.allData.myCardData || {};
 						this.visitStaffLists = this.allData.visitStaffLists || [];
 						this.videofiles = this.allData.videofiles || [];
@@ -574,6 +596,7 @@
 							if(it.disabled) it.color = '#999';
 						})
 						this.userData.save_status = `${this.allData.save_status}`
+						this.userData.usertype = `${this.allData.usertype}`
 						uni.setStorage({
 							key: 'userData',
 							data: this.userData

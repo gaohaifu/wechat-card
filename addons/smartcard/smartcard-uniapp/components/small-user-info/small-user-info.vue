@@ -15,8 +15,10 @@
 					</view>
 				</view>
 				<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-					:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')', color:theme.fontcolor}">
-					{{!certificateStatus? '未认证' : '未认证'}}
+					:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
+								color:(certificateStatus ? 'white' : theme.fontcolor)}"
+					@click="linkToCert">
+					{{!certificateStatus? '未认证' : '已认证'}}
 				</view>
 				<view class="extra">
 					<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-dianhua"></i><text
@@ -115,17 +117,29 @@
 		},
 		created() {
 			this.getSessionData()
-			console.info('----------small user info 回退是否会执行当前生命周期？？？', 
-				this.userData.save_status, this.smartcardObj.save_status[this.userData.save_status])
+			// console.info('----------small user info 回退是否会执行当前生命周期？？？', this.userData.is_certified, '====',
+			// 	this.userData.save_status, this.smartcardObj.save_status[this.userData.save_status])
 		},
 		methods: {
 			getSessionData() {
 				this.userData = uni.getStorageSync('userData') || {}
 				const themeData = uni.getStorageSync('themeData') || {}
 				if(themeData.cardimage) this.theme = themeData
-				if(this.userData.statusdata!='1'){
+				if(this.userData.is_certified === 0){
 					this.certificateStatus=false;
 				}
+			},
+			linkToCert() {
+				// console.info(this.certificateStatus, '=====', this.userData.usertype, '====usertype')
+				if(!this.certificateStatus && this.userData.usertype === '1') { // 企业负责人（管理员）
+					uni.navigateTo({
+						url: '/pages/company-attestation/index'
+					})
+				} else if(!this.certificateStatus && this.userData.usertype === '0') { // 普通用户
+					uni.navigateTo({
+						url: '/pages/user-attestation/index'
+					})
+				} 
 			}
 		}
 	}

@@ -12,7 +12,7 @@
 		"path": "pages/card-holder/index",
 		"style": {
 			"navigationBarTitleText": "名片夹",
-			"navigationBarTextStyle": "#333",
+			"navigationBarTextStyle": "black",
 			"enablePullDownRefresh": false
 		}
 	},
@@ -35,7 +35,7 @@
 		{
 			"path": "pages/change/change",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "选择主题",
 				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
@@ -45,7 +45,7 @@
 		{
 			"path": "pages/userInfo/userInfo",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "个人资料",
 				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
@@ -55,6 +55,15 @@
 			"path": "pages/user-attestation/index",
 			"style": {
 				"navigationBarTitleText": "实名认证",
+				"navigationBarTextStyle": "black",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/share/setting",
+			"style": {
+				"navigationBarTitleText": "分享设置",
+				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
 		},
@@ -75,7 +84,7 @@
 		{
 			"path": "pages/corpCard/corpCard",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "企业名片",
 				"enablePullDownRefresh": false
 			}
 		

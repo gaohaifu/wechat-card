@@ -135,6 +135,8 @@ export const uploadImage = (method , data = {} , callback , num = 9 ,type) => {
 	userToken = auth.token;
 	uni.chooseImage({
 		count:num,
+		sizeType: ['compressed'],
+		sourceType: ['camera', 'album'],
 		success: (res) => {
 			uni.showLoading({
 				title: '上传中...'
@@ -143,7 +145,7 @@ export const uploadImage = (method , data = {} , callback , num = 9 ,type) => {
 			for (var i = 0; i < tempFilePaths.length; i++) {
 				data.file = tempFilePaths[i]
 				uni.uploadFile({
-					url: baseApiUrl + method,
+					url: baseApiUrl + method + '?token=' + userToken,
 					filePath: tempFilePaths[i],
 					fileType: 'image',
 					name: 'file',

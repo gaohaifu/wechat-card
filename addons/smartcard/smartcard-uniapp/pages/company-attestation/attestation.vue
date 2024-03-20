@@ -8,7 +8,8 @@
 			<text class="example-text">上传材料示例</text>
 		</view>
 		<view class="up-box">
-			<image :src="licenseImg? licenseImg : require('../../static/images/attestation01.png')" @click="upLicense('licenseImg')" />
+			<image :src="licenseImg? cdnUrl + licenseImg : require('../../static/images/attestation01.png')"
+				@click="upLicense('licenseImg')" />
 			<view>营业执照</view>
 			<view class="up-text">与企业名称保持一致</view>
 		</view>
@@ -17,7 +18,8 @@
 			<text class="example-text">上传材料示例</text>
 		</view>
 		<view class="up-box">
-			<image :src="letterImg? letterImg : require('../../static/images/attestation02.png')" @click="upLicense('letterImg')" />
+			<image :src="letterImg? cdnUrl + letterImg : require('../../static/images/attestation02.png')"
+				@click="upLicense('letterImg')" />
 			<view style="font-size: 24rpx;">公函</view>
 			<view class="up-text" style="color: #0256FF;">下载模板</view>
 		</view>
@@ -38,11 +40,13 @@
 </template>
 
 <script>
-	import { normalToShow, errorToShow, successToShow, uploadImage } from '@/config/common.js'
+	import { normalToShow, errorToShow, successToShow } from '@/config/common.js'
+	import {cdnUrl} from '@/config/config.js'
 	export default {
 		name: 'coporationAttestation',
 		data() {
 			return {
+				cdnUrl: cdnUrl,
 				companyname: '',
 				licenseImg: '',
 				letterImg: '',
@@ -57,9 +61,9 @@
 				this.aggre = !this.aggre
 			},
 			upLicense (key) {
-				uploadImage({}, (url) => {
-					this[key] = url
-				})
+				this.$api.uploadImage('common/upload', {}, dataimg => {
+					this.form[key] = dataimg.data.url // 相对路径 fullurl绝对路径
+				}, 1)
 			},
 			submitFn() {
 				console.log('submit')
