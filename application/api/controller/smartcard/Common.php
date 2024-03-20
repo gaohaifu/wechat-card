@@ -747,21 +747,22 @@ class Common extends Base
         $Themeres = $Theme
             ->where('id','>=',1)
             ->select();
-        //var_dump($Themeres);exit;
 
         if($Userres){
+            $is_default = 0;
             foreach($Themeres as $key => $var){
                 if($Themeres[$key]['id'] == $Userres['theme_id']){
                     $Themeres[$key]['status'] = 2;
+                    $is_default = 1;
                 }else{
                     $Themeres[$key]['status'] = 1;
                 }
-                if($Userres['theme_id'] == 1){
-                    $Themeres[0]['status'] = 2;
-                }else{
-                    $Themeres[0]['status'] = 1;
-                }
             }
+            if(!$is_default){
+                $Themeres[0]['status'] = 2;
+            }
+        }else{
+            $Themeres[0]['status'] = 2;
         }
 
         $this->success('请求成功', $Themeres);
@@ -779,16 +780,16 @@ class Common extends Base
         $login_id = $this->user_id;
         $Staff = new Staff();
         if($theme_id == ''){
-            $this->success('更新成功');
+            $this->error('主题id不能为空');
         }else{
-            $res = $Staff->where('user_id', $login_id)->update(['theme_id' => $theme_id]);
-            if($res!==false){
-                //更新成功
-                $this->success('更新成功');
+            $res = $Staff->where('user_id', $login_id)->find();
+            if(!$res){
+                $this->error('请先填写员工信息');
             }else{
-                //更新失败
-                $this->error('更新失败');
-            } 
+                $res->theme_id = $theme_id;
+                $res->save();
+                $this->success('更新成功');
+            }
         }        
     }
 
