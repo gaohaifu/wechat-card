@@ -512,9 +512,6 @@ class Common extends Base
         $Staff = new Staff();
         $staff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
         $ret = Sms::check($staff['mobile'], $code, 'certified');
-        if($code=='666666'){
-            $ret = true;
-        }
         if (!$ret) {
             $this->error(__('Captcha is incorrect'));
         }

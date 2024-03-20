@@ -20,6 +20,7 @@ class Index extends Controller
         'notice'       => '通知',
         'mobilelogin'  => '移动端登录',
         'bind'         => '绑定账号',
+        'certified'         => '实名认证',
     ];
 
     public function _initialize()
