@@ -171,7 +171,7 @@
 				loadingStatus: true,
 				companyname: '',
 				companyList: [],
-				industryList: [],
+				industryList: [{name: '全部', id: -1}], // 没有初始化好像会报name错误问题
 				ids: 0,
 				platform_status: 2 // 小程序？
 			}
