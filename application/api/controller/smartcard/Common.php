@@ -1,6 +1,7 @@
 <?php
 
 namespace app\api\controller\smartcard;
+use app\admin\model\smartcard\Share;
 use app\admin\model\smartcard\Su;
 use app\admin\model\smartcard\Visitors;
 use app\common\controller\Api;
@@ -731,7 +732,111 @@ class Common extends Base
         
         $this->success('请求成功', $staff);
     }
-    
+
+    /**
+     * 分享卡片信息
+     *
+     */
+    public function shareCardInfo()
+    {
+        $site = Config::get('site');
+        $greetingsList = $site['greetingsList'];
+        $backgroundimageList = $site['backgroundimageList'];
+        $Staff = new Staff();
+        $Share = new Share();
+
+        $user_id = $this->user_id;
+        $staff = $Staff->alias('s')->join('myadmin_company c','s.company_id=c.id')
+            ->where(['user_id'=>$user_id,'is_default'=>1])
+            ->field('s.id as staff_id,s.name,s.position,c.name as companyname,mobile,wechat,qq,email')
+            ->find();
+
+        $gfirstKey = '';
+        $bfirstKey = '';
+        foreach ($greetingsList as $k=>&$item) {
+            if($gfirstKey=='') $gfirstKey = $k;
+            $item = str_replace('XXX',$staff->name,$item);
+        }
+        foreach ($backgroundimageList as $k=>&$item) {
+            if($bfirstKey=='') $bfirstKey = $k;
+            $item = cdnurl($item,true);
+        }
+
+        $share = $Share->where(['user_id'=>$user_id])->find();
+        $staff['greetings'] = $share?$share->greetings:$greetingsList[$gfirstKey];
+        $staff['backgroundimage'] = $share?$share->backgroundimage:$backgroundimageList[$bfirstKey];
+
+        $greetingsList['custom'] = $share?$share->custom_greetings:'';
+        $data['greetingsList'] = $greetingsList;
+        $data['backgroundimageList'] = $backgroundimageList;
+        $data['shareCardInfo'] = $staff;
+        $this->success('请求成功', $data);
+    }
+
+    /**
+     * 保存自定义招呼语
+     * @param string $greetings
+     **/
+    public function saveCustomGreetings(){
+        $custom_greetings = $this->request->request('custom_greetings');
+        $user_id = $this->user_id;
+        $Share = new Share();
+        $share = $Share->where(['user_id'=>$user_id])->find();
+
+        if(!$share){
+            $site = Config::get('site');
+            $greetingsList = $site['greetingsList'];
+            $backgroundimageList = $site['backgroundimageList'];
+            $greetings = '';
+            $backgroundimage = '';
+            foreach ($greetingsList as $item) {
+                $greetings = $item; break;
+            }
+            foreach ($backgroundimageList as $item) {
+                $backgroundimage = cdnurl($item,true);
+            }
+            $data = [
+                'user_id' => $user_id,
+                'greetings' => $greetings,
+                'backgroundimage' => $backgroundimage,
+                'custom_greetings' => $custom_greetings,
+            ];
+            $Share->save($data);
+            $this->success('请求成功');
+        }else{
+            $share->custom_greetings = $custom_greetings;
+            $share->save();
+            $this->success('请求成功');
+        }
+    }
+
+    /**
+     * 保存分享信息
+     **/
+    public function saveShareInfo(){
+        $greetings = $this->request->request('greetings');
+        $backgroundimage = $this->request->request('backgroundimage');
+        $user_id = $this->user_id;
+        $Share = new Share();
+        $share = $Share->where(['user_id'=>$user_id])->find();
+
+        if(!$share){
+            $data = [
+                'user_id' => $user_id,
+                'greetings' => $greetings,
+                'backgroundimage' => $backgroundimage,
+                'custom_greetings' => '',
+            ];
+            $Share->save($data);
+            $this->success('请求成功');
+        }else{
+            $share->greetings = $greetings;
+            $share->backgroundimage = $backgroundimage;
+            $share->save();
+            $this->success('请求成功');
+        }
+    }
+
     /**
      * 获取主题列表
      *
