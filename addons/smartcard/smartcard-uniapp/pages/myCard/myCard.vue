@@ -386,7 +386,7 @@
 					miniProgram: {
 						id: smartcardObj.weixinId,
 						path: '/pages/myCard/myCard?staff_id'+this.staff_id,
-						type: 0,
+						type: 2,
 						webUrl: ''
 					},
 					title: this.companyInfo.name || "名片夹",
