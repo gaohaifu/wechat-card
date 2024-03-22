@@ -150,7 +150,7 @@
 				<view class="flex-1 flex">
 					<view class="flex-1 primary-btn" @click="resendCard"
 						:class="{'disabled' : this.userData.save_status !== '0'}">
-						{{this.userData.save_status === '0' ? '回递名片' : '已回递'}}
+						{{smartcardObj.save_status[this.userData.save_status]}}
 					</view>
 					<!-- <view class="flex-1 plain-btn" style="marign-right: 20rpx;">分享Ta的名片</view>
 					<view class="flex-1 primary-btn">已回递</view> -->
@@ -315,31 +315,31 @@
 				this.isShare = true
 				this.staff_id=e.staff_id;
 				this.tools = this.tools.filter(i => (i.shareCode === '1' || i.shareCode === '2'))
-				this.services = [{
-						icon: 'icon-qiyejianjie',
-						label: '企业简介'
-					},
-					{
-						icon: 'icon-xiangce',
-						label: '我的相册'
-					},
-					{
-						icon: 'icon-qiyedongtai',
-						label: '企业动态'
-					},
-					{
-						icon: 'icon-qiyexuanchuance',
-						label: '企业宣传册'
-					},
-					{
-						icon: 'icon-chenggonganli',
-						label: '成功案例'
-					},
-					{
-						icon: 'icon-rexiaoshangpin',
-						label: '热销商品'
-					},
-				]
+				// this.services = [{
+				// 		icon: 'icon-qiyejianjie',
+				// 		label: '企业简介'
+				// 	},
+				// 	{
+				// 		icon: 'icon-xiangce',
+				// 		label: '我的相册'
+				// 	},
+				// 	{
+				// 		icon: 'icon-qiyedongtai',
+				// 		label: '企业动态'
+				// 	},
+				// 	{
+				// 		icon: 'icon-qiyexuanchuance',
+				// 		label: '企业宣传册'
+				// 	},
+				// 	{
+				// 		icon: 'icon-chenggonganli',
+				// 		label: '成功案例'
+				// 	},
+				// 	{
+				// 		icon: 'icon-rexiaoshangpin',
+				// 		label: '热销商品'
+				// 	},
+				// ]
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
 		},
@@ -362,43 +362,33 @@
 				this.backGround='transparent'
 			}
 		},
+		onShareAppMessage(res) {
+			if (res.from === 'menu') {// 来自右上角分享按钮
+			  console.log(res.target)
+			}
+			return {
+			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
+			  path: '/pages/myCard/myCard?isShare=1&staff_id=' + this.staff_id,
+			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
+			  type: 1, // 0正式版 2体验版 1开发板
+			}
+		},
 		methods: {
 			resendCard() {
-				// if(this.userData.save_status !== '0') return
-				// this.$api.resendCard({staff_id: this.staff_id}, res => {
-				// 	if(res.code === 1) {
-				// 		uni.showToast({
-				// 			icon: 'success',
-				// 			title: res.msg || '名片回递成功'
-				// 		})
-				// 	}else {
-				// 		uni.showToast({
-				// 			icon: 'none',
-				// 			title: res.msg || '名片回递失败'
-				// 		})
-				// 	}
-				// })
-				uni.share({
-					provider: "weixin",
-					scene: "WXSceneSession",
-					type: 0,
-					// href: "http://uniapp.dcloud.io/",
-					miniProgram: {
-						id: smartcardObj.weixinId,
-						path: '/pages/myCard/myCard?staff_id'+this.staff_id,
-						type: 2,
-						webUrl: ''
-					},
-					title: this.companyInfo.name || "名片夹",
-					summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
-					imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
-					success: function (res) {
-						console.log("success:" + JSON.stringify(res));
-					},
-					fail: function (err) {
-						console.log("fail:" + JSON.stringify(err));
+				if(this.userData.save_status !== '0') return
+				this.$api.resendCard({staff_id: this.staff_id}, res => {
+					if(res.code === 1) {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg || '名片回递成功'
+						})
+					}else {
+						uni.showToast({
+							icon: 'none',
+							title: res.msg || '名片回递失败'
+						})
 					}
-				});
+				})
 			},
 			// 点击会计工具
 			toolsClick(row) {
@@ -421,6 +411,28 @@
 							this.visits.find(i => i.id === 3).value++
 						}
 					})
+					// 小程序不支持？
+					// uni.share({
+					// 	provider: "weixin",
+					// 	scene: "WXSceneSession",
+					// 	type: 0,
+					// 	// href: "http://uniapp.dcloud.io/",
+					// 	miniProgram: {
+					// 		id: smartcardObj.weixinId,
+					// 		path: '/pages/myCard/myCard?staff_id'+this.staff_id,
+					// 		type: 2,
+					// 		webUrl: ''
+					// 	},
+					// 	title: this.companyInfo.name || "名片夹",
+					// 	summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
+					// 	imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
+					// 	success: function (res) {
+					// 		console.log("success:" + JSON.stringify(res));
+					// 	},
+					// 	fail: function (err) {
+					// 		console.log("fail:" + JSON.stringify(err));
+					// 	}
+					// });
 				}
 			},
 			toggleCardBox(dataProp) {
@@ -539,7 +551,9 @@
 					staff_id: this.staff_id,
 					user_id: this.user_id
 				}
-				this.$api.doIndex(condition, (res) => {
+				let api = this.$api.doIndex
+				if(this.isShare) api = this.$api.doIndexShare
+				api(condition, (res) => {
 					if(res.code === 1) {
 						this.allData=res.data
 						console.log(this.allData);
@@ -612,7 +626,11 @@
 							data: this.theme
 						})
 						
-						console.info(this.tools, '====', !this.staffInfo.mobile, !this.staffInfo.email)
+						if(this.isShare) {
+							this.services = this.allData.services || []
+						}
+						
+						console.info('首页请求的接口名称： ', api, this.allData)
 					}else {
 						// 这个是分享进来的 - 最好整合成一个页面
 						if(this.user_id!=0 || this.user_id!=''){
