@@ -1,0 +1,1451 @@
+{__NOLAYOUT__}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>自定义海报</title>
+    <link rel="stylesheet" href="/assets/addons/posters/index.min.css">
+    <style>
+
+        @font-face {
+            font-family: 'WenQuanDengKuan';
+            font-display: swap;
+            src: url('/assets/addons/posters/WenQuanDengKuanWeiMiHei.ttf');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            position: relative;
+            margin: 0px auto;
+        }
+
+        .box-shadow-h {
+            cursor: pointer;
+        }
+
+        .box-shadow, .box-shadow-h:hover {
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .1), 0 2px 2px 0 rgba(0, 0, 0, .1), 0 1px 5px 1px rgba(0, 0, 0, .1) !important;
+        }
+
+        .content {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .poster {
+            position: relative;
+            border-radius: 3px;
+            border: 1px double #DFECFD;
+            z-index: 9;
+        }
+
+        .config {
+            width: 350px;
+            min-height: 750px;
+            position: absolute;
+            margin-left: 100px;
+        }
+
+        .config .title {
+            margin: 10px auto 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .config .name {
+            margin: 10px auto;
+            font-size: 15px;
+            font-weight: bold;
+            position: relative;
+            padding-left: 10px;
+        }
+
+        .config .name:after {
+            content: '';
+            width: 4px;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            border-radius: 5px;
+            background-color: #4988FD;
+        }
+
+        .config .box {
+            margin-bottom: 20px;
+        }
+
+        .config .box.form .el-form-item {
+            margin-bottom: 10px;
+        }
+
+        .config .box.types {
+            text-align: center;
+        }
+
+        .config .types .type {
+            display: inline-block;
+            text-align: center;
+            padding: 6px 12px;
+            border-radius: 10px;
+            width: 70px;
+            position: relative;
+        }
+
+        .iconfont.icon-pic:before {
+            content: " ";
+            width: 47px;
+            height: 47px;
+            display: inline-block;
+            background: url("/assets/addons/posters/img/pic.png") no-repeat;
+            background-size:100% 100%;
+        }
+        .iconfont.icon-qr:before {
+            content: " ";
+            width: 47px;
+            height: 47px;
+            display: inline-block;
+            background: url("/assets/addons/posters/img/qr.png") no-repeat;
+            background-size:100% 100%;
+        }
+        .iconfont.icon-input:before {
+            content: " ";
+            width: 47px;
+            height: 47px;
+            display: inline-block;
+            background: url("/assets/addons/posters/img/input.png") no-repeat;
+            background-size:100% 100%;
+        }
+
+        .config .types .type > .tag {
+            font-size: 12px;
+            color: #797676;
+        }
+
+        .el-upload--picture-card {
+            width: 80px;
+            height: 80px;
+            line-height: 84px;
+        }
+
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .drag {
+            position: absolute;
+        }
+
+        .drag > .text.space > .text-content {
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .drag > .text.ellipsis {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .drag > .text > .text-content {
+            font-family: WenQuanDengKuan !important;
+            margin: 0;
+        }
+
+        .drag > .el-icon-close {
+            display: none;
+            cursor: pointer;
+            position: absolute;
+            bottom: -20px;
+            font-size: 18px;
+            left: 50%;
+            color: #000;
+            transform: translate(-50%);
+        }
+
+        .drag.current > .el-icon-close {
+            display: block;
+        }
+
+        .drag > img {
+            width: 100%;
+            height: 100%;
+        }
+
+        /*覆盖图片防止被选中*/
+        .poster .cover {
+            cursor: move;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            position: absolute;
+            user-select: none;
+        }
+
+        .drag.current > .cover, .poster.current {
+            border: 1px dotted #000;
+        }
+
+        .marker {
+            font-size: 12px;
+            line-height: 20px;
+            color: #818489;
+        }
+
+        .input-label {
+            font-size: 12px;
+        }
+
+        .scale {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #000;
+            width: 7px;
+            height: 7px;
+            z-index: 1;
+            display: none;
+        }
+
+        .poster.current > .cover > .scale, .drag.current > .cover > .scale {
+            display: block;
+        }
+
+        .scale-nw {
+            top: -3.5px;
+            left: -3.5px;
+            cursor: nw-resize;
+            border-radius: 50%;
+        }
+
+        .scale-ne {
+            top: -3.5px;
+            right: -3.5px;
+            cursor: ne-resize;
+            border-radius: 50%;
+        }
+
+        .scale-sw {
+            bottom: -3.5px;
+            left: -3.5px;
+            cursor: sw-resize;
+            border-radius: 50%;
+        }
+
+        .scale-se {
+            bottom: -3.5px;
+            right: -3.5px;
+            cursor: se-resize;
+            border-radius: 50%;
+        }
+
+        .scale-n {
+            top: -3.5px;
+            left: 50%;
+            margin-left: -3.5px;
+            cursor: n-resize;
+        }
+
+        .scale-e {
+            right: -3px;
+            top: 50%;
+            margin-top: -3.5px;
+            cursor: e-resize;
+        }
+
+        .scale-s {
+            bottom: -3px;
+            left: 50%;
+            margin-left: -3.5px;
+            cursor: s-resize;
+        }
+
+        .scale-w {
+            left: -3.5px;
+            top: 50%;
+            margin-top: -3.5px;
+            cursor: w-resize;
+        }
+
+        #manageIframe {
+            width: 100%;
+            height: 500px;
+        }
+
+        .recordDialog .el-dialog__body {
+            padding: 0 10px 30px;
+        }
+        .record-pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .manageDialog .el-dialog__body {
+            padding: 0 10px;
+        }
+
+        .manageDialog > .el-dialog {
+            min-width: 815px;
+        }
+
+        .submit {
+            padding-left: 80px;
+        }
+
+        .content .lists {
+            z-index: 6;
+            min-height: 750px;
+            min-height: 750px;
+            position: absolute;
+            padding-top: 10px;
+            margin-left: 1px;
+        }
+
+        .content .lists .item {
+            border: 1px solid #cfcfd4;
+            border-left: none;
+            padding: 0px 2px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px 0 rgb(0 0 0 / 5%);
+            border-radius: 0px 100px 100px 0px;
+            width: 50px;
+            transition: width .3s;
+            cursor: pointer;
+            min-height: 40px;
+            line-height: 40px;
+            position: relative;
+        }
+
+        .content .lists.item.bg {
+            color: #000000;
+        }
+
+        .content .lists .item .el-icon-close {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+
+        .content .lists .item.current .el-icon-close {
+            display: inline;
+        }
+
+        .content .lists .item.current {
+            border-color: #88888b;
+            width: 90px;
+        }
+
+        .content .lists .item > .image {
+            display: block;
+            width: 30px;
+            margin: 5px 5px;
+            user-select: none;
+        }
+
+        .content .lists .item > .text {
+            overflow: hidden;
+            white-space: nowrap;
+            max-width: 65px;
+            /*text-overflow: ellipsis;*/
+        }
+        .code{
+            color: #666666;
+            font-size: 14px;
+            white-space: pre-line;
+            line-height: 20px
+        }
+        .centerPop{
+            font-size: 18px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="container">
+        <div class="content">
+            <div class="poster" :class="{current: -1 === currentIndex}" @mousedown.stop="tapBg"
+                 :style="bgStyle">
+                <div class="drag"
+                     @click.stop="void(0)"
+                     v-for="(item, index) in materials"
+                     @mousedown.stop="mousedown($event, index)" :key="index"
+                     :class="{current: index === currentIndex}"
+                     :style="makeMaterialStyle(item)">
+
+                    <img v-if="item.type === 'qr'" src="/assets/addons/posters/img/qrcode.png"
+                         alt="">
+
+                    <img v-else-if="item.type === 'image'" alt=""
+                         :style="{borderRadius: item.config.radius + 'px'}"
+                         :src="(!item.generate && item.config.image) ? item.config.image : '/assets/addons/posters/img/image.png'">
+
+                    <div v-else-if="item.type === 'text'" class="text" :class="item.config.overflow">
+                        <pre class="text-content"
+                             :style="{lineHeight: item.config.lineHeight + 'px', textAlign: item.config.textAlign || 'left'}">{{ item.config.text }}</pre>
+                    </div>
+
+                    <i class="el-icon-close" @click.stop="delMaterial(index)"></i>
+
+                    <div class="cover">
+                        <div v-if="item.type !== 'text'" class="scale scale-nw"
+                             @mousedown.stop="shape($event, 'nw', false, true)"></div>
+                        <div v-if="item.type !== 'text'" class="scale scale-ne"
+                             @mousedown.stop="shape($event, 'ne', false, true)"></div>
+                        <div v-if="item.type !== 'text'" class="scale scale-sw"
+                             @mousedown.stop="shape($event, 'sw', false, true)"></div>
+                        <div v-if="item.type !== 'text'" class="scale scale-se"
+                             @mousedown.stop="shape($event, 'se', false, true)"></div>
+                        <div v-if="item.type === 'image' " class="scale scale-n"
+                             @mousedown.stop="shape($event, 'n')"></div>
+                        <div v-if="item.type !== 'qr'" class="scale scale-e"
+                             @mousedown.stop="shape($event, 'e')"></div>
+                        <div v-if="item.type === 'image'" class="scale scale-s"
+                             @mousedown.stop="shape($event, 's')"></div>
+                        <div v-if="item.type !== 'qr'" class="scale scale-w"
+                             @mousedown.stop="shape($event, 'w')"></div>
+                    </div>
+                </div>
+
+                <div class="cover">
+                    <div class="scale scale-n" @mousedown.stop="shape($event, 'n', true)"></div>
+                    <div class="scale scale-e" @mousedown.stop="shape($event, 'e', true)"></div>
+                    <div class="scale scale-s" @mousedown.stop="shape($event, 's', true)"></div>
+                    <div class="scale scale-w" @mousedown.stop="shape($event, 'w', true)"></div>
+                </div>
+            </div>
+
+            <div class="lists" :style="{left: bg.width + 'px'}">
+                <div class="item bg" :class="{current: currentIndex < 0}"
+                     :style="{backgroundColor: bg.color}" @click="setCurrent(-1)">背景
+                </div>
+                <div id="parentDrag">
+                    <div class="item" @click="setCurrent(materials.length - index - 1)"
+                         :class="{current: reverseCurrentIndex === index}"
+                         v-for="(item, index) in reverseMaterials"
+                         :key="index"
+                         :data-id="index">
+                        <img v-if="item.type === 'image'" class="image"
+                             :style="{borderRadius: item.config.radius + 'px'}"
+                             :src="(!item.generate && item.config.image) ? item.config.image : '/assets/addons/posters/img/image.png'"
+                             alt="图片"/>
+                        <img v-if="item.type === 'qr'" class="image"
+                             src="/assets/addons/posters/img/qrcode.png" alt="二维码"/>
+                        <div v-if="item.type === 'text'" class="text">{{ item.config.text }}</div>
+
+                        <i class="el-icon-close" @click.stop="delMaterial(-1 * (index - materials.length + 1))"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config" :style="{left: bg.width + 'px'}">
+                <div class="title">自定义海报</div>
+                <div class="name">设计素材</div>
+                <div class="box types">
+                    <div class="type box-shadow-h" v-for="(item, index) in materialTypes"
+                         :key="index" @click="addPoster(item.value)">
+                        <i class="iconfont" :class="item.icon"></i>
+                        <div class="tag">{{item.title}}</div>
+                    </div>
+                </div>
+
+                <div v-if="current">
+                    <div class="name">素材配置</div>
+                    <div class="box form">
+                        <el-form label-width="60px" size="small">
+                            <el-form-item label="动态">
+                                <el-switch v-model="current.generate"></el-switch>
+                                <div class="marker">后台动态生成内容</div>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.generate" label="变量">
+                                <div>{{current.type}}_{{currentIndex}}</div>
+                                <div class="marker">动态替换 {{current.type}}_{{currentIndex}} 的值</div>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'image' && !current.generate" label="图片">
+                                <el-button type="primary" plain @click.stop="manageVisible = true">选择图片
+                                </el-button>
+                                <div>
+                                    <img v-if="current.config.image" :src="current.config.image"
+                                         style="height: 100px">
+                                </div>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'text' || current.type === 'qr'"
+                                          label="内容">
+                                <el-input type="textarea" autosize
+                                          v-model="current.config.text" clearable></el-input>
+                                <div class="marker" v-if="current.generate">动态替换内容中的 {:变量} 值</div>
+                            </el-form-item>
+
+                            <el-form-item label="操作">
+                                <el-button type="default" @click="center"> 居中</el-button>
+                                <el-button-group v-if="current.type === 'text'">
+                                    <el-button :type="current.config.textAlign == 'left'? 'primary' : 'default'" @click="setTextAlign('left')">左对齐</el-button>
+                                    <el-button :type="current.config.textAlign == 'center'? 'primary' : 'default'" @click="setTextAlign('center')">居中</el-button>
+                                    <el-button :type="current.config.textAlign == 'right'? 'primary' : 'default'" @click="setTextAlign('right')">右对齐</el-button>
+                                    <el-popover placement="top" width="200" trigger="click" content="文本对齐方式不支持多行文本。">
+                                        <i slot="reference" class="el-icon-warning-outline centerPop"> </i>
+                                    </el-popover>
+                                </el-button-group>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'qr'" label="边框">
+                                <el-slider v-model="current.config.margin" :min="0"
+                                           :max="current.config.width"></el-slider>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'image'" label="尺寸">
+                                <div>
+                                    <span class="input-label">宽度(px): </span>
+                                    <el-input-number style="width: 120px" :min="1"
+                                                     :max="bg.width"
+                                                     v-model="current.config.width"></el-input-number>
+                                    <el-tooltip class="item" effect="dark" content="重置"
+                                                placement="top">
+                                        <el-button icon="el-icon-refresh"
+                                                   @click.stop="refreshImage" circle></el-button>
+                                    </el-tooltip>
+                                </div>
+                                <div>
+                                    <span class="input-label">高度(px): </span>
+                                    <el-input-number style="width: 120px" :min="1"
+                                                     :max="bg.height"
+                                                     v-model="current.config.height"/>
+                                </div>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'text'" label="超出">
+                                <el-radio-group v-model="current.config.overflow" >
+                                    <el-radio-button v-for="(item, index) in overflows" :key="index"
+                                                     :label="item.value">{{item.title}}
+                                    </el-radio-button>
+                                </el-radio-group>
+                                <el-input v-if="current.config.overflow === 'ellipsis'"
+                                          v-model="current.config.overflow_text"
+                                          placeholder="超出部分替换文本" clearable
+                                          style="width: 150px"></el-input>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'text' || current.type === 'qr'"
+                                          label="宽度">
+                                <el-slider v-model="current.config.width" :min="1"
+                                           :max="bg.width"></el-slider>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'image'" label="圆角">
+                                <el-slider v-model="current.config.radius"
+                                           :max="current.config.width / 2"></el-slider>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'image' || current.type === 'qr'"
+                                          label="透明度">
+                                <el-slider v-model="current.config.opacity"/>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'text'" label="大小">
+                                <el-slider v-model="current.config.fontSize" :min="10"
+                                           :max="100"></el-slider>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'text'" label="行高">
+                                <el-slider v-model="current.config.lineHeight" :min="10"
+                                           :max="100"></el-slider>
+                            </el-form-item>
+
+                            <el-form-item v-if="current.type === 'text'" label="颜色">
+                                <el-color-picker color-format="rgb" show-alpha
+                                                 v-model="current.config.color"></el-color-picker>
+                            </el-form-item>
+
+                        </el-form>
+                    </div>
+                </div>
+                <div v-else>
+                    <div class="name">海报背景</div>
+                    <div class="box form">
+                        <el-form label-width="80px" size="small">
+                            <el-form-item label="标题">
+                                <el-input v-model="title" clearable/>
+                            </el-form-item>
+
+                            <el-form-item label="背景色">
+                                <el-color-picker color-format="rgb" v-model="bg.color"></el-color-picker>
+                            </el-form-item>
+
+                            <el-form-item label="尺寸">
+                                <div>
+                                    <span class="input-label">宽度(px): </span>
+                                    <el-input-number :min="1" :max="maxWidth" v-model="bg.width"/>
+                                </div>
+                                <div>
+                                    <span class="input-label">高度(px): </span>
+                                    <el-input-number :min="1" :max="maxHeight" v-model="bg.height"/>
+                                </div>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </div>
+
+                <div class="submit">
+                    <el-button type="primary" @click="submit">保存</el-button>
+                    {if ($auth->check('posters/records'))}
+                    <el-button type="success" @click="recordView">记录</el-button>
+                    {/if}
+                    <el-button type="default" v-if="faParent" @click="close">关闭</el-button>
+                </div>
+            </div>
+        </div>
+
+        <el-dialog :close-on-click-modal="false" append-to-body class="manageDialog" title="选择图片" :visible.sync="manageVisible" :width="maxWidth">
+            <iframe id="manageIframe" :src="manageUrl" frameborder="0"></iframe>
+            <span slot="footer" class="dialog-footer">
+                    <el-button @click.stop="manageVisible = false">取 消</el-button>
+                    <el-button type="primary" @click.stop="selectImage">确 定</el-button>
+                </span>
+        </el-dialog>
+
+        <el-dialog :close-on-click-modal="false" append-to-body :visible.sync="dialogFormVisible" :show-close="false" title="新增">
+            <el-form size="small" :model="viewForm">
+                <el-form-item label="海报名称" :label-width="formLabelWidth">
+                    <el-input placeHolder="请输入海报名称" v-model="viewForm.name" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="放大倍数" :label-width="formLabelWidth">
+                    <el-input-number :precision="2" :step="0.1" :max="10" v-model="viewForm.size" autocomplete="off"></el-input-number>
+                </el-form-item>
+                <el-form-item v-if="viewForm.params" v-for="(v, i) in viewForm.params" :key="i" :label="viewFormLabel(i)" :label-width="formLabelWidth">
+                    <div v-if="(c = materials[getI(i)]) && !c.generate">
+                        <div v-if="c.type === 'image'">
+                            <img style="width: 40px" :src="c.config.image">
+                        </div>
+                        <div v-else>{{c.config.text}}</div>
+                    </div>
+                    <div v-else>
+                        <div v-if="c.type === 'image'">
+                            <el-button type="primary" plain @click.stop="selViewImage(i)">选择图片</el-button>
+                            <div><img v-if="viewForm.params[i]" :src="viewForm.params[i]" style="height: 100px"></div>
+                        </div>
+                        <div v-else>
+                            <el-input placeholder="多个参数换行表示 (例子name=啦啦啦啦)" type="textarea" v-model="viewForm.params[i]"></el-input>
+                            <div class="code">{{c.config.text}}</div>
+                        </div>
+                    </div>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+              <span class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="saveRecord">保存</el-button>
+              </span>
+            </template>
+        </el-dialog>
+
+        <el-dialog :close-on-click-modal="false" append-to-body class="recordDialog" :visible.sync="dialogTableVisible">
+            <template slot="title">
+                海报列表 {if ($auth->check('posters/recordadd'))}<el-button size="mini" round @click="createRecord">新增</el-button>{/if}
+            </template>
+            <el-table max-height="500px" :data="records">
+                <el-table-column label="#" width="80px" prop="id"></el-table-column>
+                <el-table-column label="" prop="name">
+                    <template slot="header" slot-scope="scope">
+                        <el-input v-model="recordParams.search" size="mini" placeholder="输入海报名称搜索"/>
+                    </template>
+                    <template slot-scope="scope">{{scope.row.name}}</template>
+                </el-table-column>
+                <el-table-column label="操作" align="right">
+                    <template slot-scope="scope">
+                        <el-button type="text" @click="recordPreview(scope.$index, scope.row)" title="预览"><i class="el-icon-picture"></i></el-button>
+                        {if ($auth->check('posters/recordadd'))}
+                        <el-button type="text" @click="recordUpdate(scope.$index, scope.row)" title="修改"><i class="el-icon-s-open"></i></el-button>
+                        {/if}
+                        {if ($auth->check('posters/recorddel'))}
+                        <el-button type="text" @click="recordDelete(scope.$index, scope.row)" title="删除"><i class="el-icon-delete-solid"></i></el-button>
+                        {/if}
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="record-pagination">
+                <el-pagination layout="prev, pager, next, total"
+                               :current-page="recordParams.page"
+                               :page-size="recordParams.limit"
+                               @current-change="currentChange"
+                               :total="recordsTotal">
+                </el-pagination>
+            </div>
+        </el-dialog>
+    </div>
+</div>
+
+<script src="/assets/addons/posters/vue.min.js"></script>
+<script src="/assets/addons/posters/index.min.js"></script>
+<script src="/assets/addons/posters/axios.min.js"></script>
+<script src="/assets/addons/posters/Sortable.min.js"></script>
+
+<script>
+    const materialsDefault = {
+        image: {
+            type: 'image',
+            generate: true,
+            zIndex: 1,
+            config: {
+                image: null,
+                left: 0,
+                top: 0,
+                width: 80,
+                height: 80,
+                radius: 0,
+                opacity: 100, //透明度
+            }
+        },
+        qr: {
+            type: 'qr',
+            generate: true,
+            zIndex: 1,
+            config: {
+                text: 'https://baidu.com/s?wd={\:id}',
+                left: 0,
+                top: 0,
+                width: 100,
+                margin: 2,
+                opacity: 100,
+            }
+        },
+        text: {
+            type: 'text',
+            generate: true,
+            zIndex: 1,
+            config: {
+                text: '自定义文本{\:name}',
+                left: 0,
+                top: 0,
+                width: 270,
+                fontSize: 20,
+                textAlign: 'left',
+                lineHeight: 20,
+                overflow: 'space',
+                overflow_text: '',
+                color: 'rgba(0, 0, 0, 1)'
+            }
+        }
+    }
+    const clone = function () {
+        return function f(obj) {
+            if (!obj) {
+                return obj;
+            }
+            if (obj instanceof Date) {
+                return new Date(obj);
+            }
+            if (obj instanceof RegExp) {
+                return new RegExp(obj);
+            }
+            if (obj === null) {
+                return obj;
+            }
+            if (typeof obj !== 'object') {
+                return obj;
+            }
+            let result = obj instanceof Array ? [] : {};
+            for (let key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    result[key] = typeof obj[key] === 'object' ? f(obj[key]) : obj[key];
+                }
+            }
+            return result;
+        }
+    }()
+
+    const CREATE = !!"{$create|default=true}"
+    let id = "{$id|default=0}",
+        manageUrl = "{:url('general/attachment/select', ['mimetype'=>'image/*'])}"
+
+    let parent = window.parent
+    let faParent = parent && parent.layer
+    const closePage = () => {
+        parent.$("#table").bootstrapTable('refresh', {});
+        parent.layer.close(parent.layer.getFrameIndex(window.name))
+    }
+
+    let searchInterval = null
+
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    function imgError(e){
+        console.log("[ Error ] ", e)
+    }
+
+    const app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                id,
+                faParent,
+                title: '',
+                maxWidth: 750,
+                maxHeight: 750,
+                bg: {
+                    color: 'rgb(255,255,255)',
+                    width: 422,
+                    height: 750,
+                },
+                overflows: [
+                    {title: '换行', value: 'space'},
+                    {title: '省略', value: 'ellipsis'},
+                ],
+                currentIndex: -1,
+                materialTypes: {
+                    image: {
+                        icon: 'icon-pic',
+                        title: '图片',
+                        value: 'image'
+                    },
+                    qr: {
+                        icon: 'icon-qr',
+                        title: '二维码',
+                        value: 'qr'
+                    },
+                    text: {
+                        icon: 'icon-input',
+                        title: '文字',
+                        value: 'text',
+                    },
+                },
+                materials: [],
+                manageVisible: false,
+                sortable: null,
+                changed: false,
+                dialogFormVisible: false,
+                dialogTableVisible: false,
+                viewForm: {
+                    id: 0,
+                    size: 1,
+                    name: '',
+                    params: undefined,
+                },
+                formLabelWidth: '120px',
+                selImgIndex: '',
+                recordParams: {
+                    search: '',
+                    page: 1,
+                    limit: 15,
+                },
+                records: [],
+                recordsTotal: [],
+            }
+        },
+        computed: {
+            manageUrl() {
+                return this.manageVisible ? manageUrl : ''
+            },
+            current() {
+                return this.materials[this.currentIndex]
+            },
+            bgStyle() {
+                return {
+                    width: this.bg.width + 'px',
+                    height: this.bg.height + 'px',
+                    backgroundColor: this.bg.color
+                }
+            },
+            reverseCurrentIndex() {
+                return this.currentIndex >= 0 ? this.materials.length - this.currentIndex - 1 : -1;
+            },
+            reverseMaterials() {
+                let materials = []
+                this.materials.forEach(v => {
+                    materials.unshift(v)
+                })
+                return materials
+            },
+            watchParams(){
+                let {title, bg, materials} = this
+                return {title, bg, materials}
+            }
+        },
+        watch:{
+            watchParams:{
+                handler(val){
+                    if (!this.changed) {
+                        this.changed = true
+                        this.viewForm.params = undefined
+                    }
+                },
+                deep: true
+            },
+            'recordParams.search'(val){
+                if (searchInterval) {
+                    clearTimeout(searchInterval)
+                    searchInterval = null
+                }
+                searchInterval = setTimeout(() => {
+                    this.recordParams.page = 1
+                    this.getRecord(true)
+                    searchInterval = null
+                }, 500)
+            }
+        },
+        created() {
+            if (!CREATE) {
+                this.init();
+            }
+        },
+        mounted() {
+            this.keyDown()
+            const that = this
+
+            this.sortable = Sortable.create(document.getElementById('parentDrag'), {
+                animation: 150,
+                onEnd: function (evt) {
+                    let length = that.materials.length
+                    this.toArray().forEach((i, k) => {
+                        let index = length - i - 1
+                        that.materials[index].zIndex = length - k
+                    })
+                },
+            });
+        },
+        methods: {
+            selViewImage(index){
+                this.selImgIndex = index
+                console.log(index)
+                this.manageVisible = true
+            },
+            getI(index){
+                return index.split('_')[1] || null
+            },
+            viewFormLabel(index){
+                let i = this.getI(index)
+                let item = this.materials[i]
+                return this.materialTypes[item.type].title +"["+index+"]"
+            },
+            formatFormParams(viewForm = {}){
+                let params = []
+                for (let i in this.materials) {
+                    let v = this.materials[i],
+                        k = v.type + '_' + i,
+                        item = {
+                            key: k,
+                            val: '',
+                            generate: v.generate,
+                        }
+                    switch (v.type){
+                        case 'image':
+                            item = {
+                                key: k,
+                                val: v.config.image,
+                                generate: v.generate,
+                            }
+                            break;
+                        case 'qr':
+                        case 'text':
+                            break;
+                    }
+                    params.splice(v.zIndex - 1, 0, item)
+                }
+                params.reverse()
+                let formParams = {}
+                let viewFormParams = viewForm.params || {}
+                for (let i in params) {
+                    if (true === params[i].generate){
+                        formParams[params[i].key] = viewFormParams[params[i].key] || params[i].val
+                    }
+                }
+                this.viewForm.id = viewForm.id || 0
+                this.viewForm.name = viewForm.name || ''
+                this.viewForm.size = viewForm.size || 1
+                this.viewForm.params = formParams
+            },
+            createRecord() {
+                this.formatFormParams()
+                this.dialogFormVisible = true
+            },
+            recordView() {
+                if (this.id && !this.changed) {
+                    if (this.records.length === 0) {
+                        this.getRecord()
+                    }
+                    this.dialogTableVisible = true
+                }else{
+                    this.$message("请先保存海报再进行预览");
+                }
+            },
+            currentChange(page){
+                this.recordParams.page = page
+                this.getRecord()
+            },
+            getRecord(init = false) {
+                if (init) {
+                    this.recordParams.page = 1
+                }
+                axios.get("{:url('records')}", {
+                    params: {posters_id: this.id, ...this.recordParams}
+                }).then(response => {
+                    let res = response.data
+                    if (res.code === 1) {
+                        this.records = res.data.data
+                        this.recordsTotal = res.data.total
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            recordPreview(index, row){
+                let url = "{:addon_url('posters')}?id="+row.id+"&t="+(Math.random() * 1000000 | 0)
+                const h = this.$createElement;
+                this.$msgbox({
+                    title: row.name,
+                    message: h('p', null,
+                        [
+                            h('div', {style: {textAlign: 'center'}}, [
+                                h('a', {domProps: {href: url, target: '_block'}}, [url])
+                            ]),
+                            h('img', {domProps: {src: url}, style: {width: '100%'},
+                                on:{
+                                    error:() => {
+                                        this.$message.error("海报加载失败");
+                                    }
+                                }
+                            })
+                        ]),
+                    showConfirmButton: false
+                }).then(action => {
+
+                });
+            },
+            recordUpdate(index, row){
+                this.formatFormParams(row)
+                this.dialogFormVisible = true
+            },
+            recordDelete(index, row){
+                this.$confirm('确认删除海报['+row.name+']', '', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("{:url('recorddel')}", { id: row.id},).then(response => {
+                        let res = response.data
+                        if (res.code === 1) {
+                            this.$message.success("删除成功");
+                            this.records.splice(index, 1)
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    }).catch(error => {console.log(error);})
+                }).catch(() => {});
+            },
+            saveRecord() {
+                let params = {}
+                let formParams = []
+                for (let i in this.viewForm.params) {
+                    formParams.push({key: i, val: this.viewForm.params[i]})
+                }
+                for (let x in formParams) {
+                    let key = formParams[x].key,
+                        val = formParams[x].val,
+                        i = this.getI(key),
+                        v = this.materials[i]
+                    // 动态数据才需要保存
+                    if (true === v.generate) {
+                        if (!val) {
+                            this.$message.error('['+key+']不能为空');
+                            return false;
+                        }
+                        params[key] = this.viewForm.params[key]
+                    }
+                }
+                axios.post("{:url('recordadd')}",
+                    { ...this.viewForm, posters_id: this.id, params},
+                ).then(response => {
+                    let res = response.data
+                    if (res.code === 1) {
+                        this.$message.success("保存成功");
+                        this.getRecord()
+                        this.dialogFormVisible = false
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                }).catch(error => {console.log(error);});
+            },
+            shape(downEvent, direction, bg = false, scale = false) {
+                let config = bg ? this.bg : this.current.config
+                let maxWidth = bg ? this.maxWidth : this.bg.width
+                let maxHeight = bg ? this.maxHeight : this.bg.height
+                let startX = downEvent.clientX
+                let startY = downEvent.clientY
+                let height = config['height'] || 0
+                let width = config['width'] || 0
+                let top = config['top'] || 0
+                let left = config['left'] || 0
+
+                let containerLeft = document.getElementsByClassName('container')[0].offsetLeft
+                let containerTop = document.getElementsByClassName('poster')[0].offsetTop
+
+                let move = moveEvent => {
+                    let currX = moveEvent.clientX
+                    let currY = moveEvent.clientY
+                    let disY = currY - startY
+                    let disX = currX - startX
+                    let hasN = /n/.test(direction)
+                    let hasS = /s/.test(direction)
+                    let hasW = /w/.test(direction)
+                    let hasE = /e/.test(direction)
+                    let newWidth = +width + (hasW ? -disX : hasE ? disX : 1)
+                    let newHeight = +height + (hasN ? -disY : hasS ? disY : 1)
+                    newWidth = newWidth > 0 ? (newWidth > maxWidth ? maxWidth : newWidth) : 1
+                    newHeight = newHeight > 0 ? (newHeight > maxHeight ? maxHeight : newHeight) : 1
+                    newHeight = scale ? parseInt(height * (newWidth / width)) : newHeight
+
+                    let checkW = startX - containerLeft - width + newWidth > maxWidth
+                    let checkN = startY - containerTop - height + newHeight > maxHeight
+
+                    hasW = hasW || checkW
+                    hasN = hasN || checkN
+
+                    config['height'] !== undefined && (config['height'] = newHeight)
+                    config['width'] !== undefined && (config['width'] = newWidth)
+                    config['left'] !== undefined && hasW && (config['left'] = this.calcLocal(+left + disX, true))
+                    config['top'] !== undefined && hasN && (config['top'] = this.calcLocal(+top + ((scale && !checkN) ? height - newHeight : disY), false))
+                }
+                let up = () => {
+                    document.removeEventListener('mousemove', move)
+                    document.removeEventListener('mouseup', up)
+                }
+                document.addEventListener('mousemove', move)
+                document.addEventListener('mouseup', up)
+            },
+            refreshImage() {
+                this.setImage(this.current.config.image)
+            },
+            selectImage() {
+                const iframe = document.getElementById('manageIframe').contentWindow
+                let selected = iframe.surface_selection
+
+                if (selected.length > 1) {
+                    this.$message.error('只能选择一张图片');
+                    return;
+                } else if (selected.length < 1) {
+                    return;
+                }
+                this.setImage(selected[0].url)
+                this.manageVisible = false
+            },
+            setImage(url) {
+                if (this.selImgIndex) {
+                    this.viewForm.params[this.selImgIndex] = url
+                    this.selImgIndex = ''
+                    return ;
+                }
+                const img = new Image()
+                img.src = url
+                img.onload = () => {
+                    this.current.config.image = url
+                    if (img.width > this.bg.width || img.height > this.bg.height) {
+                        let wScale = this.bg.width / img.width,
+                            hScale = this.bg.height / img.height,
+                            scale = wScale < hScale ? wScale : hScale
+                        this.current.config.width = Math.round(img.width * scale)
+                        this.current.config.height = Math.round(img.height * scale)
+                    } else {
+                        this.current.config.width = img.width
+                        this.current.config.height = img.height
+                    }
+                    if (this.current.config.width + this.current.config.left > this.bg.width) {
+                        this.current.config.left = 0
+                    } else if (this.current.config.height + this.current.config.top > this.bg.height) {
+                        this.current.config.top = 0
+                    }
+                }
+            },
+            keyDown() {
+                document.onkeydown = (e) => {
+                    let e1 = e || event || window.event || arguments.callee.caller.arguments[0]
+                    if (e1 && this.current) {
+                        let step = 1
+                        switch (e1.keyCode) {
+                            case 46: // 删除
+                                this.delMaterial()
+                                break;
+                            case 37: // ←
+                                this.current.config.left = this.calcLocal(this.current.config.left - step, true)
+                                break;
+                            case 38: // ↑
+                                this.current.config.top = this.calcLocal(this.current.config.top - step, false)
+                                break;
+                            case 39: // →
+                                this.current.config.left = this.calcLocal(this.current.config.left + step, true)
+                                break;
+                            case 40: // ↓
+                                this.current.config.top = this.calcLocal(this.current.config.top + step, false)
+                                break;
+                        }
+                    }
+                }
+            },
+            center() {
+                this.current.config.left = (this.bg.width - this.current.config.width) / 2
+            },
+            setTextAlign(textAlign) {
+                this.current.config = {...this.current.config, textAlign}
+            },
+            tapBg() {
+                this.currentIndex = -1
+            },
+            addPoster(value) {
+                let material = clone(materialsDefault[value])
+                switch (material.type) {
+                    case 'text':
+                        material.config.width = this.bg.width
+                        break;
+                }
+                this.materials.push(material)
+                this.currentIndex = this.materials.length - 1
+
+                this.materials.forEach((item, k) => {
+                    item.zIndex = k + 1
+                })
+            },
+            delMaterial(index = null) {
+                this.materials.splice(index === null ? this.currentIndex : index, 1)
+            },
+            makeMaterialStyle(item) {
+                let style = {
+                    zIndex: item.zIndex,
+                    left: item.config.left + 'px',
+                    top: item.config.top + 'px',
+                    width: item.config.width + 'px'
+                }
+
+                switch (item.type) {
+                    case 'image':
+                        style.height = item.config.height + 'px'
+                        style.borderRadius = item.config.radius + 'px'
+                        style.opacity = item.config.opacity / 100
+                        break;
+                    case 'text':
+                        style.fontSize = item.config.fontSize + 'px'
+                        style.color = item.config.color
+                        break;
+                    case 'qr':
+                        if (item.config.margin > 0) {
+                            style.width = item.config.width - 2 * item.config.margin + 'px'
+                            style.padding = item.config.margin + 'px'
+                            style.backgroundColor = '#fff'
+                        }
+                        style.height = style.width
+                        style.opacity = item.config.opacity / 100
+                        break;
+                }
+
+                return style
+            },
+            calcLocal(val, direction = true, current = null) {
+                if (null === current) {
+                    current = this.current
+                }
+                if (direction) {
+                    let size = current.config.width
+                    return val > this.bg.width - size ? this.bg.width - size : (val < 0 ? 0 : val)
+                } else {
+                    let size = 0
+                    switch (current.type) {
+                        case 'image':
+                            size = current.config.height
+                            break;
+                        case 'text':
+                            size = current.config.fontSize
+                            break;
+                        case 'qr':
+                            size = current.config.width
+                            break;
+                    }
+                    return val > this.bg.height - size ? this.bg.height - size : (val < 0 ? 0 : val)
+                }
+            },
+            setCurrent(index) {
+                this.currentIndex = index
+            },
+            mousedown(downEvent, index) {
+                this.setCurrent(index)
+
+                let startTop = this.current.config.top,
+                    startLeft = this.current.config.left,
+                    clientX = downEvent.clientX,
+                    clientY = downEvent.clientY
+
+                let move = moveEvent => {
+                    let currX = moveEvent.clientX
+                    let currY = moveEvent.clientY
+                    this.current.config.left = this.calcLocal(currX - clientX + startLeft, true)
+                    this.current.config.top = this.calcLocal(currY - clientY + startTop, false)
+                }
+
+                let up = () => {
+                    document.removeEventListener('mousemove', move)
+                    document.removeEventListener('mouseup', up)
+                }
+                document.addEventListener('mousemove', move)
+                document.addEventListener('mouseup', up)
+            },
+            colorToVal(color) {
+                return color.match(/\d+,\d+,\d+/g)
+            },
+            setError(err, index = -1) {
+                if (!isNaN(err)) {
+                    index = err
+                } else {
+                    this.$message.error(err);
+                }
+                this.currentIndex = parseInt(index)
+            },
+            checkMaterials() {
+                if (!this.title) {
+                    this.setError('请设置标题', -1);
+                    return false;
+                }
+
+                for (let i in this.materials) {
+                    let v = this.materials[i],
+                        c = v.config
+                    switch (v.type) {
+                        case 'image':
+                            if (!v.generate && !c.image) {
+                                this.setError('请选择素材图片', i);
+                                return false;
+                            }
+                            break;
+                        case 'qr':
+                            if (!c.text) {
+                                this.setError('请设置二维码内容', i);
+                                return false;
+                            }
+                            break;
+                        case 'text':
+                            if (!v.generate && !c.text) {
+                                this.setError('请设置文本内容', i);
+                                return false;
+                            }
+                            break;
+                    }
+                }
+                return true;
+            },
+            submit() {
+                if (true !== this.checkMaterials()) {
+                    return;
+                }
+                axios.post('', {id:this.id,title: this.title, bg: this.bg, materials: this.materials}).then(response => {
+                    let res = response.data
+                    if (res.code === 1) {
+                        if (CREATE) {
+                            this.id = res.data.id
+                        }
+                        this.changed = false
+                        this.$message.success(res.msg);
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            init() {
+                axios.get("{:url('detail')}", {
+                    params: {id: this.id},
+                }).then(response => {
+                    let res = response.data
+                    if (res.code === 1) {
+                        this.bg = res.data.bg
+                        this.title = res.data.title
+                        res.data.materials.forEach((v, k) => {
+                            v.zIndex = k + 1
+                        })
+                        this.materials = res.data.materials
+                        this.$nextTick(()=>{
+                            this.changed = false
+                        })
+                    } else {
+                        this.$message.error(res.msg);
+                    }
+                }).catch(error => {
+                    console.log(error);
+                });
+            },
+            reset() {
+                this.bg = {
+                    color: 'rgb(255,255,255)',
+                    width: 422,
+                    height: 750,
+                };
+                this.title = '';
+                this.currentIndex = -1;
+                this.materials = [];
+            },
+            close(){
+                if (this.faParent){
+                    if (this.changed) {
+                        this.$confirm('页面内容做了修改，退出将丢失修改的内容.', '是否关闭页面', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(closePage).catch(() => {});
+                    }else{
+                        closePage()
+                    }
+                }
+            }
+        }
+    })
+
+    // 本页面不需要Layer 只需要子页面文件选择 重写Layer方法
+    const Layer = {
+        getFrameIndex() {
+            return 0
+        },
+        close(index) {
+        }
+    }
+
+    let config = {$config | json_encode};
+    let cdnurl = config.upload.cdnurl;
+    const cdnU = url => (cdnurl && url.indexOf(cdnurl) === 0) ? url : cdnurl + url
+    window.$ = function () {
+        return {
+            data() {
+                const sel = function (data) {
+                    let url = data.url
+                    url = cdnU(url);
+                    app.setImage(url)
+                    app.manageVisible = false
+                }
+                return sel;
+            }
+        }
+    }
+    window.Layer = Layer
+
+
+</script>
+
+
+</body>
+</html>
