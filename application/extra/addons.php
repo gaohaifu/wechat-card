@@ -50,6 +50,9 @@ return [
         'config_init' => [
             'third',
         ],
+        'posters' => [
+            'posters',
+        ],
     ],
     'route' => [
         '/web$' => 'myadmin/web/index',
