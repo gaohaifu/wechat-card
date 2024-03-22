@@ -1,6 +1,10 @@
 <?php
 
 namespace app\api\controller\smartcard;
+use addons\myadmin\model\Admin;
+use addons\myadmin\model\AuthGroup;
+use addons\myadmin\model\AuthGroupAccess;
+use addons\myadmin\model\ConfigValue;
 use app\admin\model\smartcard\Share;
 use app\admin\model\smartcard\Su;
 use app\admin\model\smartcard\Visitors;
@@ -17,9 +21,12 @@ use app\admin\model\smartcard\Theme;
 use app\common\library\Sms;
 use app\common\model\User;
 
+use fast\Random;
 use fast\Tree;
 use think\Db;
 use think\Config;
+use think\exception\PDOException;
+use think\exception\ValidateException;
 
 
 header('Access-Control-Allow-Origin:*');//允许跨域
@@ -603,6 +610,7 @@ class Common extends Base
      **/
     public function enterpriseCertified(){
         $licenseimage = $this->request->request('licenseimage');
+        $companyname = $this->request->request('companyname');
         $official_letter = $this->request->request('official_letter');
         if (!$licenseimage){
             $this->error('企业营业执执照不能为空');
@@ -610,21 +618,84 @@ class Common extends Base
         if (!$official_letter){
             $this->error('公函不能为空');
         }
-
+        if (!$companyname){
+            $this->error('公司名称不能为空');
+        }
+        $Staff = new Staff();
         $user_id = $this->user_id;
-        $Company = new \addons\myadmin\model\Company();
-        $company = $Company->where(['id'=>$user_id])->find();
-       
-        if($company['is_authentication']==2){
-            $this->error('已认证');
+        $staff = $Staff->where(['user_id'=>$user_id,'is_default'=>1])->find();
+        if(!$staff){
+            $this->error('请先填写个人资料');
         }else{
-            $company->save([
+            if($staff['company_id']!=0){
+                $this->error('您已经加入企业，不需要企业认证');
+            }
+        }
+
+        $Company = new \addons\myadmin\model\Company();
+        $company = $Company->where(['name'=>$companyname])->find();
+        if($company){
+            $this->error('公司已存在，请修改个人资料的公司名称');
+        }
+
+        Db::startTrans();
+        try {
+
+            $params = [
+                'id'=>$user_id,
+                'type'=>'myself',
+                'group_id'=>1,
+                'name'=>$companyname,
+                'admin_limit'=>5,
+                'status'=>'created',
                 'licenseimage'=>$licenseimage,
                 'official_letter'=>$official_letter,
                 'is_authentication'=>1,
-            ]);
+            ];
+
+            $result = $Company->allowField(true)->save($params);
+
+            // 管理员表
+            $founder['salt'] = Random::alnum();
+            $founder['password'] = md5(md5('123456') . $founder['salt']);
+            $founder['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
+            $founder['company_id'] = $Company->id;
+            $founder['username'] = $staff->name;
+            $founder['nickname'] = $staff->name;
+            $founder['is_founder'] = 1; // 设置为创始人
+            $admin = new Admin;
+            $admin->allowField(true)->save($founder);
+
+            $staff->company_id = $Company->id;
+            $staff->save();
+            
+            //权限关系
+            $access_params['uid'] = $admin->id;
+            $access_params['group_id'] = 1;
+            $access_params['company_id'] = $Company->id;
+            $access = new AuthGroupAccess;
+            $access->save($access_params);
+            // 初始化配置
+            $config = new ConfigValue;
+            $config_data = ['name' => 'name', 'value' => $params['name'], 'company_id' => $Company->id];
+            $config->save($config_data);
+
+            Db::commit();
+        } catch (ValidateException $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        } catch (PDOException $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        } catch (Exception $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
         }
-        $this->success('请求成功');
+        if ($result !== false) {
+            $this->success('请求成功');
+        } else {
+            $this->error(__('No rows were inserted'));
+        }
     }
     
     /**
@@ -1088,6 +1159,9 @@ class Common extends Base
         }
 
         if(!is_null($userres)){
+            if($userres['company_id']!=$data['company_id']){
+                $data['statusdata']='2';
+            }
             $userres->allowField(true)->save($data);
             $this->success('更新员工信息成功');
         }
