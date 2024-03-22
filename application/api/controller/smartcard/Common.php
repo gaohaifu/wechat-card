@@ -850,15 +850,30 @@ class Common extends Base
                 'text_4' => $text_4,
             ],
             'size' => 2.0,
-            'output' => ROOT_PATH . 'public'.'/uploads/share/poster_2_'.$user_id.'.png',
+            'output' => ROOT_PATH . 'public'.'/uploads/share/poster_2_1_'.$user_id.'.png',
+        ];
+        Hook::listen('posters', $params, null, true);
+        $params = [
+            'id' => 2,
+            'params' => [
+                'image_0' => '/assets/addons/posters/img/bg2.png',
+                'image_1' => \app\common\model\User::where(['id' =>$this->user_id])->value('avatar'),
+                'text_2' => [
+                    'name' => $staff->name,
+                ],
+                'text_3' => [
+                    'companyname' => $staff->companyname,
+                    'position' => $staff->position,
+                ],
+                'text_4' => $text_4,
+            ],
+            'size' => 2.0,
+            'output' => ROOT_PATH . 'public'.'/uploads/share/poster_2_2_'.$user_id.'.png',
         ];
         Hook::listen('posters', $params, null, true);
 
-//        foreach ($backgroundimageList as $k=>&$item) {
-//            if($bfirstKey=='') $bfirstKey = $k;
-//            $item = cdnurl($item,true);
-//        }
-        $backgroundimageList[] = cdnurl('/uploads/share/poster_2_'.$user_id.'.png',true);
+        $backgroundimageList[] = cdnurl('/uploads/share/poster_2_1_'.$user_id.'.png',true);
+        $backgroundimageList[] = cdnurl('/uploads/share/poster_2_2_'.$user_id.'.png',true);
         $share = $Share->where(['user_id'=>$user_id])->find();
         $staff['greetings'] = $share?$share->greetings:$greetingsList[$gfirstKey];
         $staff['backgroundimage'] = $share?$share->backgroundimage:$backgroundimageList[0];
