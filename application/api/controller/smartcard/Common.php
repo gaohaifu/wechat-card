@@ -827,6 +827,14 @@ class Common extends Base
             $item = str_replace('XXX',$staff->name,$item);
         }
 
+        $text_4 =['text_0'=>'手机：'.$staff->mobile];
+        if($staff->wechat) $text_4['text_1'] = '微信：'.$staff->wechat;
+        if($staff->email) $text_4['text_'.count($text_4)] = '邮箱：'.$staff->email;
+        if($staff->qq) $text_4['text_'.count($text_4)] = 'QQ ：'.$staff->qq;
+        $count = count($text_4);
+        for ($count;$count<4;$count++){
+            $text_4['text_'.$count] = '';
+        }
         $params = [
             'id' => 2,
             'params' => [
@@ -839,12 +847,7 @@ class Common extends Base
                     'companyname' => $staff->companyname,
                     'position' => $staff->position,
                 ],
-                'text_4' => [
-                    'mobile' => $staff->mobile,
-                    'wechat' => $staff->wechat,
-                    'email' => $staff->email,
-                    'qq' => $staff->qq,
-                ],
+                'text_4' => $text_4,
             ],
             'size' => 2.0,
             'output' => ROOT_PATH . 'public'.'/uploads/share/poster_2_'.$user_id.'.png',
@@ -858,8 +861,7 @@ class Common extends Base
         $backgroundimageList[] = cdnurl('/uploads/share/poster_2_'.$user_id.'.png',true);
         $share = $Share->where(['user_id'=>$user_id])->find();
         $staff['greetings'] = $share?$share->greetings:$greetingsList[$gfirstKey];
-//        $staff['backgroundimage'] = $share?$share->backgroundimage:$backgroundimageList[$bfirstKey];
-        $staff['backgroundimage'] = $backgroundimageList[0];
+        $staff['backgroundimage'] = $share?$share->backgroundimage:$backgroundimageList[0];
 
         $greetingsList['custom'] = $share?$share->custom_greetings:'';
         $data['greetingsList'] = $greetingsList;
