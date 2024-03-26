@@ -303,6 +303,8 @@ class User extends Base
         $page = $this->request->request("page");
         $limit = $this->request->request("limit")?$this->request->request("limit"):10;
         $where['id'] = array('>=',1);
+        $where['status'] = array('=','normal');
+        $where['is_authentication'] = array('=',2);
         if($companyname != ''){
             $where['name'] = array('like','%'.$companyname.'%');
         }
