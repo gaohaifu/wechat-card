@@ -651,3 +651,22 @@ if (!function_exists('split_array')) {
         return $result;
     }
 }
+
+if (!function_exists('imgsavefromstring')) {
+    /**
+     * 图片保存
+     * @param string $imgstring 图片字符串
+     * @param string $filename 文件保存地址
+     */
+    function imgsavefromstring($imgstring, $filename)
+    {
+        $img = imagecreatefromstring($imgstring);
+        $filename = str_replace('\\', '/', $filename);
+        $dir = mb_substr($filename, 0, strrpos($filename, '/'));
+        if ( ! is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        imagepng($img,$filename);
+        imagedestroy($img);
+    }
+}

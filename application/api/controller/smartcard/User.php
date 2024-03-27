@@ -559,11 +559,18 @@ class User extends Base
         $user_id=$this->user_id;
         $data = $this->request->request('');
         $miniCode = Cache::get('mini_code_'.$user_id);
+
+        $filename = ROOT_PATH . 'public'.'/uploads/minicode/user_'.$user_id.'.png';
         if($miniCode){
-            ob_end_clean();
-            header("content-type:image/png");
-            echo $miniCode;
-            die;
+            imgsavefromstring($miniCode,$filename);
+            $data = [
+                'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'.png',true)
+            ];
+            $this->success('请求成功',$data);
+//            ob_end_clean();
+//            header("content-type:image/png");
+//            echo $miniCode;
+//            die;
         }else{
             $config = get_addon_config('smartcard');
             if (!$config || !isset($config['wechat'])) {
@@ -605,10 +612,15 @@ class User extends Base
                     $this->success('发送成功',$json);
                 }else{
                     Cache::set('mini_code_'.$user_id,$result['msg'],3600*24);
-                    ob_end_clean();
-                    header("content-type:image/png");
-                    echo $result['msg'];
-                    die;
+                    imgsavefromstring($miniCode,$filename);
+                    $data = [
+                        'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'.png',true)
+                    ];
+                    $this->success('请求成功',$data);
+//                    ob_end_clean();
+//                    header("content-type:image/png");
+//                    echo $result['msg'];
+//                    die;
                 }
             }else{
                 $this->error('失败');
