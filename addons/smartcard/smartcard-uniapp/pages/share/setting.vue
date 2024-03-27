@@ -15,34 +15,70 @@
 			<view class="scene">
 				<image class="scene-photo photo-right" src="../../static/images/img.jpg" />
 				<view class="scene-text text-right">
-					<view>{{ word ? word : '这是我的名片，请收下' }}</view>
-					<image class="card-img" src="../../static/images/mp.jpg" />
+					<view>{{ shareCardInfo.greetings || '这是我的名片，请收下' }}</view>
+					<image class="card-img" :src="shareCardInfo.backgroundimage || '../../static/images/mp.jpg'" />
 				</view>
 			</view>
 		</view>
 		<view class="setting-box">
-			<view class="word-box">
+			<view class="word-box" @click="openPopup">
 				<text>招呼语</text>
-				<input v-model="word" placeholder="请输入招呼语" />
+				<!-- <input disabled v-model="word" placeholder="请输入招呼语" /> -->
+				<view class="flex-1">{{ shareCardInfo.greetings || '请输入招呼语' }}</view>
 				<image src="../../static/images/right.png" />
 			</view>
 			<view>分享封面</view>
 			<scroll-view class="cover-box" scroll-x="true">
-				<view class="cover-img" :class="{'active': checkIndex === item}" v-for="item in [1,2,3,4,5,6]" :key="item" @click="checkHandle(item)">
-					<image src="../../static/images/mp.jpg" />
+				<view class="cover-img" :class="{'active': item.active}"
+					v-for="(item, index) in backgroundimageList" :key="item.id"
+					@click="changeBackgroundImage(index, item)">
+					<image :src="item.value" />
 					<view class="checked-icon">
 						<image src="../../static/images/cover_icon.png" />
 					</view>
 				</view>
 			</scroll-view>
 			<view class="save-box">
-				<view class="send-box">
+				<!-- <view class="send-box">
 					<image src="../../static/images/send_icon.png" />
 					<view>发送名片</view>
-				</view>
-				<view class="save-btn">保存</view>
+				</view> -->
+				<button open-type="share" class="send-box">
+					<image src="../../static/images/send_icon.png" />
+					<view>发送名片</view>
+				</button>
+				<view class="save-btn" @click="saveShareInfo">保存</view>
 			</view>
 		</view>
+		
+		<uni-popup ref="popup" type="bottom">
+			<view class="message_content">
+				<view class="message_item">
+					<view class="title">选择招呼语</view>
+					<view class="scroll">
+						<label class="flex flex-vc"
+							style="margin: 20rpx 0;"
+							v-for="(item, index) in greetingsList" :key="item.id"
+							@click="changeGreeting(index, item)">
+							<view style="margin-right: 20rpx;">
+								<radio :value="item.id" :checked="item.active" />
+							</view>
+							<view v-if="item.id !== 'custom'">{{item.value}}</view>
+							<view v-else>
+								<textarea class="text-area" name="greeting" cols="30" rows="6"
+									 v-model="greeting" placeholder="请输入自定义标题"
+									 :maxlength="30"
+									 @blur="greetingBlur"></textarea>
+							</view>
+						</label>
+					</view>
+				</view>
+				<view class="flex">
+					<view class="flex-1 cancel" @click="cancelGreeting">取消</view>
+					<view class="flex-1 save" @click="cancelGreeting">保存</view>
+				</view>
+			</view>			
+		</uni-popup>
 	</view>
 </template>
 
@@ -74,14 +110,123 @@
 				],
 				checkIndex: 1,
 				word: '',
+				shareCardInfo: {},
+				backgroundimageList: [],
+				greetingsList: [],
+				greeting: '', // 
+				userData: {}
+			}
+		},
+		onLoad() {
+			this.getShareCardInfo()
+		},
+		onShareAppMessage(res) {
+			if (res.from === 'menu') {// 来自右上角分享按钮
+			  console.log(res.target)
+			}
+			this.sendCard()
+			console.info('this.companyInfo', this.companyInfo)
+			this.userData = uni.getStorageSync('userData') || {}
+			return {
+			  title: this.shareCardInfo.greetings,
+			  path: '/pages/myCard/myCard?origin=1&isShare=1&staff_id=' + this.userData.id,
+			  imageUrl: this.shareCardInfo.backgroundimage,
+			  type: 1, // 0正式版 2体验版 1开发板
 			}
 		},
 		methods: {
+			sendCard() {
+				this.$api.sendCard({
+					staff_id: this.userData.id
+				}, res => {
+					if(res.code === 1) {
+						uni.showToast({
+							icon: 'none',
+							title: res.msg
+						})
+						this.visits.find(i => i.id === 3).value++
+					}
+				})
+			},
 			tabchange (index) {
 				this.activeId = this.menu[index].value
 			},
-			checkHandle(index) {
-				this.checkIndex = index
+			changeBackgroundImage(index, row) {
+				this.shareCardInfo.backgroundimage = row.value
+				this.backgroundimageList = this.backgroundimageList.map((i, inx) => {
+					i.active = false
+					if(inx === index) i.active = true
+					return i
+				})
+			},
+			greetingBlur() {
+				this.shareCardInfo.greetings = this.greeting
+			},
+			changeGreeting(index,row){
+				if(row.id === 'custom') {
+					this.shareCardInfo.greetings = this.greeting
+					this.shareCardInfo.isCustom = true
+				} else {
+					this.shareCardInfo.isCustom = false
+					this.shareCardInfo.greetings = row.value
+				}
+				
+				this.greetingsList = this.greetingsList.map((i, inx) => {
+					i.active = false
+					if(inx === index) i.active = true
+					return i
+				})
+			},
+			openPopup() {
+				this.$refs.popup.open('bottom')
+			},
+			cancelGreeting() {
+				this.$refs.popup.close()
+			},
+			saveGreeting(greetings) {
+				this.$api.saveCustomGreetings({
+					custom_greetings: this.greeting
+				})
+			},
+			saveShareInfo() {
+				if (this.shareCardInfo.isCustom) this.saveGreeting()
+				this.$api.saveShareInfo({
+					greetings: this.shareCardInfo.greetings,
+					backgroundimage: this.shareCardInfo.backgroundimage
+				}, res => {
+					if(res.code === 1) {
+						uni.showToast({
+							icon: 'success',
+							title: res.msg
+						})
+						uni.navigateBack()
+					}
+				})
+			},
+			getShareCardInfo() {
+				this.$api.shareCardInfo({}, res => {
+					if(res.code === 1) {
+						const data = res.data || {}
+						this.shareCardInfo = data.shareCardInfo || {}
+						let greetingsList = []
+						for(let key in (data.greetingsList || {})) {
+							greetingsList.push({
+								id: key,
+								active: data.greetingsList[key] === this.shareCardInfo.greetings, 
+								value: data.greetingsList[key]
+							})
+						}
+						this.greetingsList = greetingsList
+						this.backgroundimageList = (data.backgroundimageList || []).map((i, inx) => {
+							return {
+								id: inx,
+								active: i === this.shareCardInfo.backgroundimage,
+								value: i
+							}
+						})
+						// console.info(this.backgroundimageList, this.greetings, this.shareCardInfo, '=======>', res)
+					}
+				})
 			}
 		}
 	}
@@ -247,6 +392,9 @@
 		font-size: 20rpx;
 		color: #666;
 		text-align: center;
+		padding: 0;
+		background-color: transparent;
+		line-height: normal;
 	}
 	.send-box image {
 		width: 48rpx;
@@ -262,4 +410,35 @@
 		color: #fff;
 		border-radius: 60rpx;
 	}
+	
+	/* 弹窗 */
+	.message_content .cancel,
+	.message_content .save{
+		border-top: solid 2rpx #e6e6e6;
+		text-align: center;
+		padding: 30rpx ;
+		background-color: #fff;
+	}
+	.message_content .save {
+		background-color: #0256FF;
+		color: #fff;
+	}
+	.message_content{
+		background: #fff;
+	}
+	.message_content .message_item {
+		padding: 20rpx 20rpx;
+	}
+	.message_content .title {
+		padding: 10rpx 0 30rpx;
+		font-size: 36rpx;
+		text-align: center;
+		font-weight: 700;
+	}
+	.message_content .text-area{
+		border: solid 1px #ddd;
+		border-radius: 8rpx;
+	}
+	.scroll_view{ height: 600rpx;}
+
 </style>

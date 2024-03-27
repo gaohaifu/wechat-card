@@ -51,7 +51,10 @@ const methodsToken = [
 	'enterpriseCertified',
 	'realnameCertified',
 	'sendCard',
-	'saveCard'
+	'saveCard',
+	'shareCardInfo',
+	'saveCustomGreetings',
+	'saveShareInfo'
 ];
 const post = (method, data, callback,type, failCB) => {
 	let userToken = '';
@@ -60,7 +63,7 @@ const post = (method, data, callback,type, failCB) => {
 	if (methodsToken.indexOf(method) >= 0) {
 		// 获取用户token
 		let auth = db.get("auth");
-		// console.info(auth, '===----', db.get('user'));
+		console.info(auth, '<=====auth====method====>', method, '====>user', db.get("user"));
 		let nowdate = (new Date()) / 1000; //当前时间戳
 		//新增用户判断是否登录逻辑begin
 		common.isLogin()
@@ -418,5 +421,11 @@ export const enterpriseCertified = (data, callback) => post('enterpriseCertified
 export const realnameCertified = (data, callback) => post('realnameCertified', data, callback, 'smartcard/Common')
 // 保存名片
 export const saveCard = (data, callback) => post('saveCard', data, callback, 'smartcard/Common')
-// 发名片
+// 发名片回调
 export const sendCard = (data, callback) => post('sendCard', data, callback, 'smartcard/Common')
+// 分享卡片信息
+export const shareCardInfo = (data, callback) => post('shareCardInfo', data, callback, 'smartcard/Common')
+// 保存自定义招呼语
+export const saveCustomGreetings = (data, callback) => post('saveCustomGreetings', data, callback, 'smartcard/Common')
+// 保存分享信息
+export const saveShareInfo = (data, callback) => post('saveShareInfo', data, callback, 'smartcard/Common')

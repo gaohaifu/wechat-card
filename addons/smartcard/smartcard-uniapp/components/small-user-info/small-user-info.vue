@@ -108,6 +108,7 @@
 			themeData: {
 				deep: true,
 				handler(vl = {}) {
+					console.info('=======首页有没有执行监听到themeData')
 					if(vl.cardimage) this.theme = vl
 				}
 			},
@@ -116,11 +117,28 @@
 			}
 		},
 		created() {
+			// this.getTheme()
+			// 分享出去后子组件监听不到刷新，直接再请求一次接口
 			this.getSessionData()
 			// console.info('----------small user info 回退是否会执行当前生命周期？？？', this.userData.is_certified, '====',
 			// 	this.userData.save_status, this.smartcardObj.save_status[this.userData.save_status])
 		},
 		methods: {
+			getTheme() {
+				this.$api.doIndex({}, res => {
+					if(res.code === 1) {
+						res.data = res.data || {}
+						this.userData = res.data.userInfo || {}
+						const smartcardtheme = userData.smartcardtheme || {}
+						this.theme = {
+							color: smartcardtheme.colour || '',
+							backgroundimage: smartcardtheme.backgroundimage || smartcardBG.backgroundimage,
+							cardimage: smartcardtheme.cardimage || smartcardBG.cardimage,
+							fontcolor: smartcardtheme.fontcolor || ''
+						}
+					}
+				})
+			},
 			getSessionData() {
 				this.userData = uni.getStorageSync('userData') || {}
 				const themeData = uni.getStorageSync('themeData') || {}

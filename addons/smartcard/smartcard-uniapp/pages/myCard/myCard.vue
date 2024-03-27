@@ -1,11 +1,47 @@
 <template>
 	<view class="overall_content">
-		<smallUserInfo page-title="首页" :is-back="false" 
-			:is-show="isShowSmallUserInfo"
-			:bg-color="bgColor"
-			:back-ground="backGround"
-			:theme-data="theme"></smallUserInfo>
+		<view class="header_background" :style="{'background-image':'url('+cdnUrl+backgroundImg+')'}">
+			<cu-custom :bgColor="bgColor" :isBack="isBack" :backGround="backGround">
+				<block slot="backText">返回</block>
+				<block slot="content">首页</block>
+			</cu-custom>
+			<view class="header_padding">
+				<view class="header_message" :style="{'background-image':'url('+cdnUrl + cardimage+')'}">
+					<view class="flex_layout userImg">
+						<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
+						<view class="name_position">
+							<view :style="{color:fontcolor}">{{userData.name?userData.name:''}}</view>
+							<text :style="{color:fontcolor}">{{userData.position}}</text>
+							<text :style="{color:fontcolor}">{{companyInfo.name}}</text>
+						</view>
+					</view>
+					<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
+						:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
+									color:(certificateStatus ? 'white' : fontcolor)}"
+						@click="linkToCert">
+						{{!certificateStatus? '未认证' : '已认证'}}
+					</view>
+					<view class="extra">
+						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
+								:style="{color:fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
+						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-youjian1"></i><text
+								:style="{color:fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
+						<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:fontcolor}"
+								class="iconfont icon-weizhi"></i><text
+								:style="{color:fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
+						</view>
+					</view>
+					<view class="isHC-box" v-if="smartcardObj.save_status[userData.save_status]">
+						<view class="bg">
+							{{smartcardObj.save_status[userData.save_status]}}
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
 		<view class="overall_padding contents">
+			<!-- 发名片 -->
+			<button type="primary" open-type="share" class="share-btn">发名片</button>
 			<!-- 快捷工具 -->
 			<view class="flex_between tools">
 				<view class="flex flex-v flex-vc flex-hc tool-item"
@@ -56,13 +92,14 @@
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">我的名片数据</view>
 					<view class="flex flex-vc more">
-						<text>查看详情</text>
-						<text class="iconfont icon-Rightyou"></text>
+						<!-- <text>查看详情</text> -->
+						<text class="iconfont icon-Rightyou" @click="linkToCard"></text>
 					</view>
 				</view>
 				<view class="flex flex-hc statistics">
 					<view class="flex-1 flex flex-v flex-vc flex-hc"
-						v-for="(item, inx) in visits" :key="inx">
+						v-for="(item, inx) in visits" :key="inx"
+						 @click="linkToCard(item)">
 						<!-- <text class="num">{{item.value}}</text> -->
 						<uni-badge class="uni-badge-left-margin" :text="item.value" absolute="rightTop" size="small">
 							<view class="box"><text class="box-text num">{{item.value}}</text></view>
@@ -149,8 +186,8 @@
 				</view>
 				<view class="flex-1 flex">
 					<view class="flex-1 primary-btn" @click="resendCard"
-						:class="{'disabled' : this.userData.save_status !== '0'}">
-						{{smartcardObj.save_status[this.userData.save_status]}}
+						:class="{'disabled' : userData.save_status !== '0'}">
+						{{smartcardObj.save_status[userData.save_status]}}
 					</view>
 					<!-- <view class="flex-1 plain-btn" style="marign-right: 20rpx;">分享Ta的名片</view>
 					<view class="flex-1 primary-btn">已回递</view> -->
@@ -165,15 +202,18 @@
 
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
-	import smallUserInfo from "../../components/small-user-info/small-user-info.vue"
 	import {smartcardObj} from '@/config/common.js'
+	import {
+		cdnUrl
+	} from '@/config/config.js'
 	export default {
 		components:{
-			bottomSheet,
-			smallUserInfo
+			bottomSheet
 		},
 		data() {
 			return {
+				cdnUrl,
+				certificateStatus: false,
 				isShare: false,
 				bgColor:'bg-gradual-custom',
 				backGround:'',
@@ -214,14 +254,14 @@
 						label: '定位',
 						shareCode: '2' // 是否分享页还是默认页独有 0 无 1有 2都有
 					},
-					{
-						id: 5,
-						disabled: false,
-						icon: 'icon-famingpian',
-						color: '#0256FF',
-						label: '发名片',
-						shareCode: '0' // 是否分享页还是默认页独有 0 无 1有 2都有
-					},
+					// {
+					// 	id: 5,
+					// 	disabled: false,
+					// 	icon: 'icon-famingpian',
+					// 	color: '#0256FF',
+					// 	label: '发名片',
+					// 	shareCode: '0' // 是否分享页还是默认页独有 0 无 1有 2都有
+					// },
 					{
 						id: 6,
 						disabled: false,
@@ -250,6 +290,7 @@
 				showEnterpriseVideo: true,
 				showEnterpriseProfile: true,
 				allData:'',
+				userType: '',
 				userData:{
 					nickname:'',
 					name:'',
@@ -261,6 +302,7 @@
 				visitStaffLists: [], // 访客列表
 				videofiles: {}, // 企业视频
 				description: '', // 企业简介
+				companyInfo: {},
 				nickname:'',
 				transmit:{
 					company_id:'',
@@ -278,13 +320,15 @@
 				fontcolor: '',
 				showGlance: false,
 				myselfstatus: false,
-				theme: {}
+				theme: {},
+				origin: 1, // 来源:1=我向对方发出了名片,2=对方的名片夹,3=对方的名片浏览记录
 			}
 		},
 		onLoad(e) {
 			console.log('index调用onload',e); 
 			// 分享给别人的名片id 有可能是自己的也有可能是别人的
 			if(typeof(e.staff_id)== "undefined" || e.staff_id=='' ||  e.staff_id==null || e.staff_id=='null'){
+				this.origin = e.origin
 				uni.showToast({
 					title:'无用户信息！',
 					icon:'none',
@@ -366,14 +410,35 @@
 			if (res.from === 'menu') {// 来自右上角分享按钮
 			  console.log(res.target)
 			}
+			this.sendCard()
+			console.info('this.companyInfo', this.companyInfo)
 			return {
 			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
-			  path: '/pages/myCard/myCard?isShare=1&staff_id=' + this.staff_id,
+			  path: '/pages/myCard/myCard?origin=1&isShare=1&staff_id=' + this.staffInfo.id,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: 1, // 0正式版 2体验版 1开发板
 			}
 		},
 		methods: {
+			linkToCard(row) {
+				if(row) return; // 暂时只有查看更多能跳转
+				uni.switchTab({
+					url: '/pages/myCard/myCard'
+				})
+			},
+			sendCard() {
+				this.$api.sendCard({
+					staff_id: this.staffInfo.id
+				}, res => {
+					if(res.code === 1) {
+						uni.showToast({
+							icon: 'none',
+							title: res.msg
+						})
+						this.visits.find(i => i.id === 3).value++
+					}
+				})
+			},
 			resendCard() {
 				if(this.userData.save_status !== '0') return
 				this.$api.resendCard({staff_id: this.staff_id}, res => {
@@ -400,39 +465,29 @@
 				} else if(row.id === 2 && this.staffInfo.wechat) {
 					
 				} else if(row.id === 5) { // 发名片
-					this.$api.sendCard({
-						staff_id: this.staff_id
-					}, res => {
-						if(res.code === 1) {
-							uni.showToast({
-								icon: 'none',
-								title: res.msg
-							})
-							this.visits.find(i => i.id === 3).value++
-						}
-					})
+					
 					// 小程序不支持？
-					// uni.share({
-					// 	provider: "weixin",
-					// 	scene: "WXSceneSession",
-					// 	type: 0,
-					// 	// href: "http://uniapp.dcloud.io/",
-					// 	miniProgram: {
-					// 		id: smartcardObj.weixinId,
-					// 		path: '/pages/myCard/myCard?staff_id'+this.staff_id,
-					// 		type: 2,
-					// 		webUrl: ''
-					// 	},
-					// 	title: this.companyInfo.name || "名片夹",
-					// 	summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
-					// 	imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
-					// 	success: function (res) {
-					// 		console.log("success:" + JSON.stringify(res));
-					// 	},
-					// 	fail: function (err) {
-					// 		console.log("fail:" + JSON.stringify(err));
-					// 	}
-					// });
+					uni.share({
+						provider: "weixin",
+						scene: "WXSceneSession",
+						type: 0,
+						// href: "http://uniapp.dcloud.io/",
+						miniProgram: {
+							id: smartcardObj.weixinId,
+							path: '/pages/myCard/myCard?staff_id'+this.staff_id,
+							type: 2,
+							webUrl: ''
+						},
+						title: this.companyInfo.name || "名片夹",
+						summary: "我正在使用HBuilderX开发uni-app，赶紧跟我一起来体验！",
+						imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
+						success: function (res) {
+							console.log("success:" + JSON.stringify(res));
+						},
+						fail: function (err) {
+							console.log("fail:" + JSON.stringify(err));
+						}
+					});
 				}
 			},
 			toggleCardBox(dataProp) {
@@ -547,12 +602,15 @@
 			},
 			getIndex() {
 				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || 0 // 分享进来？分享要去share页面不公用
-				const condition = {
+				let condition = {
 					staff_id: this.staff_id,
 					user_id: this.user_id
 				}
 				let api = this.$api.doIndex
-				if(this.isShare) api = this.$api.doIndexShare
+				if(this.isShare) {
+					api = this.$api.doIndexShare
+					condition.origin = this.origin
+				}
 				api(condition, (res) => {
 					if(res.code === 1) {
 						this.allData=res.data
@@ -629,8 +687,13 @@
 						if(this.isShare) {
 							this.services = this.allData.services || []
 						}
+						if(this.userData.is_certified === 0){
+							this.certificateStatus=false;
+						}
 						
-						console.info('首页请求的接口名称： ', api, this.allData)
+						console.info('首页请求的接口名称： ', api, 
+							'allData', this.allData, 'isShare', this.isShare, 
+							'services', this.services)
 					}else {
 						// 这个是分享进来的 - 最好整合成一个页面
 						if(this.user_id!=0 || this.user_id!=''){
@@ -983,4 +1046,10 @@
 		border: solid 1px #E6E6E6;
 	}
 	.contents .video { text-align: center;}
+	.share-btn {
+		margin-bottom: 20rpx;
+	}
+	button.share-btn[type="primary"] {
+		background-color: #0256FF;
+	}
 </style>
