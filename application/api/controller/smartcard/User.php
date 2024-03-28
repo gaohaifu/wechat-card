@@ -5,6 +5,7 @@ use addons\third\model\Third;
 use app\common\library\Auth;
 use app\common\library\Sms;
 use fast\Http;
+use think\Cache;
 use think\Config;
 use think\Validate;
 use app\common\model\User as userc;
@@ -548,5 +549,83 @@ class User extends Base
             $this->error(__('发送失败'));
         }
     }
-    
+
+    /**
+     * 获取小程序码
+     * @throws \think\exception\DbException
+     */
+    public function getMiniCode()
+    {
+        $user_id=$this->user_id;
+        $data = $this->request->request('');
+        $miniCode = Cache::get('mini_code_'.$user_id);
+
+        $filename = ROOT_PATH . 'public'.'/uploads/minicode/user_'.$user_id.'.png';
+        if($miniCode){
+            imgsavefromstring($miniCode,$filename);
+            $data = [
+                'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'.png',true)
+            ];
+            $this->success('请求成功',$data);
+//            ob_end_clean();
+//            header("content-type:image/png");
+//            echo $miniCode;
+//            die;
+        }else{
+            $config = get_addon_config('smartcard');
+            if (!$config || !isset($config['wechat'])) {
+                $this->error(__('Invalid parameters'));
+            }
+
+            $access_token = Cache::get('access_token_'.$config['wechat']['app_id']);
+            if(!$access_token){
+                $params = [
+                    'appid'      => $config['wechat']['app_id'],
+                    'secret'     => $config['wechat']['app_secret'],
+                    'grant_type' => 'client_credential'
+                ];
+                $result = Http::sendRequest("https://api.weixin.qq.com/cgi-bin/token", $params, 'GET');
+                if ($result['ret']) {
+                    $json = (array)json_decode($result['msg'], true);
+                    $access_token = $json['access_token'];
+                    Cache::set('access_token_'.$config['wechat']['app_id'],$access_token,$json['expires_in']);
+                }else{
+                    $this->error('获取access_token失败');
+                }
+            }
+            unset($data['s']);
+            if(isset($data['check_path'])) $data['check_path'] = (bool)$data['check_path'];
+            if(isset($data['auto_color'])) $data['auto_color'] = (bool)$data['auto_color'];
+            $param = json_encode($data, true);
+            $result = Http::sendRequest("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=".$access_token, $param, 'POST',[
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($param),
+                    'Cache-Control: no-cache',
+                    'Pragma: no-cache'
+                ]
+            ]);
+
+            if (isset($result['ret'])) {
+                $json = (array)json_decode($result['msg'], true);
+                if($json){
+                    $this->success('发送成功',$json);
+                }else{
+                    Cache::set('mini_code_'.$user_id,$result['msg'],3600*24);
+                    imgsavefromstring($miniCode,$filename);
+                    $data = [
+                        'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'.png',true)
+                    ];
+                    $this->success('请求成功',$data);
+//                    ob_end_clean();
+//                    header("content-type:image/png");
+//                    echo $result['msg'];
+//                    die;
+                }
+            }else{
+                $this->error('失败');
+            }
+        }
+
+    }
 }
