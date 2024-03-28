@@ -91,9 +91,9 @@
 			<view class="visits">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">我的名片数据</view>
-					<view class="flex flex-vc more">
+					<view class="flex flex-vc more" @click="linkToCard('more')">
 						<!-- <text>查看详情</text> -->
-						<text class="iconfont icon-Rightyou" @click="linkToCard"></text>
+						<text class="iconfont icon-Rightyou"></text>
 					</view>
 				</view>
 				<view class="flex flex-hc statistics">
@@ -421,9 +421,10 @@
 		},
 		methods: {
 			linkToCard(row) {
-				if(row) return; // 暂时只有查看更多能跳转
+				// console.info(row, '============>row', row !== 'more')
+				if(row !== 'more') return; // 暂时只有查看更多能跳转
 				uni.switchTab({
-					url: '/pages/myCard/myCard'
+					url: '/pages/mycard-data/index'
 				})
 			},
 			sendCard() {
@@ -971,8 +972,9 @@
 		color: #999;
 	}
 	.visits .more .iconfont {
-		width: 32rpx;
-		height: 32rpx;
+		width: 64rpx;
+		height: 64rpx;
+		line-height: 64rpx;
 		font-size: 32rpx;
 		text-align: center;
 	}
