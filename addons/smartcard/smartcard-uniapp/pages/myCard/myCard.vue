@@ -197,18 +197,21 @@
 		<!--  #ifdef  MP-WEIXIN	 -->
 		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom"></bottomSheet>
 		<!--  #endif -->
+		<myCardCode ref="myCardCode"></myCardCode>
 	</view>
 </template>
 
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
+	import myCardCode from '../../components/mycard-code/index.vue'
 	import {smartcardObj} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
 	export default {
 		components:{
-			bottomSheet
+			bottomSheet,
+			myCardCode
 		},
 		data() {
 			return {
@@ -347,7 +350,8 @@
 					},
 					{
 						icon: 'icon-mingpianma',
-						label: '名片码'
+						label: '名片码',
+						doFun: this.openCode
 					},
 					{
 						icon: 'icon-fenxiangshezhi',
@@ -420,8 +424,10 @@
 			}
 		},
 		methods: {
+			openCode() {
+				this.$refs.myCardCode && this.$refs.myCardCode.open();
+			},
 			linkToCard(row) {
-				// console.info(row, '============>row', row !== 'more')
 				if(row !== 'more') return; // 暂时只有查看更多能跳转
 				uni.switchTab({
 					url: '/pages/mycard-data/index'
@@ -731,6 +737,7 @@
 						url: row.url
 					})
 				}
+				if(row.doFun) row.doFun();
 			}
 		}
 	}
