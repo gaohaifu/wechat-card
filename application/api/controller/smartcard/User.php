@@ -593,7 +593,7 @@ class User extends Base
                 if ($result['ret']) {
                     $json = (array)json_decode($result['msg'], true);
                     $access_token = $json['access_token'];
-                    Cache::set('access_token_'.$config['wechat']['app_id'],$access_token,$json['expires_in']);
+                    Cache::set('access_token_'.$config['wechat']['app_id'],$access_token,$json['expires_in']-600);
                 }else{
                     $this->error('获取access_token失败');
                 }
