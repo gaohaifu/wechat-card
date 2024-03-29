@@ -558,13 +558,18 @@ class User extends Base
     {
         $user_id=$this->user_id;
         $data = $this->request->request('');
-        $miniCode = Cache::get('mini_code_'.$user_id);
+        unset($data['s']);
+        if(isset($data['check_path'])) $data['check_path'] = (bool)$data['check_path'];
+        if(isset($data['auto_color'])) $data['auto_color'] = (bool)$data['auto_color'];
+        $param = json_encode($data, true);
+        $hashkey = hash('md5',$param);
+        $miniCode = Cache::get('mini_code_'.$user_id.'_'.$hashkey);
 
-        $filename = ROOT_PATH . 'public'.'/uploads/minicode/user_'.$user_id.'.png';
+        $filename = ROOT_PATH . 'public'.'/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png';
         if($miniCode){
             imgsavefromstring($miniCode,$filename);
             $data = [
-                'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'.png',true)
+                'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png',true)
             ];
             $this->success('请求成功',$data);
 //            ob_end_clean();
@@ -593,10 +598,7 @@ class User extends Base
                     $this->error('获取access_token失败');
                 }
             }
-            unset($data['s']);
-            if(isset($data['check_path'])) $data['check_path'] = (bool)$data['check_path'];
-            if(isset($data['auto_color'])) $data['auto_color'] = (bool)$data['auto_color'];
-            $param = json_encode($data, true);
+            
             $result = Http::sendRequest("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=".$access_token, $param, 'POST',[
                 CURLOPT_HTTPHEADER => [
                     'Content-Type: application/json',
@@ -611,10 +613,10 @@ class User extends Base
                 if($json){
                     $this->success('发送成功',$json);
                 }else{
-                    Cache::set('mini_code_'.$user_id,$result['msg'],3600*24);
-                    imgsavefromstring($miniCode,$filename);
+                    Cache::set('mini_code_'.$user_id.'_'.$hashkey,$result['msg'],3600*24);
+                    imgsavefromstring($result['msg'],$filename);
                     $data = [
-                        'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'.png',true)
+                        'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png',true)
                     ];
                     $this->success('请求成功',$data);
 //                    ob_end_clean();
