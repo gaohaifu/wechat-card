@@ -203,9 +203,9 @@ input {
 /* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
 @font-face {
   font-family: 'iconfont';  /* Project id 4425411 */
-  src: url('//at.alicdn.com/t/c/font_4425411_nd104da019.woff2?t=1706448835480') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4425411_nd104da019.woff?t=1706448835480') format('woff'),
-       url('//at.alicdn.com/t/c/font_4425411_nd104da019.ttf?t=1706448835480') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4425411_qlnpye0purk.woff2?t=1711864468132') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4425411_qlnpye0purk.woff?t=1711864468132') format('woff'),
+       url('//at.alicdn.com/t/c/font_4425411_qlnpye0purk.ttf?t=1711864468132') format('truetype');
 }
 
 .iconfont {
@@ -215,7 +215,9 @@ input {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
-
+.icon-back:before{
+	content: '\e602';
+}
 .icon-weibiaoti1:before {
   content: "\e62b";
 }
@@ -343,6 +345,9 @@ input {
 .icon-dadianhua:before {
   content: "\e6fd";
 }
+.icon-dianhua:before {
+  content: "\e6fd";
+}
 
 .icon-shouyeoff:before {
   content: "\e6fe";
@@ -430,4 +435,10 @@ input {
 
 .icon-xiangce:before {
   content: "\e6fb";
+}
+.icon-youjian1:before{
+	content: '\e604';
+}
+.icon-weizhi:before {
+	content: '\e62e';
 }

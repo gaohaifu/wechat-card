@@ -55,9 +55,11 @@
 </template>
 
 <script>
+	// import {smartcardBG} from '@/config/common.js'
 	export default {
 		data() {
 			return {
+				// smartcardBG,
 				list: [],
 				current: 0,
 				chooseIndex: 0,

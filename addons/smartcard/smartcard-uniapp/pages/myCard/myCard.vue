@@ -418,7 +418,7 @@
 			console.info('this.companyInfo', this.companyInfo)
 			return {
 			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
-			  path: '/pages/myCard/myCard?origin=1&isShare=1&staff_id=' + this.staffInfo.id,
+			  path: '/pages/myCard/myCard?origin=1&isShare=1&staff_id=' + this.staffInfo.id + '&user_id='+this.user_id,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: 1, // 0正式版 2体验版 1开发板
 			}
@@ -734,7 +734,7 @@
 			linkToService(row) {
 				if(row.url) {
 					uni.navigateTo({
-						url: row.url
+						url: `${row.url}?user_id=${this.user_id}`
 					})
 				}
 				if(row.doFun) row.doFun();
@@ -783,6 +783,9 @@
 	}
 
 	.header_message {
+		position: relative;
+		height: 360rpx;
+		box-sizing: border-box;
 		background-repeat: no-repeat;
 		background-position: left top;
 		background-size: cover;
@@ -792,20 +795,82 @@
 		color: #e1d27e;
 		box-shadow: 0 0 10px #999;
 		position: relative;
+		overflow: hidden;
 	}
-
+	
+	.userImg {
+		position: relative;
+		padding-bottom: 20rpx;
+		border-bottom: 1rpx solid #D2E7FF;
+		margin-bottom: 16rpx;
+	}
+	
+	.userImg::after {
+		content: '';
+		position: absolute;
+		bottom: -2rpx;
+		left: 0;
+		width: 100%;
+		border-bottom: solid 1rpx #FAFDFF;
+		height: 0;
+	}
+	
 	.userImg image {
 		display: block;
 		width: 130rpx;
 		height: 130rpx;
 		border-radius: 50%;
 	}
-
+	
+	.cert-status {
+		position: absolute;
+		right: -4rpx;
+		top: 40rpx;
+		width: 106rpx;
+		height: 44rpx;
+		line-height: 44rpx;
+		font-size: 20rpx;
+		font-weight: 400;
+		text-align: center;
+		box-sizing: border-box;
+		background-repeat: no-repeat;
+		background-position: left top;
+		background-size: cover;
+	}
+	
+	.cert-status.waitOp {
+		color: #8897AD;
+	}
+	
+	.cert-status.op {
+		color: #fff;
+	}
+	
+	.extra {
+		font-size: 24rpx;
+	}
+	
+	.extra>view {
+		margin-bottom: 8rpx;
+	}
+	
+	.extra .iconfont {
+		width: 30rpx;
+		height: 30rpx;
+		background: #3658FF;
+		border-radius: 50%;
+		font-size: 20rpx;
+		line-height: 32rpx;
+		text-align: center;
+		color: #fff!important;
+		margin-right: 8rpx;
+	}
+	
 	.name_position {
 		padding-left: 30rpx;
 		width: 400rpx;
 	}
-
+	
 	.name_position view {
 		font-size: 42rpx;
 		width: 100%;
@@ -813,7 +878,7 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
-
+	
 	.name_position text {
 		display: block;
 		font-size: 26rpx;
@@ -823,6 +888,40 @@
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
+	
+	.isHC-box {
+		position: absolute;
+		bottom: -1rpx;
+		right: -1rpx;
+		width: 100rpx;
+		height: 100rpx;
+	}
+	.isHC-box::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 0;
+		height: 0;
+		border-top: 0 solid skyblue;
+		border-bottom: 100rpx solid skyblue;
+		border-left: 100rpx solid transparent;
+		border-right: 0 solid transparent;
+	}
+	
+	.isHC-box .bg {
+		position: relative;
+		top: 41rpx;
+		z-index: 99;
+		left: 24rpx;
+		transform: rotate(-45deg);
+		font-size: 24rpx;
+		color: #fff;
+		font-weight: 400;
+	}
+	
+	
+	/* 内容 */
 
 	.contents .tools,
 	.contents .services,
