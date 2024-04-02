@@ -47,7 +47,7 @@ header('Access-Control-Allow-Origin:*');//允许跨域
 class Common extends Base
 {
 
-    protected $noNeedLogin = ['indexShare','staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
+    protected $noNeedLogin = ['staffInfo','smartcardfind','myCompanyInfo','departInfo','showCommentLists','locationData','companyStaffAdd','companyInfo','themeEdit'];
     protected $noNeedRight = ['*'];
     public function _initialize()
     {
@@ -78,7 +78,7 @@ class Common extends Base
     public function indexShare()
     {
         $staff_id = $this->request->request("staff_id")?$this->request->request("staff_id"):0;
-        $user_id = $this->request->request("user_id");
+        $user_id = $this->user_id;
         $origin = $this->request->request("origin");
         
         $list = $this->staffData($staff_id,$user_id,1,$origin);
@@ -117,7 +117,7 @@ class Common extends Base
     public function saveCard()
     {
         $staff_id = $this->request->request('staff_id')?$this->request->request('staff_id'):'';
-        $user_id = $this->request->request("user_id");
+        $user_id = $this->user_id;
         $self_staff_id = $this->request->request("self_staff_id")?:0;
 
         $Staff = new Staff();
