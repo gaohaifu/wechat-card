@@ -140,11 +140,11 @@
 					staff_id: this.userData.id
 				}, res => {
 					if(res.code === 1) {
-						uni.showToast({
-							icon: 'none',
-							title: res.msg
-						})
-						this.visits.find(i => i.id === 3).value++
+						// uni.showToast({
+						// 	icon: 'none',
+						// 	title: res.msg
+						// })
+						// this.visits.find(i => i.id === 3).value++
 					}
 				})
 			},

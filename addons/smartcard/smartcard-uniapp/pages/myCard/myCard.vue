@@ -52,23 +52,6 @@
 					<text>{{item.label}}</text>
 				</view>
 			</view>
-			<!-- 认证状态 -->
-			<view class="flex flex-hsb flex-vc cert-box" v-if="isShare">
-				<view class="flex flex-vc left-box">
-					<image src="../../static/images/cert-status.png" mode=""></image>
-					<text>Ta的认证</text>
-				</view>
-				<view class="flex right-box">
-					<view class="flex flex-vc flex-hc enterprise-cert">
-						<image src="../../static/images/enterprise-cert.png" mode=""></image>
-						<text>企业认证</text>
-					</view>
-					<view class="flex flex-vc flex-hc personal-cert">
-						<image src="../../static/images/personal-cert.png" mode=""></image>
-						<text>个人认证</text>
-					</view>
-				</view>
-			</view>
 			<!-- 快捷服务 -->
 			<view class="services">
 				<view class="flex flex-hsb flex-vc title-bar">
@@ -176,23 +159,6 @@
 					</view>
 				</view>
 			</view>
-			<!-- 偷懒直接设置空的div块 -->
-			<view style="height: 110rpx;" v-if="isShare"></view>
-			<!-- 分享栏 -->
-			<view class="flex flex-vc share-box" v-if="isShare">
-				<view class="flex flex-v flex-vc left-box">
-					<text class="iconfont icon-daorutongxunlu"></text>
-					<text>导入通讯录</text>
-				</view>
-				<view class="flex-1 flex">
-					<view class="flex-1 primary-btn" @click="resendCard"
-						:class="{'disabled' : userData.save_status !== '0'}">
-						{{smartcardObj.save_status[userData.save_status]}}
-					</view>
-					<!-- <view class="flex-1 plain-btn" style="marign-right: 20rpx;">分享Ta的名片</view>
-					<view class="flex-1 primary-btn">已回递</view> -->
-				</view>
-			</view>
 		</view>
 		<!--  #ifdef  MP-WEIXIN	 -->
 		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom"></bottomSheet>
@@ -220,11 +186,8 @@
 				isShare: false,
 				bgColor:'bg-gradual-custom',
 				backGround:'',
-				isShowSmallUserInfo: true,
 				smartcardObj: smartcardObj,
 				isShowBottom : false,			//底部弹窗开关
-				userStaff: false,
-				user_id: '',
 				tools: [{
 						id: 1,
 						disabled: false,
@@ -293,7 +256,7 @@
 				showEnterpriseVideo: true,
 				showEnterpriseProfile: true,
 				allData:'',
-				userType: '',
+				userType: '', // 是否企业管理人员
 				userData:{
 					nickname:'',
 					name:'',
@@ -307,15 +270,8 @@
 				description: '', // 企业简介
 				companyInfo: {},
 				nickname:'',
-				transmit:{
-					company_id:'',
-					nickname:'',
-					position:'',
-					shortname:'',
-					avatar:'',
-					phone:''
-				},
-				staff_id: 0,
+				user_id: '', // 当前登陆人用户id
+				staff_id: 0, // 分享出去的企业员工id
 				mystaff_id:0,
 				color: '',
 				backgroundImg: '',
@@ -365,41 +321,45 @@
 				this.tools = this.tools.filter(i => (i.shareCode === '1' || i.shareCode === '2'))
 				// this.services = [{
 				// 		icon: 'icon-qiyejianjie',
-				// 		label: '企业简介'
+				// 		label: '企业简介',
+				// 		url: '/pages/company/contentUs/contentUs'
 				// 	},
 				// 	{
 				// 		icon: 'icon-xiangce',
-				// 		label: '我的相册'
+				// 		label: '我的相册',
+				// 		url: '/pages/company/img/img'
 				// 	},
 				// 	{
 				// 		icon: 'icon-qiyedongtai',
-				// 		label: '企业动态'
+				// 		label: '企业动态',
+				// 		url: '/pages/company/trends/trends'
 				// 	},
 				// 	{
 				// 		icon: 'icon-qiyexuanchuance',
-				// 		label: '企业宣传册'
+				// 		label: '企业宣传册',
+				// 		url: '/pages/company/brochure/brochure'
 				// 	},
 				// 	{
 				// 		icon: 'icon-chenggonganli',
-				// 		label: '成功案例'
+				// 		label: '成功案例',
+				// 		url: '/pages/company/case/case'
 				// 	},
 				// 	{
 				// 		icon: 'icon-rexiaoshangpin',
-				// 		label: '热销商品'
+				// 		label: '热销商品',
+				// 		url: '/pages/company/goods/goods'
 				// 	},
 				// ]
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
 		},
 		onShow() {
-			this.isShowSmallUserInfo = true
 			this.refreshUser()
 			// #ifdef MP-WEIXIN
 			this.wxLogin();
 			// #endif
 		},
 		onHide() {
-			this.isShowSmallUserInfo = false
 		},
 		onPageScroll(e){
 			if(e.scrollTop>0){
@@ -415,10 +375,12 @@
 			  console.log(res.target)
 			}
 			this.sendCard()
-			console.info('this.companyInfo', this.companyInfo)
+			console.info('this.companyInfo', this.companyInfo, 'share staff_id: ', this.staffInfo.id, 'share user_id: ', this.user_id)
+			const staff_id = this.staffInfo.id; // 9
+			const user_id = this.user_id; // 11
 			return {
 			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
-			  path: '/pages/myCard/myCard?origin=1&isShare=1&staff_id=' + this.staffInfo.id + '&user_id='+this.user_id,
+			  path: '/pages/share/share?origin=1&isShare=1&staff_id=' + staff_id + '&user_id='+ user_id,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: 1, // 0正式版 2体验版 1开发板
 			}
@@ -438,10 +400,10 @@
 					staff_id: this.staffInfo.id
 				}, res => {
 					if(res.code === 1) {
-						uni.showToast({
-							icon: 'none',
-							title: res.msg
-						})
+						// uni.showToast({
+						// 	icon: 'none',
+						// 	title: res.msg
+						// })
 						this.visits.find(i => i.id === 3).value++
 					}
 				})
@@ -532,7 +494,6 @@
 						// #ifdef MP-WEIXIN
 						console.log("小程序: ",1);
 						this.isShowBottom=true
-						this.userStaff=false
 						this.user_id='';
 						// this.getIndex();
 						// #endif						
@@ -563,7 +524,6 @@
 								//console.log(data.data.userinfo) 
 								var res=data.data;
 								if (data.code == 1) {
-									this.userStaff=true
 									this.$common.successToShow('登录成功!');
 									try {
 										this.$db.set('upload',1)
@@ -629,7 +589,7 @@
 						this.videofiles = this.allData.videofiles || [];
 						this.description = this.allData.description || '';
 						this.updatetime=this.allData.newsTime
-						this.companyInfo = this.allData.smartcardcompany || {};
+						this.companyInfo = this.staffInfo.smartcardcompany || {};
 						this.color=this.staffInfo?this.staffInfo.smartcardtheme.colour:''
 						this.backgroundImg=this.staffInfo?this.staffInfo.smartcardtheme.backgroundimage:''
 						this.cardimage=this.staffInfo?this.staffInfo.smartcardtheme.cardimage:''
@@ -650,16 +610,6 @@
 						this.staff_id=this.staffInfo.id
 						// this.mystaff_id= this.userInfo.staff_id || 0
 						this.myselfstatus = this.staff_id != this.mystaff_id
-						this.transmit={
-							company_id:this.companyInfo.id,
-							position:this.userData.position,
-							shortname:this.companyInfo.name,
-							avatar:this.userData.avatar,
-							phone:this.userData.mobile,
-							wxQRCodeimage:this.userData.wxQRCodeimage,
-							wechat:this.userData.wechat,
-							staff_id:this.userData.id 
-						};
 						this.nickname=this.userData.name
 						this.visits[0].value = this.myCardData.allVisitNum
 						this.visits[1].value = this.myCardData.todayVisitNum
