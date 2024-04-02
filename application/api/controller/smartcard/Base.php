@@ -158,7 +158,9 @@ class Base extends Api
                     $Su = new Su();
                     foreach ($visitStaffLists as &$visitStaffList) {
                         $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
-                        $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
+                        $staff = $this->staffModel->with(['smartcardcompany' => function($query) {
+                            $query->withField('id,name,address,longitude,latitude,is_authentication');
+                        }])->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
                         if($staff){
                             $visitStaffList->staff_id = $staff['id'];
                             $visitStaffList->name = $staff['name'];
