@@ -512,7 +512,7 @@
 				var staff_id_c=this.s_staff_id || uni.getStorageSync('staff_id') || 0 // 分享进来？分享要去share页面不公用
 				let condition = {
 					staff_id: this.s_staff_id,
-					user_id: this.s_user_id
+					// user_id: this.s_user_id
 				}
 				let api = this.$api.doIndex
 				if(this.isShare) {
