@@ -126,6 +126,9 @@ class Common extends Base
         }else{
             $staff = $Staff->where('id', $staff_id)->find();
             if($staff){
+                if($staff['user_id']==$user_id){
+                    $this->error('不能保存自己的名片');
+                }
                 $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
                 if($su){
                     $this->error('名片已保存');
@@ -186,6 +189,9 @@ class Common extends Base
             //己方名片信息
             $selfstaff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
             if($staff){
+                if($staff['user_id']==$user_id){
+                    $this->error('staff_id是自己的');
+                }
                 //己方保存的名片
                 $su = Su::where(['user_id'=>$user_id,'staff_id'=>$staff_id])->find();
                 if($su && $su['status']==3){
