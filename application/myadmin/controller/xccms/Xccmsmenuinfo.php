@@ -35,7 +35,7 @@ class Xccmsmenuinfo extends Backend
         Service::check_xccms_init();
         $this->model = new \app\admin\model\Xccmsmenuinfo;
         $tree = Tree::instance();
-        $tree->init(collection($this->model->order('weigh desc, id')->select())->toArray(), 'parent_id');
+        $tree->init(collection($this->model->order('weigh desc, id')->where('company_id',COMPANY_ID)->select())->toArray(), 'parent_id');
         $this->categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
         $categorydata = [0 => ['id'=>0, 'type' => 'all', 'name' => __('None')]];
         foreach ($this->categorylist as $k => $v) {
