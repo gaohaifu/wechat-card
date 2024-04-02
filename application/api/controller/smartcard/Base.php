@@ -158,7 +158,9 @@ class Base extends Api
                     $Su = new Su();
                     foreach ($visitStaffLists as &$visitStaffList) {
                         $visitStaffList->avatar = cdnurl($visitStaffList->avatar,true);
-                        $staff = $this->staffModel->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
+                        $staff = $this->staffModel->with(['smartcardcompany' => function($query) {
+                            $query->withField('id,name,address,longitude,latitude,is_authentication');
+                        }])->where(['user_id' => $visitStaffList->user_id,'is_default' => 1])->find();
                         if($staff){
                             $visitStaffList->staff_id = $staff['id'];
                             $visitStaffList->name = $staff['name'];
@@ -241,7 +243,7 @@ class Base extends Api
     {
 //        $domain = Domain::where(['company_id'=>$company_id])->value('name');
         //菜单
-        $main_menu_list = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,parent_id,name,en_name,menu_type,menu_object_id,url')
+        $main_menu_list = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,parent_id,name as label,icon,en_name,menu_type,menu_object_id,url')
             ->where('parent_id', 0)
             ->where('is_top_show', 1)
             ->where('state', 1)
@@ -329,7 +331,7 @@ class Base extends Api
                 $sub_menu[$s]['url'] = $sub_menu_item_url;
             }
         
-            $main_menu_item_url = count($sub_menu) > 0 ? 'javascript:;' : $main_menu_item_url;
+            $main_menu_item_url = count($sub_menu) > 0 ? $sub_menu[0]['url'] : $main_menu_item_url;
         
             $main_menu_list[$i]['url'] = $main_menu_item_url;
             $main_menu_list[$i]['sub_menu'] = $sub_menu;
