@@ -10,15 +10,15 @@
 			</view>
 			<view class="flex_layout">
 				<view class="right_phone" @click="card">
-					<i :style="{color:color}" class="iconfont icon-mingpian"></i>
+					<i :style="{color:color}" class="iconfont icon-mingpianma"></i>
 					<text>名片</text>
 				</view>
 				<view class="right_phone" @click="phone(userData.phone)">
-					<i :style="{color:color}" class="iconfont icon-bodadianhua_"></i>
+					<i :style="{color:color}" class="iconfont icon-dadianhua"></i>
 					<text>电话</text>
 				</view>
 				<view class="right_phone" @click="wechat">
-					<i :style="{color:color}" class="iconfont icon-weixin"></i>
+					<i :style="{color:color}" class="iconfont icon-jiaweixin"></i>
 					<text>微信</text>
 				</view> 
 			</view>
@@ -92,8 +92,8 @@
 				});
 			},
 			card(){
-				uni.navigateTo({
-					url:'/pages/index/index'
+				uni.switchTab({
+					url:'/pages/myCard/myCard'
 				})
 			},
 			wechat(){

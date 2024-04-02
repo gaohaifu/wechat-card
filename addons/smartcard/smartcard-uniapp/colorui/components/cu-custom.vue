@@ -57,9 +57,18 @@
 		},
 		methods: {
 			BackPage() {
-				uni.navigateBack({
-					delta: 1
-				});
+				var pages = getCurrentPages();
+				// var page = pages[pages.length - 1];
+				// console.info(page, 'page======>pages: ', pages);
+				if (pages.length === 1) {
+					uni.switchTab({
+						url: '/pages/myCard/myCard'
+					})
+				} else {
+					uni.navigateBack({
+						delta: 1
+					});
+				}				
 			}
 		}
 	}

@@ -9,6 +9,14 @@
 		}
 	},
 	{
+		"path": "pages/share/share",
+		"style": {
+			"navigationBarTitleText": "分享的名片",
+			"navigationStyle": "custom",
+			"enablePullDownRefresh": false
+		}
+	},
+	{
 		"path": "pages/card-holder/index",
 		"style": {
 			"navigationBarTitleText": "名片夹",
@@ -97,8 +105,96 @@
 				"enablePullDownRefresh": false
 			}
 		
+		},{
+			"path": "pages/company/contentUs/contentUs",
+			"style": {
+				"navigationBarTitleText": "企业介绍",
+				// "navigationStyle": "custom",
+				"enablePullDownRefresh": false
+			}
 		}
-	],
+        ,{
+            "path" : "pages/company/img/img",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "我的相册",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/brochure/brochure",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "企业宣传册",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/case/case",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "成功案例",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/trends/trends",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "企业动态",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/goods/goods",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "热销商品",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/detail/detail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "详情",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/addCase/addCase",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "添加成功案例",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/addGoods/addGoods",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "添加热销商品",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/company/addTrends/addTrends",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "添加企业动态",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni",
