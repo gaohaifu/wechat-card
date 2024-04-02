@@ -377,7 +377,7 @@
 			this.sendCard()
 			console.info('this.companyInfo', this.companyInfo, 'share staff_id: ', this.staffInfo.id, 'share user_id: ', this.user_id)
 			const staff_id = this.staffInfo.id; // 9
-			const user_id = this.user_id; // 11
+			const user_id = //this.user_id; // 11
 			return {
 			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
 			  path: '/pages/share/share?origin=1&isShare=1&staff_id=' + staff_id + '&user_id='+ user_id,
@@ -571,7 +571,7 @@
 				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || 0 // 分享进来？分享要去share页面不公用
 				let condition = {
 					staff_id: this.staff_id,
-					user_id: this.user_id
+					// user_id: this.user_id
 				}
 				let api = this.$api.doIndex
 				if(this.isShare) {
