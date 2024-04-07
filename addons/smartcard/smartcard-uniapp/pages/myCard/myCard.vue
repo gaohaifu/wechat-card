@@ -101,20 +101,18 @@
 							<text class="time">{{item.createtime}}</text>
 						</view>
 						<view class="company">
-							<!-- <text>it</text>
-							<text>|</text> -->
-							<text>{{item.position}}｜{{item.company}}</text>
+							<text>{{item.position}}{{item.interviewee && item.interviewee.company ? ` | ${item.interviewee.company}` : ''}}</text>
 						</view>
 						<view class="counts">
-							第 {{item.visitNum}} 次查看了我的名片‘{{item.myCardText}}’
+							第 {{item.interviewee ? item.interviewee.visitNum || 0 : 0}} 次查看了我的名片{{itme.typedata_text ? `‘${item.typedata_text}’` : ''}}
 						</view>
 						<view class="from">
 							来源：{{smartcardObj.origin[`${item.origin}`]}}
 						</view>
 					</view>
 				</view>
-				<view class="flex flex-hc flex-vc more" v-if="visitStaffLists.length > 0">
-					<text>更访客数据</text>
+				<view class="flex flex-hc flex-vc more" v-if="visitStaffLists.length > 0" @click="linkToCard('more')">
+					<text>更多访客数据</text>
 					<text class="iconfont icon-Rightyou"></text>
 				</view>
 			</view>
@@ -170,7 +168,7 @@
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
-	import {smartcardObj} from '@/config/common.js'
+	import {smartcardObj, weixinShare} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
@@ -380,9 +378,9 @@
 			const user_id = this.user_id; // 11
 			return {
 			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
-			  path: '/pages/share/share?origin=1&isShare=1&staff_id=' + staff_id + '&user_id='+ user_id,
+			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + staff_id + '&user_id='+ user_id + '&pageTitle='+this.userData.name,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
-			  type: 1, // 0正式版 2体验版 1开发板
+			  type: weixinShare.type, // 0正式版 2体验版 1开发板
 			}
 		},
 		methods: {
@@ -431,8 +429,31 @@
 					uni.makePhoneCall({
 						phoneNumber: this.staffInfo.mobile //仅为示例
 					});
-				} else if(row.id === 2 && this.staffInfo.wechat) {
-					
+				}  else if(row.id === 2 && this.staffInfo.wechat) {
+					uni.setClipboardData({
+						data: this.staffInfo.wechat,
+						success() {
+							uni.showToast({
+								icon:'none',
+								title: '复制成功，可前往加好友'
+							})
+						}
+					})
+				} else if(row.id === 3 && this.staffInfo.email) {
+					uni.setClipboardData({
+						data: this.staffInfo.email,
+						success() {
+							uni.showToast({
+								icon:'none',
+								title: '复制成功，可前去发邮件'
+							})
+						}
+					})
+				} else if (row.id === 4 && this.companyInfo.latitude && this.companyInfo.longitude) {
+					uni.openLocation({
+						latitude: this.companyInfo.latitude,
+						longitude: this.companyInfo.longitude
+					})
 				} else if(row.id === 5) { // 发名片
 					
 					// 小程序不支持？
@@ -580,6 +601,12 @@
 				}
 				api(condition, (res) => {
 					if(res.code === 1) {
+						if(res.isStaff === 0) {
+							uni.navigateTo({
+								url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+							})
+							return
+						}
 						this.allData=res.data
 						console.log(this.allData);
 						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
@@ -652,31 +679,8 @@
 							'allData', this.allData, 'isShare', this.isShare, 
 							'services', this.services)
 					}else {
-						// 这个是分享进来的 - 最好整合成一个页面
-						if(this.user_id!=0 || this.user_id!=''){
-							if(staff_id_c!=''){
-								uni.showToast({
-									title:'无此用户名片信息,即将跳转到个人名片主页...',
-									icon:'none',
-									duration:1500
-								})
-								setTimeout(()=>{
-									uni.navigateTo({
-										url:'/pages/myCard/myCard'
-									})
-								},2000)
-								return false;
-						    }
-						}
-						this.$common.errorToShow(res.msg, () => {
-							// 自己搜索之类的
-							if(staff_id_c==undefined || staff_id_c==null  ||  staff_id_c=='' || staff_id_c==0){
-								if(this.user_id!=0){
-									uni.navigateTo({
-										url:'/pages/userInfo/userInfo?user_id=' + this.user_id
-									})
-								}
-							}
+						uni.navigateTo({
+							url:'/pages/userInfo/userInfo?user_id=' + this.user_id
 						})
 					}
 				})

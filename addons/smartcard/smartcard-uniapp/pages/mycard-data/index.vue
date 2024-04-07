@@ -30,10 +30,10 @@
 					@click="tabHandle(item.value)"
 					v-if="!item.hidden">{{item.name}}</view>
 			</view>
-			<view class="flex more-search-box" v-if="current === 1">
+			<!-- <view class="flex more-search-box" v-if="current === 1">
 				<view class="btn01">全部</view>
 				<view class="flex flex-vc btn02">按名片查看<text class="iconfont icon-down"></text></view>
-			</view>
+			</view> -->
 			<!-- <view class="flex more-search-box" v-if="current === 3">
 				<view class="btn01">待更新(0)</view>
 				<view class="flex flex-vc btn02">已更新(0)</view>

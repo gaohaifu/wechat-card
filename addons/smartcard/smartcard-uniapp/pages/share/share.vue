@@ -3,7 +3,7 @@
 		<view class="header_background" :style="{'background-image':'url('+cdnUrl+backgroundImg+')'}">
 			<cu-custom :bgColor="bgColor" :isBack="true" :backGround="backGround">
 				<block slot="backText">返回</block>
-				<block slot="content">首页</block>
+				<block slot="content">{{pageTitle}}</block>
 			</cu-custom>
 			<view class="header_padding">
 				<view class="header_message" :style="{'background-image':'url('+cdnUrl + cardimage+')'}">
@@ -134,18 +134,24 @@
 			</view>
 			<view class="flex-1 flex">
 				<button open-type="share" class="flex-1 plain-btn">分享Ta的名片</button>
-				<view class="flex-1 primary-btn" @click="resendCard"
-					:class="{'disabled' : userData.save_status !== '0'}"
-					 style="marign-left: 20rpx;"
-					 v-if="userData.save_status !== '0'">
-					{{smartcardObj.save_status[userData.save_status]}}
+				<view style="width: 20rpx;"></view>
+				<view class="flex-1 primary-btn"
+					 v-if="!staffInfo.id"
+					 @click="linkToUserInfo">
+					创建名片
 				</view>
-				<view class="flex-1 primary-btn" @click="resendCard"
-					:class="{'disabled' : userData.save_status !== '0'}"
-					 style="marign-left: 20rpx;"
-					 v-else>
-					保存名片
-				</view>
+				<template v-else>
+					<view class="flex-1 primary-btn" @click="resendCard"
+						:class="{'disabled' : userData.save_status !== '0'}"
+						 v-if="userData.save_status !== '0'">
+						{{smartcardObj.save_status[userData.save_status]}}
+					</view>
+					<view class="flex-1 primary-btn" @click="saveCard"
+						:class="{'disabled' : userData.save_status !== '0'}"
+						 v-else>
+						保存名片
+					</view>
+				</template>				
 				<!-- <view class="flex-1 plain-btn" style="marign-right: 20rpx;">分享Ta的名片</view>
 				<view class="flex-1 primary-btn">已回递</view> -->
 			</view>
@@ -161,7 +167,7 @@
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
-	import {smartcardObj, userInfo} from '@/config/common.js'
+	import {smartcardObj, userInfo, weixinShare} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
@@ -271,10 +277,14 @@
 				fontcolor: '',
 				theme: {},
 				origin: 1, // 来源:1=我向对方发出了名片,2=对方的名片夹,3=对方的名片浏览记录
+				pageTitle: '分享的名片', // 页面标题
 			}
 		},
 		onLoad(e) {
 			console.log('index调用onload',e); 
+			if (e.pageTitle) {
+				this.pageTitle = e.pageTitle + '的名片'
+			}
 			let session_user = uni.getStorageSync('userData') || {}
 			// 分享给别人的名片id 有可能是自己的也有可能是别人的
 			if(typeof(e.staff_id)== "undefined" || e.staff_id=='' ||  e.staff_id==null || e.staff_id=='null'){
@@ -311,15 +321,30 @@
 			  console.log(res.target)
 			}
 			this.sendCard()
-			console.info('this.companyInfo', this.companyInfo)
 			return {
 			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
-			  path: '/pages/myCard/myCard?origin=1&isShare=1&staff_id=' + this.s_user_id + '&user_id='+this.s_user_id,
+			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + this.s_staff_id + '&user_id='+ tbis.s_user_id + '&pageTitle='+this.userData.name,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
-			  type: 1, // 0正式版 2体验版 1开发板
+			  type: weixinShare.type, // 0正式版 2体验版 1开发板
 			}
 		},
 		methods: {
+			saveCard() {
+				this.$api.saveCard({
+					staff_id: this.s_staff_id,
+					user_id: this.s_user_id
+				}, res => {
+					uni.showToast({
+						icon: 'none',
+						title: res.msg
+					})
+				})
+			},
+			linkToUserInfo() {
+				uni.navigateTo({
+					url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+				})
+			},
 			openCode() {
 				this.$refs.myCardCode && this.$refs.myCardCode.open();
 			},
@@ -366,7 +391,29 @@
 						phoneNumber: this.staffInfo.mobile //仅为示例
 					});
 				} else if(row.id === 2 && this.staffInfo.wechat) {
-					
+					uni.setClipboardData({
+						data: this.staffInfo.wechat,
+						success() {
+							uni.showToast({
+								icon:'none',
+								title: '复制成功，可前往加好友'
+							})
+						}
+					})
+				} else if(row.id === 3 && this.staffInfo.email) {
+					uni.setClipboardData({
+						data: this.staffInfo.email,
+						success() {
+							uni.showToast({
+								icon:'none',
+								title: '复制成功，可前去发邮件'
+							})
+						}
+					})
+				} else if (row.id === 4 && this.companyInfo.address) {
+					uni.openLocation({
+						address: this.companyInfo.address
+					})
 				} else if(row.id === 5) { // 发名片
 					
 					// 小程序不支持？
@@ -391,6 +438,9 @@
 							console.log("fail:" + JSON.stringify(err));
 						}
 					});
+				} else if(row.id === 6) {
+					// 保存名片
+					this.saveCard()
 				}
 			},
 			toggleCardBox(dataProp) {
@@ -425,12 +475,12 @@
 					if(data.code==1){
 						this.user_id=data.data.user.id;
 						// 是否已填写个人资料
-						if(data.isStaff === 0) {
-							uni.navigateTo({
-								url: '/pages/userInfo/userInfo?user_id=' + this.user_id
-							})
-							return
-						}
+						// if(data.isStaff === 0) {
+						// 	uni.navigateTo({
+						// 		url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+						// 	})
+						// 	return
+						// }
 						this.linkToMyHome(this.user_id)
 						this.getIndex();
 					}else{
@@ -521,6 +571,12 @@
 				}
 				api(condition, (res) => {
 					if(res.code === 1) {
+						// if(res.isStaff === 0) {
+						// 	uni.navigateTo({
+						// 		url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+						// 	})
+						// 	return
+						// }
 						this.allData=res.data
 						console.log('getIndex: ', this.allData);
 						this.usertype=this.allData.usertype;     //是否是企业负责人（0：不是  1：是）
@@ -588,31 +644,9 @@
 							'allData', this.allData, 'isShare', this.isShare, 
 							'services', this.services)
 					}else {
-						if(this.user_id!=0 || this.user_id!=''){
-							if(staff_id_c!=''){
-								uni.showToast({
-									title:'无此用户名片信息,即将跳转到个人名片主页...',
-									icon:'none',
-									duration:1500
-								})
-								setTimeout(()=>{
-									uni.switchTab({
-										url:'/pages/myCard/myCard'
-									})
-								},2000)
-								return false;
-						    }
-						}
-						this.$common.errorToShow(res.msg, () => {
-							// 自己搜索之类的
-							if(staff_id_c==undefined || staff_id_c==null  ||  staff_id_c=='' || staff_id_c==0){
-								if(this.user_id!=0){
-									uni.navigateTo({
-										url:'/pages/userInfo/userInfo?user_id=' + this.user_id
-									})
-								}
-							}
-						})
+						// uni.navigateTo({
+						// 	url:'/pages/userInfo/userInfo?user_id=' + this.user_id
+						// })
 					}
 				})
 			},

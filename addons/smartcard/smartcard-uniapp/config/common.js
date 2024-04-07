@@ -16,7 +16,11 @@ export const smartcardBG = {
 	cert: cdnUrl + 'uploads/20240313/6931c2d991a68fb9c68dc3c4ca1ce057.png', // 认证背景
 	unCert: cdnUrl + 'uploads/20240313/8698ab6a90ba338e35481ea3fd87bc3a.png', // 未认证状态背景图
 }
-
+// 分享type
+export const weixinShare = {
+	url : '/pages/share/share',
+	type: 2
+}
 // 一些公共变量
 export const smartcardObj = {
 	// 名片夹来源
