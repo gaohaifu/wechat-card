@@ -384,7 +384,7 @@ class Base extends Api
                 ->where($where)
                 //->field('A.*,A.name as realname,A.picimages as avatarimage,B.nickname,B.avatar,C.id as company_id,D.id as theme_id,D.name as theme_name')
                 ->find();
-                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh']);
+                if($staffInfo) $staffInfo=$staffInfo->hidden(['tags_ids','visit','favor','picimages','videofiles','updatetime','createtime','weigh']);
             if (!is_null($staffInfo)) {
                 $user = \app\common\model\User::where(['id' =>$staffInfo->user_id])->find();
                 $staffInfo['avatar'] = cdnurl($user['avatar'],true);

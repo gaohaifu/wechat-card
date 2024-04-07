@@ -1080,7 +1080,7 @@ class Common extends Base
                 $user = \app\common\model\User::where(['id' =>$staffre->user_id])->find();
                 $staffre['avatar'] = cdnurl($user['avatar'],true);
                 $staffre['is_certified'] = $user['is_certified'];
-                $staffre->hidden(['tags_ids','visit','favor','address','picimages','videofiles','updatetime','createtime','weigh']);
+                $staffre->hidden(['tags_ids','visit','favor','picimages','videofiles','updatetime','createtime','weigh']);
             }
             
 //            $staffres=collection($staffres)->toArray();
