@@ -244,7 +244,7 @@ class Common extends Base
             $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
             $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
             $exchangeCard['mystaff'] = [
-                'companyname'=>$mystaff->smartcardcompany->name,
+                'companyname'=>isset($mystaff->smartcardcompany->name)?$mystaff->smartcardcompany->name:$mystaff->companyname,
                 'position'=>$mystaff->position
             ];
             $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
@@ -362,7 +362,7 @@ class Common extends Base
             $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
             $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
             $exchangeCard['mystaff'] = [
-                'companyname'=>$mystaff->smartcardcompany->name,
+                'companyname'=>isset($mystaff->smartcardcompany->name)?$mystaff->smartcardcompany->name:$mystaff->companyname,
                 'position'=>$mystaff->position
             ];
             $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
@@ -454,7 +454,7 @@ class Common extends Base
                     $visitStaffList->staff_id = $staff['id'];
                     $visitStaffList->name = $staff['name'];
                     $visitStaffList->position = $staff['position'];
-                    $visitStaffList->companyname = $staff->smartcardcompany->name;
+                    $visitStaffList->companyname = isset($staff->smartcardcompany->name)?$staff->smartcardcompany->name:$staff->companyname;
                 }else{
                     $visitStaffList->staff_id = null;
                     $visitStaffList->name = null;
@@ -556,7 +556,7 @@ class Common extends Base
             $this->error('您非企业主');
         }
         $data['companyInfo'] = [
-            'companyname'=>$staff->smartcardcompany->name,
+            'companyname'=>isset($staff->smartcardcompany->name)?$staff->smartcardcompany->name:$staff->companyname,
             'position'=>$staff->position,
         ];
         $data['memberInfo'] = [
