@@ -621,6 +621,7 @@ class Common extends Base
         $official_letter = $this->request->request('official_letter');
         $longitude = $this->request->request('longitude');
         $latitude = $this->request->request('latitude');
+        $address = $this->request->request('address');
         if (!$licenseimage){
             $this->error('企业营业执执照不能为空');
         }
@@ -635,6 +636,9 @@ class Common extends Base
         }
         if (!$latitude){
             $this->error('定点纬度不能为空');
+        }
+        if (!$address){
+            $this->error('地址不能为空');
         }
         $Staff = new Staff();
         $user_id = $this->user_id;
@@ -668,6 +672,7 @@ class Common extends Base
                 'is_authentication'=>1,
                 'longitude'=>$longitude,
                 'latitude'=>$latitude,
+                'address'=>$address,
             ];
 
             $result = $Company->allowField(true)->save($params);
