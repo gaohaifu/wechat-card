@@ -3,6 +3,7 @@
 namespace app\admin\controller\myadmin\company;
 
 use app\common\controller\Backend;
+use app\common\service\CompanyService;
 use think\Db;
 use Exception;
 use think\exception\PDOException;
@@ -165,6 +166,10 @@ class Index extends Backend
                     $config = new ConfigValue;
                     $config_data = ['name' => 'name', 'value' => $params['name'], 'company_id' => $company->id];
                     $config->save($config_data);
+
+                    //初始化公司数据
+                    $companyService = new CompanyService();
+                    $companyService->init_data($company->id);
 
                     Db::commit();
                 } catch (ValidateException $e) {
