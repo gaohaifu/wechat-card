@@ -65,13 +65,13 @@ class Addon extends Model
     {
         return $this->belongsTo(Company::class, 'company_id')->setEagerlyType(1);
     }
-    
+
     // 获取配置
     static function config($name, $company_id)
     {
         $config = get_addon_fullconfig($name);
         $data = [];
-        $company_config = self::where('company_id', $company_id)->where('name', $name)->value('config');
+        $company_config = self::where('company_id', $company_id)->where('isuse', 1)->where('name', $name)->value('config');
         $company_config = json_decode($company_config, true);
         foreach ($config as $key => $ad) {
             $value = $ad['value'];

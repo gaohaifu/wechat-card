@@ -37,7 +37,7 @@ return array (
           'condition' => '',
           'remark' => 'Dashboard tips',
           'ismenu' => 1,
-          'menutype' => 'addtabs',
+          'menutype' => NULL,
           'extend' => '',
           'py' => 'kzt',
           'pinyin' => 'kongzhitai',

@@ -25,6 +25,9 @@ class Auth extends \fast\Auth
         parent::__construct();
     }
 
+    /**
+     * 魔术函数
+     */
     public function __get($name)
     {
         $data = null;
@@ -33,10 +36,40 @@ class Auth extends \fast\Auth
                 $data = $this->getCompanyInfo($this->company_id);
                 break;
             default:
-                $data = Session::get('myadmin.' . $name);
+                $data = $this->getInfo(null, $name);
                 break;
         }
         return $data;
+    }
+
+    /**
+     * 获取当前登录信息
+     * @param   string $token 口令
+     * @return  array
+     */
+    public function getInfo($token = null, $name = null)
+    {
+        $session = Session::get('myadmin');
+        if ($session) {
+            if ($name) {
+                return $session[$name] ?? null;
+            }
+            return $session;
+        }
+        $request = request();
+        $token_name = $this->config['token_name'] ?? 'token';
+        $token = $request->header($token_name, $token);
+        $token = $request->param($token_name, $token);
+        if ($token) {
+            $admin = Admin::get(['token' => $token]);
+            if ($admin) {
+                if ($name) {
+                    return $admin[$name] ?? null;
+                }
+                return $admin->toArray();
+            }
+        }
+        return null;
     }
 
     /**
@@ -136,7 +169,7 @@ class Auth extends \fast\Auth
         $this->logined = false; //重置登录状态
         Session::delete("myadmin");
         Cookie::delete("mykeeplogin");
-        Cookie::delete('PHPSESSID');
+        //Cookie::delete('PHPSESSID');
         return true;
     }
 
@@ -150,7 +183,7 @@ class Auth extends \fast\Auth
         if ($this->logined) {
             return true;
         }
-        $admin = Session::get('myadmin');
+        $admin = $this->getInfo();
         if (!$admin) {
             return false;
         }
@@ -356,7 +389,7 @@ class Auth extends \fast\Auth
     {
         $uid = is_null($uid) ? $this->id : $uid;
 
-        return $uid != $this->id ? Admin::get(intval($uid)) : Session::get('myadmin');
+        return $uid != $this->id ? Admin::get(intval($uid)) : $this->getInfo();
     }
 
     /**
@@ -514,7 +547,7 @@ class Auth extends \fast\Auth
     public function getSidebar($params = [], $fixedPage = 'dashboard')
     {
         // 边栏开始
-        Hook::listen("admin_sidebar_begin", $params);
+        Hook::listen("myadmin_sidebar_begin", $params);
         $colorArr = ['red', 'green', 'yellow', 'blue', 'teal', 'orange', 'purple'];
         $colorNums = count($colorArr);
         $badgeList = [];

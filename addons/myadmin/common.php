@@ -41,10 +41,10 @@ if (!function_exists('get_auto_vars')) {
         }
         if (PRIVATE_DOMAIN) {
             if (isset($vars['companyappid'])) {
-                if(Config::get('company.identifier') == $vars['companyappid']){
+                if (Config::get('company.identifier') == $vars['companyappid']) {
                     unset($vars['companyappid']);
                 }
-            }else{                
+            } else {
                 unset($vars['companyappid']);
             }
         } else {
@@ -53,5 +53,18 @@ if (!function_exists('get_auto_vars')) {
             }
         }
         return $vars;
+    }
+}
+
+/**
+ * 获取企业插件配置
+ * @param string $name 插件名称
+ * @param int  $company_id 企业ID
+ * @return array
+ */
+if (!function_exists('company_addons_config')) {
+    function company_addons_config($company_id, $name)
+    {
+        return addons\myadmin\model\Addon::config($name, $company_id);
     }
 }

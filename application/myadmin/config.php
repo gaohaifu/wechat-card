@@ -13,5 +13,6 @@ return [
         'auth_group_access' => 'myadmin_auth_group_access', // 用户-用户组关系表
         'auth_rule'         => 'myadmin_auth_rule', // 权限规则表
         'auth_user'         => 'myadmin_admin', // 用户信息表
+        'token_name'         => 'token', // 验证TOKEN标识
     ]
 ];

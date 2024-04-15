@@ -21,6 +21,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form', 'template'], function
                         //{ checkbox: true },
                         { field: 'title', width: '160', align: 'left', title: __('配置名称'), operate: 'LIKE' },
                         { field: 'intro', align: 'left', title: __('配置说明'), operate: 'LIKE' },
+                        //{ field: 'status', title: __("Status"), width: '80', operate: false, searchList: { "normal": __('Normal'), "hidden": __('Hidden'), "expired": __('过期') }, formatter: Table.api.formatter.status },
                         { field: 'status', title: __("Status"), width: '80', operate: false, searchList: { "normal": __('Normal'), "hidden": __('Hidden'), "expired": __('过期') }, formatter: Table.api.formatter.status },
 
                         {

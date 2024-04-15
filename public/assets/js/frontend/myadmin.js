@@ -68,7 +68,7 @@ define(['jquery', 'bootstrap', 'frontend', 'form', 'template'], function ($, und
                 var company = { taxerate: $("#c-taxerate").text() || 0, handrate: $("#c-handrate").text() || 0, };
                 var handrate = company.handrate / 100;
                 var taxerate = company.taxerate / 100;
-                var money = parseFloat($("#c-money").val()).toFixed(2);
+                var money = parseFloat($("#c-money").val() || 0).toFixed(2);
                 var handfee = parseFloat(money * handrate).toFixed(2);
                 var taxefee = parseFloat(money * taxerate).toFixed(2);
                 $("#c-handfee").val(handfee);

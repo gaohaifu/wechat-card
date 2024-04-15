@@ -30,6 +30,9 @@ return [
             'myadmin',
             'xccms',
         ],
+        'app_begin' => [
+            'myadmin',
+        ],
         'user_sidenav_after' => [
             'myadmin',
         ],

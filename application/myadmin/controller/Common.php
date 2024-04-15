@@ -14,7 +14,7 @@ class Common extends Backend
     protected $noNeedLogin = ['token','company'];
     protected $noNeedRight = ['*'];
     protected $model = null;
-
+    
     /**
      * 初始化
      */
@@ -38,6 +38,7 @@ class Common extends Backend
      */
     public function user()
     {
+        $this->companyAutoCondition = false;
         $this->selectpageFields = 'id,username,nickname,mobile';
         $this->searchFields = 'id,username,nickname,mobile';
         $this->model = new \app\common\model\User;
@@ -50,6 +51,7 @@ class Common extends Backend
      */
     public function player()
     {
+        $this->companyAutoCondition = false;
         $this->selectpageFields = 'id,name';
         $this->searchFields = 'id,name';
         $this->model = new \addons\myadmin\model\AuthPlayer;
@@ -63,6 +65,7 @@ class Common extends Backend
      */
     public function companylayer()
     {
+        $this->companyAutoCondition = false;
         $this->selectpageFields = 'id,name';
         $this->searchFields = 'id,name';
         $player_ids = (new \addons\myadmin\model\CompanyPlayer)->where('company_id', COMPANY_ID)->column('player_id');
@@ -77,6 +80,7 @@ class Common extends Backend
      */
     public function company()
     {
+        $this->companyAutoCondition = false;
         $this->selectpageFields = 'id,name';
         $this->searchFields = 'id,name';
         $this->model = new \addons\myadmin\model\Company;
