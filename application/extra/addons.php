@@ -12,6 +12,20 @@ return [
         'sms_check' => [
             'alisms',
         ],
+        'action_begin' => [
+            'geetest',
+            'third',
+        ],
+        'config_init' => [
+            'geetest',
+            'nkeditor',
+            'third',
+        ],
+        'view_filter' => [
+            'geetest',
+            'mylogin',
+            'third',
+        ],
         'app_init' => [
             'myadmin',
             'xccms',
@@ -31,9 +45,8 @@ return [
         'disable_myadmin_menu' => [
             'myadmin',
         ],
-        'view_filter' => [
-            'mylogin',
-            'third',
+        'posters' => [
+            'posters',
         ],
         'user_delete_successed' => [
             'third',
@@ -43,15 +56,6 @@ return [
         ],
         'module_init' => [
             'third',
-        ],
-        'action_begin' => [
-            'third',
-        ],
-        'config_init' => [
-            'third',
-        ],
-        'posters' => [
-            'posters',
         ],
     ],
     'route' => [
