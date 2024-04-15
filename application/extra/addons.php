@@ -3,6 +3,21 @@
 return [
     'autoload' => false,
     'hooks' => [
+        'app_init' => [
+            'alioss',
+            'myadmin',
+            'xccms',
+        ],
+        'module_init' => [
+            'alioss',
+            'third',
+        ],
+        'upload_config_init' => [
+            'alioss',
+        ],
+        'upload_delete' => [
+            'alioss',
+        ],
         'sms_send' => [
             'alisms',
         ],
@@ -25,10 +40,6 @@ return [
             'geetest',
             'mylogin',
             'third',
-        ],
-        'app_init' => [
-            'myadmin',
-            'xccms',
         ],
         'app_begin' => [
             'myadmin',
@@ -55,9 +66,6 @@ return [
             'third',
         ],
         'user_logout_successed' => [
-            'third',
-        ],
-        'module_init' => [
             'third',
         ],
     ],
