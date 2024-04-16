@@ -272,6 +272,10 @@ class Xccms extends Addons
         // 使用正则表达式替换所有不以 http:// 或 https:// 开头的 src 属性
         $content = preg_replace_callback('/<img\s+[^>]*src\s*=\s*["\']([^"\']+)["\'][^>]*>/i', function ($matches) use ($protocol, $domain) {
             $src = $matches[1];
+            // 先检查 src 值是否包含 .php，如果包含则跳过后续处理
+            if (strpos($src, '.php') !== false) {
+                return '<img src="' . $src . '">';
+            }
             // 检查是否以 http:// 或 https:// 开头
             if (!preg_match("~^(?:f|ht)tps?://~i", $src)) {
                 // 如果不是以 http:// 或 https:// 开头，则替换为当前域名的完整 URL
