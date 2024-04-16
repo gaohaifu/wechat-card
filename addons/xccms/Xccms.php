@@ -265,25 +265,29 @@ class Xccms extends Addons
      */
     public function viewFilter(& $content)
     {
+        //return $content;
         // 获取当前的协议和域名
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
         $domain = $_SERVER['HTTP_HOST'];
 
         // 使用正则表达式替换所有不以 http:// 或 https:// 开头的 src 属性
         $content = preg_replace_callback('/<img\s+[^>]*src\s*=\s*["\']([^"\']+)["\'][^>]*>/i', function ($matches) use ($protocol, $domain) {
+            $html = $matches[0];
             $src = $matches[1];
             // 先检查 src 值是否包含 .php，如果包含则跳过后续处理
             if (strpos($src, '.php') !== false) {
-                return '<img src="' . $src . '">';
+                return $html;
             }
             // 检查是否以 http:// 或 https:// 开头
             if (!preg_match("~^(?:f|ht)tps?://~i", $src)) {
                 // 如果不是以 http:// 或 https:// 开头，则替换为当前域名的完整 URL
                 //$src = $protocol . $domain . $src;
-                $src = cdnurl($src);
+                $newSrc = cdnurl($src);
+                $html = str_replace($src,$newSrc,$html);
+                return $html;
+            }else{
+                return $html;
             }
-            // 返回替换后的 img 标签
-            return '<img src="' . $src . '">';
         }, $content);
 
     }
