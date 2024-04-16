@@ -176,6 +176,22 @@ class Myadmin extends Addons
     }
 
     /**
+     * 应用开始
+     */
+    public function appBegin()
+    {
+        $addon_list = get_addon_list();
+        $addon = [];
+        foreach ($addon_list  as $info) {
+            $issave = $info['myadmin'] ?? 0;
+            if ($issave) {
+                $addon[$info['name']] = $info;
+            }
+        }
+        Config::set('addon_list', $addon);
+    }
+
+    /**
      * 企业中心边栏后
      * @return mixed
      * @throws \Exception

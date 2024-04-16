@@ -54,7 +54,7 @@ class Mylogin extends Addons
         $path = str_replace('.', '/', $controllername) . '/' . $actionname;
         $info = get_addon_info('mylogin');
 
-        if ($module == 'admin' && $path == 'index/login' && $info['state'] == 1 && strpos($content,'.system-message') === false)
+        if (($module == 'myadmin' or $module == 'admin') && $path == 'index/login' && $info['state'] == 1 && strpos($content,'.system-message') === false)
         {
             //插件配置
             $config = get_addon_config($info['name']);

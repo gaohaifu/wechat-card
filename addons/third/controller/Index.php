@@ -109,8 +109,9 @@ class Index extends Controller
 
         //判断是否需要绑定
         $user = null;
+        $isBind = Service::isBindThird($thirdinfo['platform'], $thirdinfo['openid'], '', $thirdinfo['unionid']);
         if ($this->auth->isLogin()) {
-            if (Service::isBindThird($thirdinfo['platform'], $thirdinfo['openid'], '', $thirdinfo['unionid'])) {
+            if ($isBind) {
                 $this->error("已经绑定其它账号，无法进行绑定", $url);
             }
             Service::connect($thirdinfo['platform'], $thirdinfo);
@@ -120,7 +121,7 @@ class Index extends Controller
         if (!$user) {
             $config = get_addon_config('third');
             //要求绑定账号或会员当前是登录状态
-            if ($config['bindaccount'] || $this->auth->id) {
+            if (!$isBind && ($config['bindaccount'] || $this->auth->id)) {
                 Session::set("third-{$platform}", $thirdinfo);
                 $this->redirect(url('index/third/prepare') . "?" . http_build_query(['platform' => $platform, 'url' => $url]));
             } else {

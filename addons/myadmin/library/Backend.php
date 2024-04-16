@@ -124,7 +124,7 @@ class Backend extends Controller
     /**
      * 当前企业数据过滤
      */
-    protected $companyAutoCondition = false;
+    protected $companyAutoCondition = true;
     /**
      * 仅限制企业本身数据
      */
@@ -781,10 +781,14 @@ class Backend extends Controller
      */
     protected function setCompanyAutoRelation()
     {
-        if ($this->model) {
-            $fields = $this->model->getQuery()->getTableInfo('', 'fields');
-            if (isset($this->companyAutoCondition)) {
-                $this->companyAutoCondition = in_array("company_id", $fields);
+        if (isset($this->companyAutoCondition)) {
+            if ($this->model) {
+                if ($this->companyAutoCondition) {
+                    $fields = $this->model->getQuery()->getTableInfo('', 'fields');
+                    $this->companyAutoCondition = in_array("company_id", $fields);
+                }
+            } else {
+                $this->companyAutoCondition = false;
             }
         }
     }

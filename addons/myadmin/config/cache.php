@@ -48,7 +48,22 @@ application/index/view/myadmin
 application/index/view/layout/myadmin.html
 public/assets/js/frontend/myadmin.js
 public/assets/js/frontend/myadmin
-public/assets/addons/myadmin
 public/assets/js/addons/myadmin',
-  'update_data' => '',
+  'update_data' => 'ALTER TABLE `__PREFIX__myadmin_company` ADD COLUMN `handrate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'手续费率\' AFTER `latitude`;
+ALTER TABLE `__PREFIX__myadmin_company` ADD COLUMN `taxerate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'税费率\' AFTER `handrate`;
+ALTER TABLE `__PREFIX__myadmin_company` ADD COLUMN `player` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT \'\' COMMENT \'角色组\' AFTER `deletetime`;
+ALTER TABLE `__PREFIX__myadmin_company_group` DROP COLUMN `type`;
+ALTER TABLE `__PREFIX__myadmin_company_group` DROP COLUMN `price`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` DROP COLUMN `handingfee`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` DROP COLUMN `taxes`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` MODIFY COLUMN `money` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'提现金额\' AFTER `company_id`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `settledmoney` decimal(10, 2) NULL DEFAULT NULL COMMENT \'到账金额\' AFTER `money`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `handrate` decimal(10, 1) UNSIGNED NULL DEFAULT 0.0 COMMENT \'手续费率\' AFTER `settledmoney`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `handfee` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'手续费\' AFTER `handrate`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `taxerate` decimal(10, 1) UNSIGNED NULL DEFAULT 0.0 COMMENT \'税费率\' AFTER `handfee`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `taxefee` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'税费\' AFTER `taxerate`;
+ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `reply` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT \'回复\' AFTER `memo`;
+ALTER TABLE `__PREFIX__myadmin_user` ADD COLUMN `handrate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'手续费率\' AFTER `company_id`;
+ALTER TABLE `__PREFIX__myadmin_user` ADD COLUMN `taxerate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT \'税费率\' AFTER `handrate`;
+ALTER TABLE `__PREFIX__myadmin_addon` ADD COLUMN `isuse` tinyint(2) NULL DEFAULT 1 COMMENT \'是否使用\' AFTER `config`;',
 );

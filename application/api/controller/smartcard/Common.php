@@ -244,7 +244,7 @@ class Common extends Base
             $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
             $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
             $exchangeCard['mystaff'] = [
-                'companyname'=>$mystaff->smartcardcompany->name,
+                'companyname'=>isset($mystaff->smartcardcompany->name)?$mystaff->smartcardcompany->name:$mystaff->companyname,
                 'position'=>$mystaff->position
             ];
             $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
@@ -362,7 +362,7 @@ class Common extends Base
             $exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
             $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
             $exchangeCard['mystaff'] = [
-                'companyname'=>$mystaff->smartcardcompany->name,
+                'companyname'=>isset($mystaff->smartcardcompany->name)?$mystaff->smartcardcompany->name:$mystaff->companyname,
                 'position'=>$mystaff->position
             ];
             $exchangeCard['origin'] = Visitors::where(['user_id'=>$exchangeCard->user_id,'staff_id'=>$exchangeCard->self_staff_id])->order('createtime desc')->value('origin');
@@ -454,7 +454,7 @@ class Common extends Base
                     $visitStaffList->staff_id = $staff['id'];
                     $visitStaffList->name = $staff['name'];
                     $visitStaffList->position = $staff['position'];
-                    $visitStaffList->companyname = $staff->smartcardcompany->name;
+                    $visitStaffList->companyname = isset($staff->smartcardcompany->name)?$staff->smartcardcompany->name:$staff->companyname;
                 }else{
                     $visitStaffList->staff_id = null;
                     $visitStaffList->name = null;
@@ -556,7 +556,7 @@ class Common extends Base
             $this->error('您非企业主');
         }
         $data['companyInfo'] = [
-            'companyname'=>$staff->smartcardcompany->name,
+            'companyname'=>isset($staff->smartcardcompany->name)?$staff->smartcardcompany->name:$staff->companyname,
             'position'=>$staff->position,
         ];
         $data['memberInfo'] = [
@@ -619,6 +619,9 @@ class Common extends Base
         $licenseimage = $this->request->request('licenseimage');
         $companyname = $this->request->request('companyname');
         $official_letter = $this->request->request('official_letter');
+        $longitude = $this->request->request('longitude');
+        $latitude = $this->request->request('latitude');
+        $address = $this->request->request('address');
         if (!$licenseimage){
             $this->error('企业营业执执照不能为空');
         }
@@ -627,6 +630,15 @@ class Common extends Base
         }
         if (!$companyname){
             $this->error('公司名称不能为空');
+        }
+        if (!$longitude){
+            $this->error('定点经度不能为空');
+        }
+        if (!$latitude){
+            $this->error('定点纬度不能为空');
+        }
+        if (!$address){
+            $this->error('地址不能为空');
         }
         $Staff = new Staff();
         $user_id = $this->user_id;
@@ -658,6 +670,9 @@ class Common extends Base
                 'licenseimage'=>$licenseimage,
                 'official_letter'=>$official_letter,
                 'is_authentication'=>1,
+                'longitude'=>$longitude,
+                'latitude'=>$latitude,
+                'address'=>$address,
             ];
 
             $result = $Company->allowField(true)->save($params);
@@ -1071,7 +1086,7 @@ class Common extends Base
         
         $staffres = $Staff
             ->with(['smartcardcompany' => function($query) {
-                $query->withField('id,name,address_area');
+                $query->withField('id,name,address,longitude,latitude');
             }])
             ->where('user_id',$user_id)
             ->select();

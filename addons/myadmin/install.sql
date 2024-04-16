@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_addon` (
   `forever` int(11) DEFAULT '0' COMMENT '是否长期',
   `company_id` int(11) DEFAULT NULL COMMENT '关联商家ID',
   `config` text COLLATE utf8mb4_unicode_ci COMMENT '插件配置',
+  `isuse` tinyint(2) DEFAULT '1' COMMENT '是否使用',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='应用购买配置表';
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='应用购买配置表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_addons` (
   `name` varchar(30) NOT NULL DEFAULT '' COMMENT 'ID',
@@ -53,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_admin_log` (
   `company_id` int(11) DEFAULT NULL COMMENT '商家ID',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `name` (`username`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员日志表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员日志表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_attachment` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -206,7 +207,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_company_money_log` (
   `createtime` bigint(16) DEFAULT NULL COMMENT '创建时间',
   `company_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员余额变动表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员余额变动表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_company_player` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -230,7 +231,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_company_score_log` (
   `memo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '备注',
   `createtime` bigint(16) DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员积分变动表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员积分变动表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_company_withdraw` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -253,7 +254,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_company_withdraw` (
   `createtime` bigint(16) DEFAULT NULL COMMENT '添加时间',
   `updatetime` bigint(16) DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='提现表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提现表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_config` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -310,7 +311,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_user` (
   `handrate` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '手续费率',
   `taxerate` decimal(10,2) unsigned DEFAULT '0.00' COMMENT '税费率',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_user_group` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -333,7 +334,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_user_money_log` (
   `createtime` bigint(16) DEFAULT NULL COMMENT '创建时间',
   `company_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员余额变动表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员余额变动表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_user_rule` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -384,7 +385,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_user_withdraw` (
   `createtime` bigint(16) DEFAULT NULL COMMENT '添加时间',
   `updatetime` bigint(16) DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='提现表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提现表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_category` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -398,7 +399,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_category` (
   `updatetime` bigint(16) DEFAULT NULL COMMENT '更新时间',
   `deletetime` bigint(16) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-分类表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-分类表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_content` (
   `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '自动编号',
@@ -432,7 +433,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_mould` (
   `updatetime` bigint(16) DEFAULT NULL COMMENT '更新时间',
   `deletetime` bigint(16) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-模型表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-模型表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_product` (
   `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '自动编号',
@@ -469,7 +470,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_product_category` (
   `updatetime` bigint(16) DEFAULT NULL COMMENT '更新时间',
   `deletetime` bigint(16) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-产品分类表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-产品分类表';
 
 CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_single` (
   `id` int(10) NOT NULL AUTO_INCREMENT COMMENT '自动编号',
@@ -488,8 +489,7 @@ CREATE TABLE IF NOT EXISTS `__PREFIX__myadmin_web_single` (
   `deletetime` bigint(16) DEFAULT NULL COMMENT '删除时间',
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-单页表';
-
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='企业网站-单页表';
 
 ALTER TABLE `__PREFIX__myadmin_company` ADD COLUMN `handrate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT '手续费率' AFTER `latitude`;
 ALTER TABLE `__PREFIX__myadmin_company` ADD COLUMN `taxerate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT '税费率' AFTER `handrate`;
@@ -507,4 +507,4 @@ ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `taxefee` decimal(10
 ALTER TABLE `__PREFIX__myadmin_company_withdraw` ADD COLUMN `reply` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '回复' AFTER `memo`;
 ALTER TABLE `__PREFIX__myadmin_user` ADD COLUMN `handrate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT '手续费率' AFTER `company_id`;
 ALTER TABLE `__PREFIX__myadmin_user` ADD COLUMN `taxerate` decimal(10, 2) UNSIGNED NULL DEFAULT 0.00 COMMENT '税费率' AFTER `handrate`;
-
+ALTER TABLE `__PREFIX__myadmin_addon` ADD COLUMN `isuse` tinyint(2) NULL DEFAULT 1 COMMENT '是否使用' AFTER `config`;

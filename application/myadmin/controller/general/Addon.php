@@ -17,6 +17,7 @@ use think\Exception;
 class Addon extends Backend
 {
     protected $model = null;
+    protected $AddonModel = null;
     protected $noNeedRight = ['config'];
 
     public function _initialize()
@@ -52,6 +53,9 @@ class Addon extends Backend
                 if ($has = $this->AddonModel->where('name', $ov['name'])->where('company_id', COMPANY_ID)->find()) {
                     $has->append(['status']);
                     $ov->status = $has['status'];
+                    if ($has['isuse'] == 0) {
+                        $ov->status = '关闭';
+                    }
                 } else {
                     $ov->status = '异常';
                 }

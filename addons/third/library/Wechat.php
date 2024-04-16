@@ -32,7 +32,7 @@ class Wechat
         }
         $this->config = array_merge($this->config, is_array($options) ? $options : []);
         $this->isWechat = Service::isWechat();
-        if (!$this->isWechat) {
+        if (!$this->isWechat && request()->server('HTTP_USER_AGENT') && !request()->header('sid')) {
             //不在微信内调用PC端扫码登录
             $config = get_addon_config('third');
             $this->config = array_merge($this->config, $config['wechatweb'] ?? []);

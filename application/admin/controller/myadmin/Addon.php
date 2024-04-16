@@ -6,6 +6,7 @@ use app\common\controller\Backend;
 
 use think\Config;
 use think\Hook;
+use think\Exception;
 
 /**
  * 高级配置
@@ -15,6 +16,7 @@ use think\Hook;
 class Addon extends Backend
 {
     protected $model = null;
+    protected $AddonModel = null;
     public function _initialize()
     {
         parent::_initialize();
@@ -95,9 +97,7 @@ class Addon extends Backend
     }
 
     /**
-     * Selectpage搜索
-     *
-     * @internal
+     * 企业配置列表
      */
     public function buy()
     {
@@ -125,5 +125,103 @@ class Addon extends Backend
         $this->view->assign("company_id", $company_id);
         $this->assignconfig("company_id", $company_id);
         return $this->view->fetch();
+    }
+
+    /**
+     * 删除企业配置
+     */
+    public function buydel($ids = null)
+    {
+        $this->model = $this->AddonModel;
+        return parent::del($ids);
+    }
+
+    /**
+     * 批量企业配置
+     */
+    public function buymulti($ids = null)
+    {
+        $this->model = $this->AddonModel;
+        return parent::multi($ids);
+    }
+
+    /**
+     * 企业配置
+     */
+    public function config($name = null, $company_id = null)
+    {
+        $name = $name ? $name : $this->request->get("name");
+        if (!$name) {
+            $this->error(__('Parameter %s can not be empty', 'name'));
+        }
+        if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
+            $this->error(__('Addon name incorrect'));
+        }
+        if (!is_dir(ADDON_PATH . $name)) {
+            $this->error(__('Directory not found'));
+        }
+        $hasid = $this->AddonModel->where('company_id', $company_id)->where('name', $name)->value('id');
+        if (!$company_id) {
+            $this->error(__('No Results were found'));
+        }
+        $info = get_addon_info($name);
+        $config = get_addon_fullconfig($name);
+        $company_config = $this->AddonModel->where('company_id', $company_id)->where('name', $name)->value('config');
+
+        if ($company_config) {
+            $company_config = json_decode($company_config, true);
+            foreach ($config as $key => $ad) {
+                if (isset($company_config[$ad['name']])) {
+                    $company_value = $company_config[$ad['name']];
+                    if (is_array($company_value)) {
+                        $company_value = array_merge($config[$key]['value'], $company_value);
+                    }
+                    $config[$key]['value'] = $company_value;
+                }
+            }
+        }
+        if (!$info) {
+            $this->error(__('No Results were found'));
+        }
+        if ($this->request->isPost()) {
+            $params = $this->request->post("row/a", [], 'trim');
+            if ($params) {
+                $configList = [];
+                foreach ($config as $k => &$v) {
+                    if (isset($params[$v['name']])) {
+                        if ($v['type'] == 'array') {
+                            $params[$v['name']] = is_array($params[$v['name']]) ? $params[$v['name']] : (array)json_decode($params[$v['name']], true);
+                            $value = $params[$v['name']];
+                        } else {
+                            $value = is_array($params[$v['name']]) ? implode(',', $params[$v['name']]) : $params[$v['name']];
+                        }
+                        $v['value'] = $value;
+                        $configList[$v['name']] = $value;
+                    }
+                }
+                $configList = json_encode($configList, JSON_UNESCAPED_UNICODE);
+                try {
+                    if ($hasid && $name) {
+                        $this->AddonModel->where('company_id', $company_id)->where('name', $name)->update(['config' => $configList]);
+                        $this->success();
+                    }
+                } catch (Exception $e) {
+                    $this->error(__($e->getMessage()));
+                }
+            }
+            $this->error(__('Parameter %s can not be empty', ''));
+        }
+        $tips = [];
+        foreach ($config as $index => &$item) {
+            if ($item['name'] == '__tips__') {
+                $tips = $item;
+                unset($config[$index]);
+            }
+        }
+        $addon = ['info' => $info, 'config' => $config, 'tips' => $tips];
+        $this->view->assign("addon", $addon);
+        $configFile = ADDON_PATH . $name . DS . 'config.html';
+        $viewFile = is_file($configFile) ? $configFile : '';
+        return $this->view->fetch($viewFile);
     }
 }

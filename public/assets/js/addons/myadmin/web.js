@@ -2,8 +2,6 @@ define(['jquery', 'bootstrap', 'frontend', 'form', 'template'], function ($, und
     var Controller = {
         content:function () {
             $(document).on("click", ".navbar-toggle", function () {
-                //alert('gfdsdsg');
-                //$("body").toggleClass("sidebar-open");
             });
         },
         api: {

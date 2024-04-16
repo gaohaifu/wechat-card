@@ -3,6 +3,21 @@
 return [
     'autoload' => false,
     'hooks' => [
+        'app_init' => [
+            'alioss',
+            'myadmin',
+            'xccms',
+        ],
+        'module_init' => [
+            'alioss',
+            'third',
+        ],
+        'upload_config_init' => [
+            'alioss',
+        ],
+        'upload_delete' => [
+            'alioss',
+        ],
         'sms_send' => [
             'alisms',
         ],
@@ -12,9 +27,22 @@ return [
         'sms_check' => [
             'alisms',
         ],
-        'app_init' => [
+        'action_begin' => [
+            'geetest',
+            'third',
+        ],
+        'config_init' => [
+            'geetest',
+            'nkeditor',
+            'third',
+        ],
+        'view_filter' => [
+            'geetest',
+            'mylogin',
+            'third',
+        ],
+        'app_begin' => [
             'myadmin',
-            'xccms',
         ],
         'user_sidenav_after' => [
             'myadmin',
@@ -31,27 +59,14 @@ return [
         'disable_myadmin_menu' => [
             'myadmin',
         ],
-        'view_filter' => [
-            'mylogin',
-            'third',
+        'posters' => [
+            'posters',
         ],
         'user_delete_successed' => [
             'third',
         ],
         'user_logout_successed' => [
             'third',
-        ],
-        'module_init' => [
-            'third',
-        ],
-        'action_begin' => [
-            'third',
-        ],
-        'config_init' => [
-            'third',
-        ],
-        'posters' => [
-            'posters',
         ],
     ],
     'route' => [
