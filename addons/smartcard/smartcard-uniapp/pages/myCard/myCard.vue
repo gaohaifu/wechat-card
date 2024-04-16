@@ -384,6 +384,46 @@
 			}
 		},
 		methods: {
+			showModalPhone() {
+				uni.showModal({
+					title: '需要读取您的联系人授权',
+					content: '请前往“设置”开启相关权限',
+					showCancel: false
+					
+				})
+			},
+			createPhoneMan() {
+				uni.getSetting({
+					success: (res) => {
+						// console.info(res, '=============>>>')
+						if (!res.authSetting['scope.addPhoneContact']) {
+						  this.showModalPhone()
+						} else {
+							uni.authorize({
+								scope: 'scope.addPhoneContact',
+								success: () => {
+									  uni.addPhoneContact({
+											mobilePhoneNumber: this.staffInfo.mobile,
+											firstName: this.staffInfo.name,
+											// nickName: this.staffInfo.name,
+											organization: this.staffInfo.companyname,
+											fail(err) {
+												console.info('err......phone', err)
+											}
+									  })
+								},
+								fail(err) {
+									this.showModalPhone()
+								}
+							})
+						}
+					},
+					fail(err) {
+						this.showModalPhone()
+					}
+				})
+				
+			},
 			linkToCert() {
 				// console.info(this.certificateStatus, '=====', this.userData.usertype, '====usertype')
 				if(!this.certificateStatus && this.userData.usertype === '1') { // 企业负责人（管理员）

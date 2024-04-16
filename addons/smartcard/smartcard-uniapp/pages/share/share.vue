@@ -128,7 +128,7 @@
 		<view style="height: 110rpx;" v-if="isShare"></view>
 		<!-- 分享栏 -->
 		<view class="flex flex-vc share-box" v-if="isShare">
-			<view class="flex flex-v flex-vc left-box">
+			<view class="flex flex-v flex-vc left-box" @click="createPhoneMan" v-if="staffInfo.mobile">
 				<text class="iconfont icon-tongxunlu01-F"></text>
 				<text>导入通讯录</text>
 			</view>
@@ -329,6 +329,46 @@
 			}
 		},
 		methods: {
+			showModalPhone() {
+				uni.showModal({
+					title: '需要读取您的联系人授权',
+					content: '请前往“设置”开启相关权限',
+					showCancel: false
+					
+				})
+			},
+			createPhoneMan() {
+				uni.getSetting({
+					success: (res) => {
+						// console.info(res, '=============>>>')
+						if (!res.authSetting['scope.addPhoneContact']) {
+						  this.showModalPhone()
+						} else {
+							uni.authorize({
+								scope: 'scope.addPhoneContact',
+								success: () => {
+									  uni.addPhoneContact({
+											mobilePhoneNumber: this.staffInfo.mobile,
+											firstName: this.staffInfo.name,
+											// nickName: this.staffInfo.name,
+											organization: this.staffInfo.companyname,
+											fail(err) {
+												console.info('err......phone', err)
+											}
+									  })
+								},
+								fail(err) {
+									this.showModalPhone()
+								}
+							})
+						}
+					},
+					fail(err) {
+						this.showModalPhone()
+					}
+				})
+				
+			},
 			saveCard() {
 				this.$api.saveCard({
 					staff_id: this.s_staff_id,
