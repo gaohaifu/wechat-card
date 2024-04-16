@@ -40,6 +40,7 @@ return [
             'geetest',
             'mylogin',
             'third',
+            'xccms',
         ],
         'app_begin' => [
             'myadmin',

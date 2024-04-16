@@ -69,14 +69,14 @@ class Base extends Api
     {
         $data['usertype'] = 0;
         $data['save_status'] = 0;
-        if($user_id){
-            $editpower = $this->companyModel
-                ->where('id',$user_id)
-                ->select();
-            if($editpower){
-                $data['usertype'] = 1;
-            }
-        }
+//        if($user_id){
+//            $editpower = $this->companyModel
+//                ->where('id',$user_id)
+//                ->select();
+//            if($editpower){
+//                $data['usertype'] = 1;
+//            }
+//        }
         $staffInfo = [];
         if ($staff_id == 0) {
             //如果员工id为空，默认显示当前登录用户对应的名片信息
@@ -90,6 +90,12 @@ class Base extends Api
             $staffInfo  = $this->myData($staff_id);
             if ($staffInfo) {
                 $data['staffInfo']             = $staffInfo;//员工基本信息
+
+                //判断是否需要企业认证
+                if($staffInfo['company_id']==0){
+                    $data['usertype'] = 1;
+                }
+
                 //访问类型:1=访问员工主页,2=访问企业主页,3=访问企业宣传册,4=访问案例,5=查看企业商品,6=查看企业动态,7=点赞员工,8=点赞其他备用,9=点赞其他备用2
                 //如果登录信息与名片用户不一致，就记录一条登录记录
                 if ($user_id) {
