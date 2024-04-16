@@ -384,6 +384,18 @@
 			}
 		},
 		methods: {
+			linkToCert() {
+				// console.info(this.certificateStatus, '=====', this.userData.usertype, '====usertype')
+				if(!this.certificateStatus && this.userData.usertype === '1') { // 企业负责人（管理员）
+					uni.navigateTo({
+						url: '/pages/company-attestation/index'
+					})
+				} else if(!this.certificateStatus && this.userData.usertype === '0') { // 普通用户
+					uni.navigateTo({
+						url: '/pages/user-attestation/index'
+					})
+				} 
+			},
 			openCode() {
 				this.$refs.myCardCode && this.$refs.myCardCode.open();
 			},
@@ -645,8 +657,7 @@
 						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
 						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
 						if(!(this.staffInfo.smartcardcompany && (this.staffInfo.smartcardcompany.longitude && 
-							this.staffInfo.smartcardcompany.latitude || 
-							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
+							this.staffInfo.smartcardcompany.latitude))) this.tools.find(i => i.id === 4).disabled = true
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
 						this.tools.forEach(it => {
 							if(it.disabled) it.color = '#999';

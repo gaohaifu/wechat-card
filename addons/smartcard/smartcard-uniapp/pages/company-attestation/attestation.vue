@@ -4,6 +4,13 @@
 		<view class="company-label">企业名称</view>
 		<view class="company-name">{{ companyname }}</view>
 		<view class="company-label">
+			<text>企业地址</text>
+			<view class="flex flex-vc example-text" @click="addressClick">
+				<input type="text" v-model="address" placeholder="请选择地址" :disabled="true" />
+				<text class="iconfont icon-dizhi1"></text>
+			</view>
+		</view>
+		<view class="company-label">
 			<text>认证材料</text>
 			<text class="example-text">上传材料示例</text>
 		</view>
@@ -46,6 +53,9 @@
 		name: 'coporationAttestation',
 		data() {
 			return {
+				address: '',
+				latitude: '',
+				longitude: '',
 				cdnUrl: cdnUrl,
 				companyname: '',
 				licenseImg: '',
@@ -57,6 +67,18 @@
 			this.companyname = options.companyname || '企业认证'
 		},
 		methods: {
+			// 选择地址
+			addressClick() {
+				console.log('address');
+				uni.chooseLocation({
+					success: (res) => {
+						console.log(res);
+						this.address = res.address
+						this.latitude = res.latitude
+						this.longitude = res.longitude
+					}
+				});
+			},
 			aggreFn() {
 				this.aggre = !this.aggre
 			},
@@ -75,6 +97,9 @@
 					return normalToShow('请阅读并同意《企业认证服务协议》')
 				}
 				this.$api.enterpriseCertified({
+					address: this.address,
+					latitude: this.latitude,
+					longitude: this.longitude,
 					licenseimage: this.licenseImg,
 					official_letter: this.letterImg
 				}, (res) =>{
@@ -173,5 +198,13 @@
 		color: #fff;
 		background-color: #0256FF;
 		border-radius: 60rpx;
+	}
+	.page-wrap .iconfont {
+		width: 32rpx;
+		height: 32rpx;
+		font-size: 32rpx;
+		line-height: 32rpx;
+		text-align: center;
+		color: #999;
 	}
 </style>

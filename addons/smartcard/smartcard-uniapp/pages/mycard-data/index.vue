@@ -1,7 +1,7 @@
 <!-- 我的名片数据 -->
 <template>
 	<view>
-		<view class="visit-header">
+		<view class="visit-header" @click="test()">
 			<view class="card-count">
 				<view class="card-count-content">
 					<view>名片访问总量(次)</view>
@@ -103,6 +103,11 @@
 			this.getMyCardList()
 		},
 		methods: {
+			test() {
+				// uni.navigateTo({
+				// 	url: '/pages/company-attestation/attestation'
+				// })
+			},
 			tabHandle(val) {
 				if (this.current === val) return
 				this.current = val
@@ -110,10 +115,11 @@
 			getStatistics() {
 				this.$api.myCardVisit({}, res => {
 					if(res.code === 1) {
-						this.allVisitNum = res.allVisitNum || 0
-						this.todayVisitNum = res.todayVisitNum || 0
-						this.allSendNum = res.allSendNum || 0
-						this.allExchangeNum = res.allExchangeNum || 0
+						const data = res.data || {}
+						this.allVisitNum = data.allVisitNum || 0
+						this.todayVisitNum = data.todayVisitNum || 0
+						this.allSendNum = data.allSendNum || 0
+						this.allExchangeNum = data.allExchangeNum || 0
 					}
 				})
 			},
@@ -126,17 +132,25 @@
 					if(res.code === 1) {
 						res.data = res.data || []
 						this.status = res.data.length < 10 ? 'noMore' : 'more' // nomore待处理
-						let result = {}
+						let result = {}, temp = []
 						res.data.forEach(it => {
+							it.createtime = it.createtime ? new Date(it.createtime * 1000) : new Date();
 							const date = formatDate(it.createtime,"yyyy/MM/dd");
 							it.time = formatDate(it.createtime,"hh:mm");
-							result.date = result.date ? result.date.push(it) : [it];
+							it.date = date;
+							if(result[date]) {
+								result[date].data.push(it)
+							} else {
+								result[date] = {
+									date: date,
+									data: [it]
+								}
+							}
 						})
-						let temp = []
-						for(const key in result) {
-							temp.push({date: key, data: result[key]})
+						for(let key in result) {
+							temp.push(result[key])
 						}
-						console.info('result....', result, 'temp list', temp)
+						// console.info('result....', result, '======>temp', temp)
 						this.myCardList = this.myCardList.concat(temp)
 					}else {
 						this.status = 'more'

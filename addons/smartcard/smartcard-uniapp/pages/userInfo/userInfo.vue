@@ -304,6 +304,8 @@
 					success: (res) => {
 						console.log(res);
 						this.address = res.address
+						this.latitude = res.latitude
+						this.longitude = res.longitude
 					}
 				});
 			},
@@ -368,6 +370,8 @@
 				data['introcontent'] = this.introcontent;
 				data['qq'] = this.qq
 				data['industry_id'] = this.industry_id
+				data['longitude'] = this.longitude
+				data['latitude'] = this.latitude
 				
 				// data['company_id_s'] = this.company_id_s
 				if (this.ids != 0) {
