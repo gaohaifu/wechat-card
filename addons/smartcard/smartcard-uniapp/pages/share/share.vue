@@ -331,10 +331,9 @@
 		methods: {
 			showModalPhone() {
 				uni.showModal({
-					title: '需要读取您的联系人授权',
-					content: '请前往“设置”开启相关权限',
+					title: '读取您的通讯录授权',
+					content: '请尝试重新进入本页面并授权我们使用通讯录权限或者前往“设置”开启相关权限',
 					showCancel: false
-					
 				})
 			},
 			createPhoneMan() {
@@ -342,32 +341,47 @@
 					success: (res) => {
 						// console.info(res, '=============>>>')
 						if (!res.authSetting['scope.addPhoneContact']) {
-						  this.showModalPhone()
+							this.openPhoneAuth(false)
 						} else {
-							uni.authorize({
-								scope: 'scope.addPhoneContact',
-								success: () => {
-									  uni.addPhoneContact({
-											mobilePhoneNumber: this.staffInfo.mobile,
-											firstName: this.staffInfo.name,
-											// nickName: this.staffInfo.name,
-											organization: this.staffInfo.companyname,
-											fail(err) {
-												console.info('err......phone', err)
-											}
-									  })
-								},
-								fail(err) {
-									this.showModalPhone()
-								}
-							})
+							this.openPhoneAuth(true)
 						}
 					},
-					fail(err) {
+					fail: (err) => {
 						this.showModalPhone()
 					}
 				})
 				
+			},
+			openPhoneAuth(isAuth) {
+				if(isAuth) {
+					this.openPhoneApi()
+				}else {
+					uni.authorize({
+						scope: 'scope.addPhoneContact',
+						success: () => {
+							this.openPhoneApi()
+						},
+						fail: (err) => {
+							this.showModalPhone()
+						}
+					})
+				}				
+			},
+			openPhoneApi() {
+				uni.addPhoneContact({
+					mobilePhoneNumber: this.staffInfo.mobile,
+					firstName: this.staffInfo.name,
+					// nickName: this.staffInfo.name,
+					organization: this.staffInfo.companyname,
+					fail: (err) => {
+						// this.showModalPhone()
+						uni.showModal({
+							title: '读取您的通讯录授权',
+							content: '需要您同意权限方可使用本功能',
+							showCancel: false
+						})
+					}
+				})
 			},
 			saveCard() {
 				this.$api.saveCard({
