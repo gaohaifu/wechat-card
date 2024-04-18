@@ -34,14 +34,7 @@ class Xccmsmenuinfo extends Backend
         parent::_initialize();
         Service::check_xccms_init();
         $this->model = new \app\admin\model\Xccmsmenuinfo;
-        $tree = Tree::instance();
-        $tree->init(collection($this->model->order('weigh desc, id')->where('company_id',COMPANY_ID)->select())->toArray(), 'parent_id');
-        $this->categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
-        $categorydata = [0 => ['id'=>0, 'type' => 'all', 'name' => __('None')]];
-        foreach ($this->categorylist as $k => $v) {
-            // $categorydata[$v['id']] = $v;
-            array_push($categorydata, $v);
-        }
+        [$categorylist,$categorydata] = $this->model->get_category_tree();
 
         $this->is_show_tips = Xccmsconfig::get_value('is_show_tips');
 
@@ -265,9 +258,7 @@ class Xccmsmenuinfo extends Backend
     private function bind_product_category()
     {
         $this->model = new \app\admin\model\Xccmsproductcategory;
-        $tree = Tree::instance();
-        $tree->init(collection($this->model->field('id,name,parent_id')->where('state', 1)->order('weigh desc, id')->select())->toArray(), 'parent_id');
-        $categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
+        [$categorylist,$categorydata] = $this->model->get_category_tree();
         $categorydata = [];
         foreach ($categorylist as $k => $v) {
             // $categorydata[$v['id']] = $v;
@@ -280,9 +271,7 @@ class Xccmsmenuinfo extends Backend
     private function bind_content_category()
     {
         $this->model = new \app\admin\model\Xccmscontentcategory;
-        $tree = Tree::instance();
-        $tree->init(collection($this->model->field('id,name,parent_id')->where('state', 1)->order('weigh desc, id')->select())->toArray(), 'parent_id');
-        $categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
+        [$categorylist,$categorydata] = $this->model->get_category_tree();
         $categorydata = [];
         foreach ($categorylist as $k => $v) {
             // $categorydata[$v['id']] = $v;

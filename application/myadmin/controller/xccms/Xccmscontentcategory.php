@@ -28,14 +28,8 @@ class Xccmscontentcategory extends Backend
         Service::check_xccms_init();
 
         $this->model = new \app\admin\model\Xccmscontentcategory;
-        $tree = Tree::instance();
-        $tree->init(collection($this->model->order('weigh desc, id')->select())->toArray(), 'parent_id');
-        $this->categorylist = $tree->getTreeList($tree->getTreeArray(0), 'name');
-        $categorydata = [0 => ['type' => 'all', 'name' => __('None')]];
-        foreach ($this->categorylist as $k => $v) {
-            $categorydata[$v['id']] = $v;
-        }
-
+        $categorydata = $this->model->get_category_tree();
+        
         $this->view->assign("parentList", $categorydata);
     }
 

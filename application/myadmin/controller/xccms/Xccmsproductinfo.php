@@ -31,13 +31,7 @@ class Xccmsproductinfo extends Backend
         $this->model = new \app\admin\model\Xccmsproductinfo;
 
         //内容分类树
-        $treeCategory = Tree::instance();
-        $treeCategory->init(collection(Xccmsproductcategory::field('id,name,parent_id')->where('state', 1)->order('name, id')->select())->toArray(), 'parent_id');
-        $this->categorylist = $treeCategory->getTreeList($treeCategory->getTreeArray(0), 'name');
-        $categorydata = [0 => ['type' => 'all', 'name' => __('None')]];
-        foreach ($this->categorylist as $k => $v) {
-            $categorydata[$v['id']] = $v;
-        }
+        [$this->categorylist,$categorydata] = (new Xccmsproductcategory())->get_category_tree();
 
         $this->categorydata = $categorydata;
         $this->view->assign("categoryparentList", $categorydata);
@@ -216,11 +210,13 @@ class Xccmsproductinfo extends Backend
         [$where, $sort, $order, $offset, $limit] = $this->buildparams();
 
         $list = $this->model->field('id,category_id,title,is_recommend,list_image,banners,price,visits,weigh,state,updatetime,updatedby')
+            ->where($where)
             ->where($whereList)
             ->where($whereList_category)
             ->order('title, id desc')
             ->paginate($limit);
-            $rows = $list->items();
+
+        $rows = $list->items();
 
         if (count($rows) > 0)
         {
@@ -264,6 +260,7 @@ class Xccmsproductinfo extends Backend
     private function getTree($pid = 0)
     {
         $list = Xccmsproductcategory::field('id,name')
+            ->where('company_id',COMPANY_ID)
             ->where('parent_id', $pid)
             ->where('state', 1)
             ->order('name, id')
