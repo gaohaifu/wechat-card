@@ -10,6 +10,7 @@ return [
         ],
         'module_init' => [
             'alioss',
+            'apilog',
             'third',
         ],
         'upload_config_init' => [
@@ -26,6 +27,9 @@ return [
         ],
         'sms_check' => [
             'alisms',
+        ],
+        'response_send' => [
+            'apilog',
         ],
         'action_begin' => [
             'geetest',

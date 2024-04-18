@@ -29,7 +29,7 @@ class Xccmscontentcategory extends Backend
 
         $this->model = new \app\admin\model\Xccmscontentcategory;
         $categorydata = $this->model->get_category_tree();
-        
+
         $this->view->assign("parentList", $categorydata);
     }
 
