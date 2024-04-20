@@ -64,7 +64,9 @@
 			}
 		},
 		onLoad(options) {
-			this.companyname = options.companyname || '企业认证'
+			const userData = uni.getStorageSync('userData') || {}
+			// console.info(userData, '=====>>>')
+			this.companyname = options.companyname || userData.companyname || '企业认证'
 		},
 		methods: {
 			// 选择地址
@@ -84,7 +86,7 @@
 			},
 			upLicense (key) {
 				this.$api.uploadImage('common/upload', {}, dataimg => {
-					this.form[key] = dataimg.data.url // 相对路径 fullurl绝对路径
+					this[key] = dataimg.data.url // 相对路径 fullurl绝对路径
 				}, 1)
 			},
 			submitFn() {
