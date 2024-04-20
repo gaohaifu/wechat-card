@@ -505,6 +505,20 @@ class Common extends Base
     }
     
     /**
+     * 获取实名认证信息
+     **/
+    public function getRealnameInfo(){
+        $user_id = $this->user_id;
+        $user = user::where(['id'=>$user_id])->find();
+        $data = [
+            'is_certified'=>$user['is_certified'],
+            'id_card_face'=>$user['id_card_face']?cdnurl($user['id_card_face'],true):$user['id_card_face'],
+            'id_card_reverse'=>$user['id_card_reverse']?cdnurl($user['id_card_reverse'],true):$user['id_card_reverse'],
+            'reason'=>$user['reason'],
+        ];
+        $this->success('请求成功',$data);
+    }
+    /**
      * 实名认证
      * @param string $id_card_face 正面
      * @param string $id_card_reverse 反面
@@ -608,6 +622,43 @@ class Common extends Base
             $staff->is_owner = ($staff->user_id==$staff->company_id)?1:0;
         }
         $this->success('请求成功', $staffs);
+    }
+    
+    /**
+     * 获取企业认证信息
+     **/
+    public function getEnterpriseInfo(){
+        $Staff = new Staff();
+        $user_id = $this->user_id;
+        $staff = $Staff->where(['user_id'=>$user_id,'is_default'=>1])->find();
+        if(!$staff){
+            $this->error('请先填写个人资料');
+        }else{
+            if($staff['company_id']!=0){
+                $Company = new \addons\myadmin\model\Company();
+                $company = $Company->where(['id'=>$staff['company_id']])->find();
+                $data = [
+                    'address'=>$company['address'],
+                    'longitude'=>$company['longitude'],
+                    'latitude'=>$company['latitude'],
+                    'is_authentication'=>$company['is_authentication'],
+                    'licenseImg'=>$company['licenseimage']?cdnurl($company['licenseimage'],true):$company['licenseimage'],
+                    'letterImg'=>$company['official_letter']?cdnurl($company['official_letter'],true):$company['official_letter'],
+                    'reason'=>$company['reason'],
+                ];
+            }else{
+                $data = [
+                    'address'=>'',
+                    'longitude'=>'',
+                    'latitude'=>'',
+                    'is_authentication'=>'',
+                    'licenseImg'=>'',
+                    'letterImg'=>'',
+                    'reason'=>'',
+                ];
+            }
+        }
+        $this->success('请求成功',$data);
     }
     
     /**
