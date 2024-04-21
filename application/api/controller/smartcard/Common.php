@@ -512,8 +512,10 @@ class Common extends Base
         $user = user::where(['id'=>$user_id])->find();
         $data = [
             'is_certified'=>$user['is_certified'],
-            'id_card_face'=>$user['id_card_face']?cdnurl($user['id_card_face'],true):$user['id_card_face'],
-            'id_card_reverse'=>$user['id_card_reverse']?cdnurl($user['id_card_reverse'],true):$user['id_card_reverse'],
+//            'id_card_face'=>$user['id_card_face']?cdnurl($user['id_card_face'],true):$user['id_card_face'],
+            'id_card_face'=>$user['id_card_face'],
+//            'id_card_reverse'=>$user['id_card_reverse']?cdnurl($user['id_card_reverse'],true):$user['id_card_reverse'],
+            'id_card_reverse'=>$user['id_card_reverse'],
             'reason'=>$user['reason'],
         ];
         $this->success('请求成功',$data);
@@ -642,8 +644,10 @@ class Common extends Base
                     'longitude'=>$company['longitude'],
                     'latitude'=>$company['latitude'],
                     'is_authentication'=>$company['is_authentication'],
-                    'licenseImg'=>$company['licenseimage']?cdnurl($company['licenseimage'],true):$company['licenseimage'],
-                    'letterImg'=>$company['official_letter']?cdnurl($company['official_letter'],true):$company['official_letter'],
+//                    'licenseImg'=>$company['licenseimage']?cdnurl($company['licenseimage'],true):$company['licenseimage'],
+                    'licenseImg'=>$company['licenseimage'],
+//                    'letterImg'=>$company['official_letter']?cdnurl($company['official_letter'],true):$company['official_letter'],
+                    'letterImg'=>$company['official_letter'],
                     'reason'=>$company['reason'],
                 ];
             }else{
