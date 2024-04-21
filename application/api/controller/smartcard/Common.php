@@ -1141,7 +1141,7 @@ class Common extends Base
         
         $staffres = $Staff
             ->with(['smartcardcompany' => function($query) {
-                $query->withField('id,name,address,longitude,latitude');
+                $query->withField('id,name,address,longitude,latitude,is_authentication');
             }])
             ->where('user_id',$user_id)
             ->select();
