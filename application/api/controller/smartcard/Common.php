@@ -512,8 +512,10 @@ class Common extends Base
         $user = user::where(['id'=>$user_id])->find();
         $data = [
             'is_certified'=>$user['is_certified'],
-            'id_card_face'=>$user['id_card_face']?cdnurl($user['id_card_face'],true):$user['id_card_face'],
-            'id_card_reverse'=>$user['id_card_reverse']?cdnurl($user['id_card_reverse'],true):$user['id_card_reverse'],
+//            'id_card_face'=>$user['id_card_face']?cdnurl($user['id_card_face'],true):$user['id_card_face'],
+            'id_card_face'=>$user['id_card_face'],
+//            'id_card_reverse'=>$user['id_card_reverse']?cdnurl($user['id_card_reverse'],true):$user['id_card_reverse'],
+            'id_card_reverse'=>$user['id_card_reverse'],
             'reason'=>$user['reason'],
         ];
         $this->success('请求成功',$data);
@@ -642,8 +644,10 @@ class Common extends Base
                     'longitude'=>$company['longitude'],
                     'latitude'=>$company['latitude'],
                     'is_authentication'=>$company['is_authentication'],
-                    'licenseImg'=>$company['licenseimage']?cdnurl($company['licenseimage'],true):$company['licenseimage'],
-                    'letterImg'=>$company['official_letter']?cdnurl($company['official_letter'],true):$company['official_letter'],
+//                    'licenseImg'=>$company['licenseimage']?cdnurl($company['licenseimage'],true):$company['licenseimage'],
+                    'licenseImg'=>$company['licenseimage'],
+//                    'letterImg'=>$company['official_letter']?cdnurl($company['official_letter'],true):$company['official_letter'],
+                    'letterImg'=>$company['official_letter'],
                     'reason'=>$company['reason'],
                 ];
             }else{
@@ -697,61 +701,70 @@ class Common extends Base
         if(!$staff){
             $this->error('请先填写个人资料');
         }else{
-            if($staff['company_id']!=0){
+            if($staff['company_id']!=0 && $staff['smartcardcompany']['is_authentication']==2){
                 $this->error('您已经加入企业，不需要企业认证');
             }
         }
 
         $Company = new \addons\myadmin\model\Company();
-        $company = $Company->where(['name'=>$companyname])->find();
+        $company = $Company->where(['name'=>$companyname,'id'=>['neq',$user_id]])->find();
         if($company){
             $this->error('公司已存在，请修改个人资料的公司名称');
         }
-
+        $company1 = $Company->where(['id'=>$user_id])->find();
         Db::startTrans();
         try {
-
-            $params = [
-                'id'=>$user_id,
-                'type'=>'myself',
-                'group_id'=>1,
-                'name'=>$companyname,
-                'admin_limit'=>5,
-                'status'=>'created',
-                'licenseimage'=>$licenseimage,
-                'official_letter'=>$official_letter,
-                'is_authentication'=>1,
-                'longitude'=>$longitude,
-                'latitude'=>$latitude,
-                'address'=>$address,
-            ];
-
-            $result = $Company->allowField(true)->save($params);
-
-            // 管理员表
-            $founder['salt'] = Random::alnum();
-            $founder['password'] = md5(md5('123456') . $founder['salt']);
-            $founder['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
-            $founder['company_id'] = $Company->id;
-            $founder['username'] = $staff->name;
-            $founder['nickname'] = $staff->name;
-            $founder['is_founder'] = 1; // 设置为创始人
-            $admin = new Admin;
-            $admin->allowField(true)->save($founder);
-
-            $staff->company_id = $Company->id;
-            $staff->save();
-            
-            //权限关系
-            $access_params['uid'] = $admin->id;
-            $access_params['group_id'] = 1;
-            $access_params['company_id'] = $Company->id;
-            $access = new AuthGroupAccess;
-            $access->save($access_params);
-            // 初始化配置
-            $config = new ConfigValue;
-            $config_data = ['name' => 'name', 'value' => $params['name'], 'company_id' => $Company->id];
-            $config->save($config_data);
+            if($company1){
+                $company1->licenseimage = $licenseimage;
+                $company1->official_letter = $official_letter;
+                $company1->is_authentication = 1;
+                $company1->longitude = $longitude;
+                $company1->latitude = $latitude;
+                $company1->address = $address;
+                $result = $company1->save();
+            }else{
+                $params = [
+                    'id'=>$user_id,
+                    'type'=>'myself',
+                    'group_id'=>1,
+                    'name'=>$companyname,
+                    'admin_limit'=>5,
+                    'status'=>'created',
+                    'licenseimage'=>$licenseimage,
+                    'official_letter'=>$official_letter,
+                    'is_authentication'=>1,
+                    'longitude'=>$longitude,
+                    'latitude'=>$latitude,
+                    'address'=>$address,
+                ];
+    
+                $result = $Company->allowField(true)->save($params);
+    
+                // 管理员表
+                $founder['salt'] = Random::alnum();
+                $founder['password'] = md5(md5('123456') . $founder['salt']);
+                $founder['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
+                $founder['company_id'] = $Company->id;
+                $founder['username'] = $staff->name;
+                $founder['nickname'] = $staff->name;
+                $founder['is_founder'] = 1; // 设置为创始人
+                $admin = new Admin;
+                $admin->allowField(true)->save($founder);
+    
+                $staff->company_id = $Company->id;
+                $staff->save();
+    
+                //权限关系
+                $access_params['uid'] = $admin->id;
+                $access_params['group_id'] = 1;
+                $access_params['company_id'] = $Company->id;
+                $access = new AuthGroupAccess;
+                $access->save($access_params);
+                // 初始化配置
+                $config = new ConfigValue;
+                $config_data = ['name' => 'name', 'value' => $params['name'], 'company_id' => $Company->id];
+                $config->save($config_data);
+            }
 
             Db::commit();
         } catch (ValidateException $e) {
@@ -1137,7 +1150,7 @@ class Common extends Base
         
         $staffres = $Staff
             ->with(['smartcardcompany' => function($query) {
-                $query->withField('id,name,address,longitude,latitude');
+                $query->withField('id,name,address,longitude,latitude,is_authentication');
             }])
             ->where('user_id',$user_id)
             ->select();
