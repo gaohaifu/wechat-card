@@ -35,7 +35,7 @@ class Backend extends Controller
      * 无需鉴权的方法,但需要登录
      * @var array
      */
-    protected $noNeedRight = [];
+    protected $noNeedRight = ['getList'];
 
     /**
      * 布局模板
@@ -128,7 +128,7 @@ class Backend extends Controller
     /**
      * 仅限制企业本身数据
      */
-    protected $limitSelf = false;
+    protected $limitSelf = true;
     /**
      * 控制器前置方法
      */

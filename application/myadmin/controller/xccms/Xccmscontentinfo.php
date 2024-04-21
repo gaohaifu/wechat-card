@@ -267,6 +267,7 @@ class Xccmscontentinfo extends Backend
     private function getTree($pid = 0)
     {
         $list = Xccmscontentcategory::field('id,name')
+            ->where('company_id',COMPANY_ID)
             ->where('parent_id', $pid)
             ->where('state', 1)
             ->order('name, id')
