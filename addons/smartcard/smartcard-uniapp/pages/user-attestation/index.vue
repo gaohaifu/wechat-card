@@ -1,5 +1,9 @@
 <template>
 	<view class="page-wrap">
+		<view class="page-title" v-if="is_certified == 3">
+			<view>认证失败情况</view>
+			<view class="descript" style="width: 480rpx; color: red;">{{reason}}</view>
+		</view>
 		<view class="page-title">
 			<view>实名认证</view>
 			<view class="descript">完成实名认证，让你的电子名片更可信，拓展更多人脉和商机</view>
@@ -46,16 +50,38 @@
 					phone: '',
 					code: '',
 					id_card_face: '', // 正面
-					id_card_reverse: '' // 反面
-				}
+					id_card_reverse: '' // 反面,
+					
+				},
+				reason: '',
+				is_certified: ''
 			}
 		},
 		onLoad() {
 			this.userData = uni.getStorageSync('userData')
 			this.form.name = this.userData.name
 			this.form.phone = this.userData.mobile
+			this.getRealnameInfo()
 		},
 		methods: {
+			// 获取实名认证信息
+			getRealnameInfo() {
+				this.$api.getRealnameInfo({}, response => {
+					if (response.code !== 1) {
+						uni.showToast({
+							icon: 'none',
+							title:res.msg
+						})
+						return;
+					}
+					const res = response.data || {}
+					console.info(response, '===========>>>', res)
+					this.reason = res.reason || ''
+					this.is_certified = res.is_certified // 认证状态:0=未认证,1=待审核,2=已审核,3=审核失败
+					this.form.id_card_face = res.id_card_face
+					this.form.id_card_reverse = res.id_card_reverse
+				})
+			},
 			// 验证码倒计时
 			countdownFn() {
 				if (this.timer) return
@@ -92,7 +118,7 @@
 				this.$api.realnameCertified({ ...this.form }, res => {
 					console.log(res, '实名认证')
 					if (res.code == 1) {
-						successToShow(res.msg)
+						successToShow('成功提交审核')
 					} else errorToShow(res.msg)
 				})
 			}
