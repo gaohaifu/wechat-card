@@ -79,6 +79,7 @@
 			"path": "pages/company-attestation/attestation",
 			"style": {
 				"navigationBarTitleText": "企业认证-立即认证",
+				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
 		},
@@ -86,6 +87,7 @@
 			"path": "pages/company-attestation/index",
 			"style": {
 				"navigationBarTitleText": "企业认证",
+				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
 		},

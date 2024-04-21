@@ -12,7 +12,7 @@
 						<view class="name_position">
 							<view :style="{color:fontcolor}">{{userData.name?userData.name:''}}</view>
 							<text :style="{color:fontcolor}">{{userData.position}}</text>
-							<text :style="{color:fontcolor}">{{companyInfo.name}}</text>
+							<text :style="{color:fontcolor}">{{companyInfo.name || userData.companyname}}</text>
 						</view>
 					</view>
 					<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"

@@ -11,7 +11,7 @@
 					<view class="name_position">
 						<view :style="{color:theme.fontcolor}">{{userData.name?userData.name:''}}</view>
 						<text :style="{color:theme.fontcolor}">{{userData.position}}</text>
-						<text :style="{color:theme.fontcolor}">{{companyInfo.name}}</text>
+						<text :style="{color:theme.fontcolor}">{{companyInfo.name || userData.companyname}}</text>
 					</view>
 				</view>
 				<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"

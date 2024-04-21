@@ -72,16 +72,18 @@
 			}
 		},
 		onLoad(options) {
-			const userData = uni.getStorageSync('userData') || {}
+			let userData = uni.getStorageSync('userData') || {}
+			userData.smartcardcompany = userData.smartcardcompany || {}
 			// console.info(userData, '=====>>>')
-			this.companyname = options.companyname || userData.companyname || '企业认证'
+			this.companyname = options.companyname || userData.smartcardcompany.name || userData.companyname || '企业认证'
 			this.getEnterpriseInfo()
 		},
 		methods: {
 			// 获取实名认证信息
 			getEnterpriseInfo() {
-				this.$api.getEnterpriseInfo({}, res => {
-					console.info(res, '===========>>>')
+				this.$api.getEnterpriseInfo({}, response => {
+					const res = response.data || {}
+					console.info(response, '===========>>>')
 					this.reason = res.reason || ''
 					this.address = res.address
 					this.latitude = res.latitude
@@ -114,7 +116,7 @@
 				}, 1)
 			},
 			submitFn() {
-				console.log('submit')
+				console.log('submit', this.latitude, this.longitude, this.licenseImg, this.letterImg)
 				if (!(this.latitude && this.longitude)) {
 					return normalToShow('请选择公司地址')
 				} else if (!this.licenseImg) {
@@ -125,6 +127,7 @@
 					return normalToShow('请阅读并同意《企业认证服务协议》')
 				}
 				this.$api.enterpriseCertified({
+					companyname: this.companyname,
 					address: this.address,
 					latitude: this.latitude,
 					longitude: this.longitude,
@@ -133,7 +136,7 @@
 				}, (res) =>{
 					console.log(res, '企业认证')
 					if (res.code == 1) {
-						successToShow(res.msg)
+						successToShow('成功提交审核')
 					} else errorToShow(res.msg)
 				})
 			}
