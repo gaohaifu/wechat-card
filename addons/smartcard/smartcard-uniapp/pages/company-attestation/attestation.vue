@@ -1,6 +1,12 @@
 <!-- 企业认证表单 -->
 <template>
 	<view class="page-wrap">
+		<view class="company-label" v-if="is_authentication == 3">
+			<text>认证失败情况</text>
+			<view class="example-text" style="width: 480rpx; color: red;">
+				{{reason}}
+			</view>
+		</view>
 		<view class="company-label">企业名称</view>
 		<view class="company-name">{{ companyname }}</view>
 		<view class="company-label">
@@ -60,17 +66,37 @@
 				companyname: '',
 				licenseImg: '',
 				letterImg: '',
-				aggre: false
+				aggre: false,
+				reason: '',
+				is_authentication: ''
 			}
 		},
 		onLoad(options) {
-			this.companyname = options.companyname || '企业认证'
+			const userData = uni.getStorageSync('userData') || {}
+			// console.info(userData, '=====>>>')
+			this.companyname = options.companyname || userData.companyname || '企业认证'
+			this.getEnterpriseInfo()
 		},
 		methods: {
+			// 获取实名认证信息
+			getEnterpriseInfo() {
+				this.$api.getEnterpriseInfo({}, res => {
+					console.info(res, '===========>>>')
+					this.reason = res.reason || ''
+					this.address = res.address
+					this.latitude = res.latitude
+					this.longitude = res.longitude
+					this.is_authentication = res.is_authentication // 认证状态:0=未认证,1=待审核,2=已审核,3=审核失败
+					this.licenseImg = res.licenseImg
+					this.letterImg = res.letterImg
+				})
+			},
 			// 选择地址
 			addressClick() {
 				console.log('address');
 				uni.chooseLocation({
+					latitude: this.latitude,
+					longitude:this.longitude,
 					success: (res) => {
 						console.log(res);
 						this.address = res.address
@@ -84,12 +110,14 @@
 			},
 			upLicense (key) {
 				this.$api.uploadImage('common/upload', {}, dataimg => {
-					this.form[key] = dataimg.data.url // 相对路径 fullurl绝对路径
+					this[key] = dataimg.data.url // 相对路径 fullurl绝对路径
 				}, 1)
 			},
 			submitFn() {
 				console.log('submit')
-				if (!this.licenseImg) {
+				if (!(this.latitude && this.longitude)) {
+					return normalToShow('请选择公司地址')
+				} else if (!this.licenseImg) {
 					return normalToShow('请上传营业执照')
 				} else if (!this.letterImg) {
 					return normalToShow('请上传公函')

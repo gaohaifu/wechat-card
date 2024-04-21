@@ -55,7 +55,9 @@ const methodsToken = [
 	'shareCardInfo',
 	'saveCustomGreetings',
 	'saveShareInfo',
-	'getMiniCode'
+	'getMiniCode',
+	'getRealnameInfo',
+	'getEnterpriseInfo'
 ];
 const post = (method, data, callback,type, failCB) => {
 	let userToken = '';
@@ -432,3 +434,7 @@ export const saveCustomGreetings = (data, callback) => post('saveCustomGreetings
 export const saveShareInfo = (data, callback) => post('saveShareInfo', data, callback, 'smartcard/Common')
 // 获取小程序码
 export const getMiniCode = (data, callback) => post('getMiniCode', data, callback, 'smartcard/User')
+// 获取实名认证信息
+export const getRealnameInfo = (data, callback) => post('getRealnameInfo', data, callback, 'smartcard/Common')
+// 获取企业认证信息
+export const getEnterpriseInfo = (data, callback) => post('getEnterpriseInfo', data, callback, 'smartcard/Common')
