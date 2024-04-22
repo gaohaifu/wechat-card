@@ -28,6 +28,11 @@ use think\Log;
 class CompanyService extends Base
 {
     public function init_data($companyId){
+        $where['company_id'] = $companyId;
+        $xccmsMenulist = collection(Xccmsmenuinfo::where($where)->select())->toArray();
+        if ($xccmsMenulist){
+            return true;
+        }
 
         $defalutCompanyId = Env::get('app.defalut_company_id',1);
         $where['company_id'] = $defalutCompanyId;
@@ -46,5 +51,6 @@ class CompanyService extends Base
         }
         $re = Xccmsmenuinfo::insertAll($xccmsMenulist);
 
+        return true;
     }
 }

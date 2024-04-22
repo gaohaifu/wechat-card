@@ -1,0 +1,107 @@
+<style>
+    .plupload-preview li,
+    .faupload-preview li {
+        margin-top: 0px;
+        margin-bottom: 15px;
+    }
+</style>
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('CompanyName')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="required" class="form-control" placeholder="请输入企业名称（限中文）" name="row[name]" type="text" value="{$row.name|htmlentities}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Address_area')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="row dingdian-box">
+                <div class="col-xs-12">
+                    <div class="input-group input-groupp-md" style="margin-bottom:10px;">
+                        <input type="text" name="row[address]" id="c-address" value="{$row.address}" placeholder="可手动输入地址" class="form-control" />
+                        <a href="javascript:" class="btn-search-icon input-group-addon" data-toggle='addresspicker' data-input-id="c-address" data-lng-id="c-address_longitude" data-lat-id="c-address_latitude" data-addon="{:get_addon_info('address')?1:0}">选择定位</a>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="input-group input-groupp-md">
+                        <div href="javascript:" class="btn-search-icon input-group-addon">经度</div>
+                        <input type="number" name="row[longitude]" id="c-address_longitude" value="{$row.longitude}" placeholder="经度值" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="input-group input-groupp-md">
+                        <div href="javascript:" class="btn-search-icon input-group-addon">纬度</div>
+                        <input type="number" name="row[latitude]" id="c-address_latitude" value="{$row.latitude}" placeholder="纬度值" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('licenseimage')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-licenseimage"></ul>
+            <div class="input-group">
+                <input id="c-licenseimage" readonly class="form-control" data-rule="" size="50" name="row[licenseimage]" type="text"
+                       value="{$row.licenseimage|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-licenseimage" class="btn btn-danger faupload"
+                                  data-input-id="c-licenseimage" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                                  data-multiple="false" data-preview-id="p-licenseimage"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-licenseimage" class="btn btn-primary fachoose"
+                                  data-input-id="c-licenseimage" data-mimetype="image/*" data-multiple="false"> <i
+                            class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-licenseimage"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('official_letter')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-official_letter"></ul>
+            <div class="input-group">
+                <input id="c-official_letter" readonly class="form-control" data-rule="" size="50" name="row[official_letter]" type="text"
+                       value="{$row.official_letter|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-official_letter" class="btn btn-danger faupload"
+                                  data-input-id="c-official_letter" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                                  data-multiple="false" data-preview-id="p-official_letter"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-official_letter" class="btn btn-primary fachoose"
+                                  data-input-id="c-official_letter" data-mimetype="image/*" data-multiple="false"> <i
+                            class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-official_letter"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="reason" class="control-label col-xs-12 col-sm-2">{:__('原因')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input type="text" id="reason" placeholder="审核原因" class="form-control" name="row[reason]" value="{$row.reason|htmlentities}"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('审核')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                {foreach name="auditList" item="vo"}
+                <label for="row[is_authentication]-{$key}"><input id="row[is_authentication]-{$key}" name="row[is_authentication]" type="radio"
+                        value="{$key}" {in name="key" value="$row.is_authentication" }checked{/in} /> {$vo}</label> {/foreach}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
