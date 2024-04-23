@@ -37,7 +37,7 @@ class Xccmsmenuinfo extends Backend
         [$categorylist,$categorydata] = $this->model->get_category_tree();
 
         $this->is_show_tips = Xccmsconfig::get_value('is_show_tips');
-
+        $this->categorylist = $categorylist;
         $this->categorydata = $categorydata;
         $this->view->assign("parentList", $categorydata);
         $this->view->assign('is_show_tips', $this->is_show_tips);
