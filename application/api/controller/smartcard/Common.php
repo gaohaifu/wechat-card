@@ -121,6 +121,12 @@ class Common extends Base
         $self_staff_id = $this->request->request("self_staff_id")?:0;
 
         $Staff = new Staff();
+
+        $selfstaff = $Staff->where('user_id', $user_id)->find();
+        if(!$selfstaff){
+            $this->error('未创建自己的名片');
+        }
+
         if($staff_id == ''){
             $this->error('staff_id不能为空');
         }else{
@@ -188,6 +194,9 @@ class Common extends Base
             $staff = $Staff->where('id', $staff_id)->find();
             //己方名片信息
             $selfstaff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
+            if(!$selfstaff){
+                $this->error('未创建自己的名片');
+            }
             if($staff){
                 if($staff['user_id']==$user_id){
                     $this->error('staff_id是自己的');
