@@ -92,7 +92,7 @@ class Base extends Api
                 $data['staffInfo']             = $staffInfo;//员工基本信息
 
                 //判断是否需要企业认证
-                if($staffInfo['company_id']==0 || $staffInfo['smartcardcompany']['is_authentication']==3){
+                if($staffInfo['company_id']==0 || $staffInfo['smartcardcompany']['is_authentication']==3 || $staffInfo['smartcardcompany']['is_authentication']==0){
                     $data['usertype'] = 1;
                 }
 
