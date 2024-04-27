@@ -121,6 +121,12 @@ class Common extends Base
         $self_staff_id = $this->request->request("self_staff_id")?:0;
 
         $Staff = new Staff();
+
+        $selfstaff = $Staff->where('user_id', $user_id)->find();
+        if(!$selfstaff){
+            $this->error('未创建自己的名片');
+        }
+
         if($staff_id == ''){
             $this->error('staff_id不能为空');
         }else{
@@ -188,6 +194,9 @@ class Common extends Base
             $staff = $Staff->where('id', $staff_id)->find();
             //己方名片信息
             $selfstaff = $Staff->where(['user_id'=>$user_id, 'is_default'=>1])->find();
+            if(!$selfstaff){
+                $this->error('未创建自己的名片');
+            }
             if($staff){
                 if($staff['user_id']==$user_id){
                     $this->error('staff_id是自己的');
@@ -441,7 +450,7 @@ class Common extends Base
                 ->join('user B', 'A.user_id=B.id')
                 ->where($wheredata)
                 ->where(['A.typedata' => '1'])
-                ->field('A.id,A.user_id,B.avatar,A.createtime,A.origin,A.is_first,if((successions>=3 and TIMESTAMPDIFF(day, FROM_UNIXTIME(`B`.`logintime`,\'%Y-%m-%d\'),NOW())<=1) , 1 , 0 ) as is_active')
+                ->field('A.id,A.user_id,B.avatar,B.username,A.createtime,A.origin,A.is_first,if((successions>=3 and TIMESTAMPDIFF(day, FROM_UNIXTIME(`B`.`logintime`,\'%Y-%m-%d\'),NOW())<=1) , 1 , 0 ) as is_active')
 //                ->group('A.user_id')
                 ->page($page,10)
                 ->order('A.createtime','desc')
@@ -456,10 +465,10 @@ class Common extends Base
                     $visitStaffList->position = $staff['position'];
                     $visitStaffList->companyname = isset($staff->smartcardcompany->name)?$staff->smartcardcompany->name:$staff->companyname;
                 }else{
-                    $visitStaffList->staff_id = null;
-                    $visitStaffList->name = null;
-                    $visitStaffList->position = null;
-                    $visitStaffList->companyname = null;
+                    $visitStaffList->staff_id = '';
+                    $visitStaffList->name = $visitStaffList->username;
+                    $visitStaffList->position = '';
+                    $visitStaffList->companyname = '';
                 }
                 $su = $Su->where(['user_id' => $visitStaffList->user_id,'staff_user_id'=>$user_id])->order('status desc')->find();
                 if($su){

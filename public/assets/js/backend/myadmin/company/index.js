@@ -60,6 +60,20 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             formatter: Table.api.formatter.operate,
                             buttons: [
                                 {
+                                    name: 'audit',
+                                    text: function (table, row, index) {
+                                        return '审核';
+                                    },
+                                    title: function (table, row, index) {
+                                        return '审核 [' + table['name'] + '] - 角色';
+                                    },
+                                    icon: 'fa fa-file-o',
+                                    classname: 'btn btn-info btn-xs btn-dialog',
+                                    url: function (table, row, index) {
+                                        return 'myadmin/company/index/edit?type=audit&ids=' + table['id'];
+                                    }
+                                },
+                                {
                                     name: 'add',
                                     text: function (table, row, index) {
                                         return '签约';

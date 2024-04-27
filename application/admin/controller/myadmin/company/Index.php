@@ -3,6 +3,7 @@
 namespace app\admin\controller\myadmin\company;
 
 use app\common\controller\Backend;
+use app\common\service\CompanyService;
 use think\Db;
 use Exception;
 use think\exception\PDOException;
@@ -36,6 +37,7 @@ class Index extends Backend
         $this->model = new \addons\myadmin\model\Company;
         $this->GroupModel = new \addons\myadmin\model\CompanyGroup;
         $this->view->assign("statusList", $this->model->getStatusList());
+        $this->view->assign("auditList", $this->model->getAuditList());
 
         $playerList = AuthPlayer::column('name,label', 'label');
         $this->view->assign("playerList", $playerList);
@@ -210,52 +212,27 @@ class Index extends Backend
             $params = $this->request->post("row/a");
             $founder = $this->request->post("founder/a");
             if ($params) {
-                if (!$group =  $this->GroupModel->get($params['group_id'])) {
-                    $this->error('请选择企业分组');
-                }
-
                 $params = $this->preExcludeFields($params);
                 $result = false;
                 Db::startTrans();
                 try {
-                    // 修改管理员信息
-                    $has = 1;
-                    if (isset($founder['username']) && $founder['username']) {
-                        if (strlen($founder['username']) < 3 || strlen($founder['username']) > 32) {
-                            throw new Exception("请输入用户名长度在3-32位之间");
-                        }
-                        $has = Admin::where('company_id', $row['id'])->where('username', $founder['username'])->where('id', '<>', $row['founder']['id'])->count('id');
-                    }
-                    if (isset($founder['password']) && $founder['password']) {
-                        if (strlen($founder['password']) < 6 || strlen($founder['password']) > 32) {
-                            throw new Exception("请输入密码长度在6-32位之间");
-                        }
-                        $founder['salt'] = Random::alnum();
-                        $founder['password'] = md5(md5($founder['password']) . $founder['salt']);
-                    } else {
-                        unset($founder['password']);
-                    }
-                    if ($has) {
-                        throw new Exception("用户名不可用");
-                    }
-                    $admin = Admin::get($row['founder']['id']);
-                    if ($founder) {
-                        $adminname = str_replace("\\model\\", "\\validate\\", Admin::class);
-                        $adminValidate = \think\Loader::validate($adminname);
-                        $adminValidate->rule(['username' => 'require|regex:\w{3,12}|unique:myadmin_admin,username,' . $admin->id]);
-                        $adminResult = $admin->validate($adminname . '.edit')->allowField(true)->save($founder);
-                        if ($adminResult === false) {
-                            exception($admin->getError());
-                        }
-                        $admin->allowField(true)->save($founder);
+                    //审核通过的时候直接修改状态
+                    if ($row->status == 'created' && $params['is_authentication'] == 2){
+                        $params['status'] = 'normal';
                     }
                     //是否采用模型验证
-                    $name = str_replace("\\model\\", "\\validate\\", get_class($this->model));
+                    /*$name = str_replace("\\model\\", "\\validate\\", get_class($this->model));
                     $companyValidate = \think\Loader::validate($name);
                     $companyValidate->rule(['name' => 'require|regex:[\x7f-\xff]{7,200}|unique:myadmin_company,name,' . $row->id]);
-                    $result = $row->validate($name . '.edit')->allowField(true)->save($params);
+                    $result = $row->validate($name . '.edit')->allowField(true)->save($params);*/
+                    $result = $row->allowField(true)->save($params);
                     if ($result === false) {
                         exception($row->getError());
+                    }
+                    if ($params['is_authentication'] == 2){
+                        //初始化公司数据
+                        $companyService = new CompanyService();
+                        $companyService->init_data($ids);
                     }
                     Db::commit();
                 } catch (ValidateException $e) {
@@ -277,7 +254,11 @@ class Index extends Backend
             $this->error(__('Parameter %s can not be empty', ''));
         }
         $this->view->assign("row", $row);
-        return $this->view->fetch();
+        if (input('type') == 'audit'){
+            return $this->view->fetch('audit');
+        }else{
+            return $this->view->fetch();
+        }
     }
 
     /**

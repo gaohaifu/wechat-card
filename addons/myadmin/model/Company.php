@@ -75,6 +75,11 @@ class Company extends Model
         return ['created' => __('Created'), 'normal' => __('Normal'), 'hidden' => __('Hidden'), 'expired' => __('Expired')];
     }
 
+    public function getAuditList()
+    {
+        return ['0' => __('未认证'), '1' => __('待审核'), '2' => __('通过'), '3' => __('驳回')];
+    }
+
     protected function setBegintimeAttr($value)
     {
         return $value === '' ? null : ($value && !is_numeric($value) ? strtotime($value . ' 00:00:00') : $value);

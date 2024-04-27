@@ -132,6 +132,46 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('licenseimage')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-licenseimage"></ul>
+            <div class="input-group">
+                <input id="c-licenseimage" readonly class="form-control" data-rule="" size="50" name="row[licenseimage]" type="text"
+                       value="{$row.licenseimage|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-licenseimage" class="btn btn-danger faupload"
+                                  data-input-id="c-licenseimage" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                                  data-multiple="false" data-preview-id="p-licenseimage"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-licenseimage" class="btn btn-primary fachoose"
+                                  data-input-id="c-licenseimage" data-mimetype="image/*" data-multiple="false"> <i
+                            class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-licenseimage"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('official_letter')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-official_letter"></ul>
+            <div class="input-group">
+                <input id="c-official_letter" readonly class="form-control" data-rule="" size="50" name="row[official_letter]" type="text"
+                       value="{$row.official_letter|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-official_letter" class="btn btn-danger faupload"
+                                  data-input-id="c-official_letter" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                                  data-multiple="false" data-preview-id="p-official_letter"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-official_letter" class="btn btn-primary fachoose"
+                                  data-input-id="c-official_letter" data-mimetype="image/*" data-multiple="false"> <i
+                            class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-official_letter"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
         <div class="col-xs-12 col-sm-8">
             <div class="radio">

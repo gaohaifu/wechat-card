@@ -48,9 +48,10 @@ class Xccmsmenuinfo extends Model
         $tree->init(collection($this->where($where)->order('weigh desc, id')->select())->toArray(), 'parent_id');
         $list = $tree->getTreeList($tree->getTreeArray(0), $field);
 
-        $categorydata = [0 => ['type' => 'all', 'name' => __('None')]];
+        $categorydata = [0 => ['id'=>0, 'type' => 'all', 'name' => __('None')]];
         foreach ($list as $k => $v) {
-            $categorydata[$v['id']] = $v;
+            //$categorydata[$v['id']] = $v;
+            array_push($categorydata, $v);
         }
         return [$list,$categorydata];
     }
