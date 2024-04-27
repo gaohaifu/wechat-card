@@ -15,12 +15,6 @@
 							<text :style="{color:fontcolor}">{{companyInfo.name || userData.companyname}}</text>
 						</view>
 					</view>
-					<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-						:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
-									color:(certificateStatus ? 'white' : fontcolor)}"
-						@click="linkToCert">
-						{{!certificateStatus? '未认证' : '已认证'}}
-					</view>
 					<view class="extra">
 						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
 								:style="{color:fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
@@ -50,6 +44,23 @@
 					@click="toolsClick(item)">
 					<text class="iconfont" :class="item.icon" :style="{color: item.color}"></text>
 					<text>{{item.label}}</text>
+				</view>
+			</view>
+			<!-- 认证状态 -->
+			<view class="flex flex-hsb flex-vc cert-box">
+				<view class="flex flex-vc left-box">
+					<image src="../../static/images/cert-status.png" mode=""></image>
+					<text>Ta的认证</text>
+				</view>
+				<view class="flex right-box">
+					<view class="flex flex-vc flex-hc enterprise-cert" @click="linkToCert(1)">
+						<image src="../../static/images/enterprise-cert.png" mode=""></image>
+						<text>企业认证</text>
+					</view>
+					<view class="flex flex-vc flex-hc personal-cert" @click="linkToCert(2)">
+						<image src="../../static/images/personal-cert.png" mode=""></image>
+						<text>个人认证</text>
+					</view>
 				</view>
 			</view>
 			<!-- 快捷服务 -->
@@ -168,7 +179,7 @@
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
-	import {smartcardObj, weixinShare} from '@/config/common.js'
+	import {smartcardBG,smartcardObj, weixinShare} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
@@ -180,7 +191,9 @@
 		data() {
 			return {
 				cdnUrl,
-				certificateStatus: false,
+				smartcardBG,
+				is_authentication: '', // 企业负责人 0=未认证,1=待审核,2=已审核,3=审核失败
+				is_certified: '',
 				isShare: false,
 				bgColor:'bg-gradual-custom',
 				backGround:'',
@@ -384,13 +397,12 @@
 			}
 		},
 		methods: {
-			linkToCert() {
-				// console.info(this.certificateStatus, '=====', this.userData.usertype, '====usertype')
-				if(!this.certificateStatus && this.userData.usertype === '1') { // 企业负责人（管理员）
+			linkToCert(type) {
+				if(type === 1 && this.userData.is_authentication !== 2) { // 企业负责人（管理员）
 					uni.navigateTo({
 						url: '/pages/company-attestation/index'
 					})
-				} else if(!this.certificateStatus && this.userData.usertype === '0') { // 普通用户
+				} else if(type === 2 && this.userData.is_certified !== 2) { // 普通用户
 					uni.navigateTo({
 						url: '/pages/user-attestation/index'
 					})
@@ -682,9 +694,11 @@
 						if(this.isShare) {
 							this.services = this.allData.services || []
 						}
-						if(this.userData.is_certified === 0){
-							this.certificateStatus=false;
-						}
+						this.userData.is_authentication = this.companyInfo.is_authentication
+						// 企业负责人 0=未认证,1=待审核,2=已审核,3=审核失败
+						if(this.userData.usertype === 1 && this.companyInfo.is_authentication === 2) this.certificateStatus=true;
+						// 普通用户:0=未实名,1=待审核,2=认证成功
+						if(this.userData.usertype === 0 && this.userData.is_certified === 2) this.certificateStatus=true;
 						
 						console.info('首页请求的接口名称： ', api, 
 							'allData', this.allData, 'isShare', this.isShare, 
