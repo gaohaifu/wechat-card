@@ -76,7 +76,8 @@
 					<view class="flex flex-v flex-vc flex-hc flex-wrap service-item"
 						v-for="(item, inx) in services" :key="inx"
 						@click="linkToService(item)">
-						<text class="iconfont" :class="item.icon"></text>
+						<text class="iconfont" :class="item.icon" v-if="item.icon && item.icon.indexOf('http') === -1"></text>
+						<img class="iconfont" :src="item.icon" :alt="item.label" v-else>
 						<text>{{item.label}}</text>
 					</view>
 				</view>
@@ -688,7 +689,7 @@
 						// })
 						
 						if(this.isShare) {
-							this.services = this.allData.services || []
+							this.services = (this.allData.services || [])
 						}
 												
 						console.info('首页请求的接口名称： ', api, 
