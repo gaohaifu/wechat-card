@@ -1,0 +1,130 @@
+{include file="fastscrm/template/_vue"/}
+<style>
+    .tags-box,.workers-box{
+        border: 1px solid #ccc;
+        min-height: 40px;
+    }
+    .el-tag{
+        margin: 3px;
+    }
+    #channelAdd{
+        display: none;
+    }
+    .el-radio-group {
+        vertical-align: baseline !important;
+    }
+    .scrm-foot{
+        padding: 8px 20px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-size: 100% 100%;
+        background-color: #ecf0f1;
+        margin-bottom: 0!important;
+        z-index: 999;
+    }
+    .tip-title{
+        color: #409eff;margin-top: 10px
+    }
+    #picurl,#file{
+        display: none;
+    }
+    [v-cloak] {display: none;}
+</style>
+<div id="templateAdd" v-cloak>
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="{:__('Name')}" prop="name">
+            <el-input v-model="ruleForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="{:__('Msg_type')}" prop="msg_type">
+            <el-select @change="changeType" v-model="ruleForm.msg_type" placeholder="请选择消息类型" >
+                {foreach name="msgTypeList" item="vo"}
+                <el-option key="{$key}" label="{$vo}" value="{$key}"></el-option>
+                {/foreach}
+            </el-select>
+        </el-form-item>
+        <el-form-item label="文本内容" prop="text" v-if="ruleForm.msg_type=='text'">
+            <el-input type="textarea" placeholder="请输入文本内容"  maxlength="1024" show-word-limit v-model="ruleForm.text"></el-input>
+        </el-form-item>
+        <el-form-item label="标题" prop="title" v-if="ruleForm.msg_type=='news'">
+            <el-input maxlength="64" show-word-limit v-model="ruleForm.title"></el-input>
+        </el-form-item>
+        <el-form-item label="描述" v-if="ruleForm.msg_type=='news'">
+            <el-input maxlength="256" show-word-limit v-model="ruleForm.description"></el-input>
+        </el-form-item>
+        <el-form-item label="链接" prop="url" v-if="ruleForm.msg_type=='news'">
+            <el-input v-model="ruleForm.url"  placeholder="请输入跳转链接,且必须以http://或https://开头"></el-input>
+        </el-form-item>
+        <el-form-item label="内容" prop="markdown" v-if="ruleForm.msg_type=='markdown'">
+            <el-input type="textarea" placeholder="请输入markdown格式内容" :autosize="{ minRows: 4}" v-model="ruleForm.markdown"></el-input>
+            <div  class="help-block">语法
+                <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="hover">
+                    <div>
+                        <div style="color: #409eff">一、标题（支持1至6级标题，注意#与文字中间要有空格）：</div>
+                        # 标题一<br/>
+                        ## 标题二<br/>
+                        ### 标题三<br/>
+                        #### 标题四<br/>
+                        ##### 标题五<br/>
+                        ###### 标题六<br/>
+                        <div class="tip-title">二、加粗：</div>
+                        **bold**
+                        <div class="tip-title">三、链接：</div>
+                        [这是一个链接](http://work.weixin.qq.com/api/doc)
+                        <div class="tip-title">四、行内代码段（暂不支持跨行）：</div>
+                        `code`
+                        <div class="tip-title">五、引用：</div>
+                        > 引用文字
+                        <div class="tip-title">六、字体颜色（只支持3种内置颜色）：</div>
+                        &ltfont color="info"&gt绿色&lt/font&gt<br/>
+                        &ltfont color="comment"&gt灰色&lt/font&gt<br/>
+                        &ltfont color="warning"&gt橙红色&lt/font&gt
+                    </div>
+                    <i class="fa fa-question-circle-o"  style="color: #999" slot="reference"></i>
+                </el-popover>
+            </div>
+        </el-form-item>
+        <div class="form-group" id="picurl">
+            <label for="c-image" class="el-form-item__label" style="width: 100px">图片</label>
+            <div class="input-group">
+                <input id="c-image" data-rule="" class="el-input__inner" style="border-radius: 4px 0 0 4px;" size="50" name="image" type="text" :value="ruleForm.picurl">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-image" class="btn btn-danger faupload" style="line-height: 26px;" data-maxsize="2M" data-input-id="c-image" data-mimetype="jpg,png,jpeg" data-multiple="false" data-preview-id="p-image"><i class="fa fa-upload"></i> 上传</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-image"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-image"></ul>
+        </div>
+        <div class="form-group" id="file">
+            <label for="c-image" class="el-form-item__label" style="width: 100px">文件</label>
+            <div class="input-group">
+                <input id="c-file" data-rule="" class="el-input__inner" style="border-radius: 4px 0 0 4px;" size="50" name="file" type="text" :value="ruleForm.file">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-file" class="btn btn-danger faupload" style="line-height: 26px;" data-maxsize="20M" data-input-id="c-file"  data-multiple="false" data-preview-id="p-file"><i class="fa fa-upload"></i> 上传</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-file"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-file"></ul>
+        </div>
+        <el-form-item label="{:__('Status')}">
+            <el-radio-group v-model="ruleForm.status">
+                {foreach name="statusList" item="vo"}
+                <el-radio label="{$key}">{$vo}</el-radio>
+                {/foreach}
+            </el-radio-group>
+        </el-form-item>
+    </el-form>
+
+    <div style="height: 50px"></div>
+    <div class="form-group scrm-foot">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button  class="btn btn-primary" @click="submitForm('ruleForm')">{:__('OK')}</button>
+            <button  class="btn btn-default" @click="resetForm('ruleForm')">{:__('Reset')}</button>
+        </div>
+    </div>
+</div>

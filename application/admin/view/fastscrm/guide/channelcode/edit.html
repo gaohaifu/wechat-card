@@ -1,0 +1,99 @@
+{include file="fastscrm/template/_vue"/}
+<style>
+    .tags-box,.workers-box{
+        border: 1px solid #ccc;
+        min-height: 40px;
+    }
+    .el-tag{
+        margin: 3px;
+    }
+    #channelEdit{
+        display: none;
+    }
+    .el-radio-group {
+        vertical-align: baseline !important;
+    }
+    .scrm-foot{
+        padding: 8px 20px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-size: 100% 100%;
+        background-color: #ecf0f1;
+        margin-bottom: 0!important;
+        z-index: 999;
+    }
+</style>
+<div id="channelEdit">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="{:__('Name')}" prop="name">
+            <el-input disabled maxlength="30" show-word-limit v-model="ruleForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="{:__('Group_id')}" prop="group_id">
+            <el-select v-model="ruleForm.group_id" placeholder="请选择所属分组">
+                <el-option v-for="(item,index) in  groups" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="{:__('Type')}">
+            <el-radio-group v-model="ruleForm.type">
+                {foreach name="typeList" item="vo"}
+                <el-radio label="{$key}" disabled>{$vo}</el-radio>
+                {/foreach}
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="{:__('Worker_id')}">
+            <el-button   @click="addworkers" v-if="workers.length==0" type="primary" icon="el-icon-user">选择员工</el-button>
+            <el-button   @click="addworkers" v-else type="primary" icon="el-icon-user" plain>已选择{{workers.length}}人</el-button>
+            <div class="help-block">
+                因企业微信限制，单人类型只能选择一人，多人类型最多选择100人,自动过滤重复和多余员工
+            </div>
+        </el-form-item>
+        <el-form-item label="{:__('Tags')}">
+            <div v-if="tags.length>0" @click="addtags">
+                <el-tag
+                        v-for="tag in tags"
+                        :key="tag.id"
+                        closable
+                        @close="deltag"
+                >
+                    {{tag.name}}
+                </el-tag>
+            </div>
+            <el-button   @click="addtags" v-else type="primary" icon="el-icon-user">选择标签</el-button>
+        </el-form-item>
+        <el-form-item label="{:__('Remark')}">
+            <el-input maxlength="30" show-word-limit v-model="ruleForm.remark"></el-input>
+        </el-form-item>
+        <el-form-item label="{:__('Scene')}">
+            <el-radio-group v-model="ruleForm.scene">
+                {foreach name="sceneList" item="vo"}
+                <el-radio disabled label="{$key}">{$vo}</el-radio>
+                {/foreach}
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="{:__('Style')}" v-if="ruleForm.scene==1">
+            <el-radio-group v-model="ruleForm.style">
+                {foreach name="styleList" item="vo"}
+                <el-radio label="{$key}">{$vo}</el-radio>
+                {/foreach}
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item label="{:__('Skip_verify')}">
+            <el-switch v-model="ruleForm.skip_verify"></el-switch>
+            <div  class="help-block">开启后，客户添加该企业微信时，员工无需好友验证，将会自动添加成功</div>
+        </el-form-item>
+        <el-form-item label="{:__('Is_exclusive')}">
+            <el-switch disabled v-model="ruleForm.is_exclusive"></el-switch>
+            <div  class="help-block">开启后，同一个企业的客户会优先添加到同一个员工</div>
+        </el-form-item>
+    </el-form>
+    <div style="height: 50px"></div>
+    <div class="form-group scrm-foot">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button  class="btn btn-primary" @click="submitForm('ruleForm')">{:__('OK')}</button>
+            <button  class="btn btn-default" @click="resetForm('ruleForm')">{:__('Reset')}</button>
+        </div>
+    </div>
+</div>

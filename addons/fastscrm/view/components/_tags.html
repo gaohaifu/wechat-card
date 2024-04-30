@@ -1,0 +1,71 @@
+<template id="tags" >
+     <van-popup v-model="show" close-on-popstate round position="bottom" :style="{ height: '60%' }">
+         <div class="title-box fxl wlkflex">
+             <div class="title">选择标签</div>
+             <div class="close-icon"><van-icon @click="cancel" color="#c8c9cc" size="1.5rem" name="cross" /></div>
+         </div>
+
+         <div class="content">
+             <div class="tags-box">
+                 <div class="mt15" v-for="(item,index) in list">
+                     <div class="label">{{item.group_name}}：</div>
+                     <van-tag @click="chose(index,key)" v-for="(tag,key) in item.tags" size="large" :color="tag.active?'#5771F9':'#ebedf0'" :text-color="tag.active?'#ffffff':'#999'">{{tag.name}}</van-tag>
+                 </div>
+             </div>
+         </div>
+         <div class="loading" v-show="loading">
+             <van-loading type="spinner" color="#5771F9" />
+         </div>
+         <div class="wlkflex footer">
+             <div class="footer-btn fc9 cancel" @click="cancel">取消</div>
+             <div class="footer-btn confirm" @click="confirm">确认</div>
+         </div>
+     </van-popup>
+</template>
+<script src="__CDN__/assets/addons/fastscrm/components/tags.js"></script>
+<style>
+    .title-box{
+        text-align: center;
+        line-height: 3.7rem;
+        position: fixed;
+        width: 100%;
+        z-index: 10;
+        background-color: white;
+        border-radius: 1rem 1rem 0 0;
+    }
+    .title-box .title{
+        width: 59%;
+        text-align: right;
+    }
+    .title-box .close-icon{
+        width: 12%;
+
+    }
+    .content{
+        width: 90%;
+        margin: 5rem auto 6rem auto;
+    }
+    .tags-box .van-tag{
+        margin: .7rem .7rem 0 0;
+    }
+    .footer{
+        justify-content: flex-end;
+        position: fixed;
+        bottom: 2rem;
+        width: 100%;
+    }
+    .footer .footer-btn{
+        padding: .8rem 2.5rem;
+        border-radius: .3rem;
+        margin-right: 1rem;
+    }
+    .footer .cancel{
+        border: 1px solid #ebedf0;
+        background-color: #FFFFFF;
+    }
+    .footer .confirm{
+        border: 1px solid #5771F9;
+        background-color: #5771F9;
+        color: #FFFFFF;
+    }
+</style>

@@ -1,0 +1,27 @@
+body{
+    background-color: white!important;
+}
+.content{
+    width: 93%;
+    margin: 0 auto;
+}
+.content .customers{
+    height: 6rem;
+    background-color: #5771F9;
+    border-radius: .5rem;
+    justify-content: space-around;
+    color: white;
+    box-shadow: 7px 20px 55px rgba(49, 75, 206, 0.2);
+}
+.content .customers .info{
+    height: 3.5rem;
+    align-content: space-between;
+    flex-flow: wrap;
+}
+.content .customers .num{
+    font-size: 1.5rem;
+    width: 100%;
+}
+.content .customers .name{
+    width: 100%;
+}

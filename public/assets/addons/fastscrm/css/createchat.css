@@ -1,0 +1,77 @@
+body{
+    background-color: white !important;
+}
+.chat-body{
+    position: relative;
+}
+.chat-content{
+    width: 90%;
+    margin: 0 auto 10rem auto;
+}
+.chat-from .chat-info{
+   margin-top: 1.5rem;
+}
+.chat-from .chat-label{
+    margin-bottom: .7rem;
+}
+.chat-from .clear,.van-field{
+    border: 1px solid #ebedf0;
+    border-radius: .3rem;
+}
+.chat-btn{
+    position: fixed;
+    width: 90%;
+    left: 5%;
+    bottom: 1rem;
+}
+.total{
+    background-color: #eff1fe;
+    margin-top: 2rem;
+    line-height: 3rem;
+    padding-left: .6rem;
+    border-radius: .2rem;
+    color: #5e6d82;
+}
+.detail-body{
+    position: relative;
+}
+.detail-content{
+    margin-bottom: 10rem;
+}
+.detail-content .userinfo{
+    justify-content: flex-start;
+}
+.detail-content .checked{
+    line-height: 2.4rem;
+}
+.detail-content .userinfo .avatar{
+    width: 3.3rem;
+    height: 3.1rem;
+    object-fit: cover;
+    border-radius: .3rem;
+}
+.detail-content .van-hairline--top-bottom::after, .van-hairline-unset--top-bottom::after {
+    border-width: 0;
+}
+.next-btn{
+    position: fixed;
+    width: 90%;
+    left: 5%;
+    bottom: 1rem;
+}
+.last-body{
+    position: relative;
+}
+.last-content{
+    width: 90%;
+    margin: 0 auto;
+}
+.last-content .last-info{
+    margin-top: 1.5rem;
+}
+.last-content .last-label{
+    margin-bottom: .7rem;
+}
+.van-popover--light{
+    left: 6%!important;
+}

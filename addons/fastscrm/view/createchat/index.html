@@ -1,0 +1,265 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/createchat.css?v1.1">
+<div id="chatPage" v-cloak>
+    <div>
+        <van-nav-bar
+                title="一键拉群"
+                left-text=""
+                left-arrow
+                fixed
+                border
+                safe-area-inset-top
+                @click-left="onClickLeft"
+                placeholder
+        />
+    </div>
+    <div v-if="next===1">
+        <div class="chat-body">
+            <div class="chat-content">
+                <div class="tips">
+                    <div class="ml05">因企业微信限制，一个群最多自动加入39个客户，超过限制将自动新建群聊</div>
+                </div>
+                <div class="head-tag mt1">
+                    <div class="shape"></div>
+                    <div class="ml05 fsx"> 一键拉群</div>
+                </div>
+
+                <div class="chat-from">
+                    <div class="chat-head wlkflex mt1">
+                        <div>客户筛选</div>
+                        <div class="clear pd05 fc9 fsm" @click="clear">清空筛选</div>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-label">企业标签：</div>
+                        <van-field
+                                v-model="tagsText"
+                                is-link
+                                colon
+                                border
+                                center
+                                readonly
+                                arrow-direction="down"
+                                placeholder="请选择标签"
+                                @click="choseTags"
+                        >
+                        </van-field>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-label">添加时间：</div>
+                        <div class="wlkflex">
+                            <div>
+                                <van-field
+                                        v-model="searchForm.startTime"
+                                        right-icon="tosend"
+                                        clickable
+                                        colon
+                                        border
+                                        center
+                                        readonly
+                                        placeholder="开始日期"
+                                        @click="choseTime"
+                                />
+                            </div>
+                            <div class="ml05 mr05">～</div>
+                            <div>
+                                <van-field
+                                        v-model="searchForm.endTime"
+                                        right-icon="tosend"
+                                        clickable
+                                        colon
+                                        border
+                                        center
+                                        readonly
+                                        placeholder="结束日期"
+                                        @click="choseTime"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-label">添加渠道：</div>
+                        <div v-if="searchForm.add!=''">
+                            <van-field
+
+                                    v-model="addList[searchForm.add]['text']"
+                                    is-link
+                                    colon
+                                    border
+                                    center
+                                    readonly
+                                    arrow-direction="down"
+                                    placeholder="请选择渠道"
+                                    @click="choseAdd"
+                            />
+                        </div>
+                        <div v-else>
+                            <van-field
+                                    v-model="searchForm.add"
+                                    is-link
+                                    colon
+                                    border
+                                    center
+                                    readonly
+                                    arrow-direction="down"
+                                    placeholder="请选择渠道"
+                                    @click="choseAdd"
+                            />
+                        </div>
+
+                    </div>
+                    <div class="chat-info">
+                        <div class="chat-label">客户性别：</div>
+                        <van-field
+                                v-model="sexList[searchForm.sex]"
+                                is-link
+                                colon
+                                border
+                                center
+                                readonly
+                                arrow-direction="down"
+                                placeholder="请选择性别"
+                                @click="choseSex"
+                        />
+                    </div>
+                </div>
+                <div class="total">
+                    <div class="ml05">满足条件的客户数：<span class="fcw">{{total}}</span></div>
+                </div>
+                <div class="chat-btn">
+                    <van-button type="primary" @click="setNext(2)"  color="#5771F9" block>查看客户</van-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="next===2">
+        <div class="detail-body">
+            <div class="detail-content">
+                <div class="wlkflex wd92 mt1 mb1">
+                    <div class="head-tag">
+                        <div class="shape"></div>
+                        <div class="ml05 fsx"> 共{{total}}个客户</div>
+                    </div>
+                    <div class="checked">
+                        <van-checkbox v-model="checkedAll" checked-color="#5771F9"  shape="square" @click="checkAll">全选</van-checkbox>
+                    </div>
+                </div>
+                <div>
+                    <div v-if="finished && total==0" class="center">
+                        <van-empty
+                                class="custom-image"
+                                image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                        />
+                    </div>
+                    <van-checkbox-group v-model="result" ref="checkboxGroup">
+                        <van-cell-group>
+                            <van-list
+                                    v-model="loading"
+                                    :error.sync="error"
+                                    error-text="请求失败，点击重新加载"
+                                    :finished="finished"
+                                    finished-text="没有更多了"
+                                    :immediate-check="false"
+                                    @load="getData"
+                            >
+                                <van-cell
+                                        v-for="(item,index) in list"
+                                        clickable
+                                        @click="toggle(index)"
+                                >
+                                    <div class="wlkflex userinfo">
+                                        <img class="avatar" :src="item.avatar?item.avatar:'__CDN__/assets/img/avatar.png'" alt="">
+                                        <div class="ml1">{{item.name}}</div>
+                                    </div>
+                                    <template #right-icon>
+                                        <van-checkbox  checked-color="#5771F9" :name="item" ref="checkboxes" />
+                                    </template>
+                                </van-cell>
+                            </van-list>
+
+                        </van-cell-group>
+                    </van-checkbox-group>
+                </div>
+            </div>
+            <div class="next-btn">
+                <van-button type="primary" :disabled="listTotal==0 || result.length<=1" @click="setNext(3)" color="#5771F9" block>下一步</van-button>
+            </div>
+        </div>
+    </div>
+    <div v-if="next===3">
+        <div class="last-body">
+            <div class="last-content">
+                <div class="tips">
+                    <div class="ml05">选中的客户数为{{result.length}}人，将拉入{{result.length<=39?1:Math.ceil(result.length/39)}}个群聊中</div>
+                </div>
+                <div class="head-tag mt2">
+                    <div class="shape"></div>
+                    <div class="ml05 fsx"> 批量设置群聊名称</div>
+                </div>
+                <div class="last-info">
+                    <div class="last-label">群名称：</div>
+                    <van-field
+                            v-model="chatName"
+                            colon
+                            border
+                            center
+                            placeholder="请输入群名称"
+                    />
+                </div>
+                <div class="last-info">
+                    <div class="last-label">群序号：</div>
+                    <van-field
+                            type="digit"
+                            v-model="chatIndex"
+                            colon
+                            border
+                            center
+                            placeholder="请输入群序号，如不填则默认从1开始"
+                    >
+                        <template #button>
+                            <van-popover
+                                    v-model="showPopover"
+                                    trigger="click"
+                            >
+                                <div class="fc9 fsm pd05">在创建多个群时，将从此序号开始依次生成群名，如“讨论组1”</div>
+                                <template #reference>
+                                    <van-icon name="question-o" size="17" color="#969799" />
+                                </template>
+                            </van-popover>
+                        </template>
+                    </van-field>
+                </div>
+            </div>
+        </div>
+        <div class="next-btn">
+            <van-button type="primary"  @click="createChat" color="#5771F9" block>开始创建</van-button>
+        </div>
+    </div>
+    <wlk-tags ref="tags"></wlk-tags>
+    <div><van-calendar v-model="timeShow" type="range" color="#5771F9" :min-date="minDate" confirm-disabled-text="请选择结束时间" @confirm="timeConfirm" /></div>
+    <div>
+        <van-popup v-model="showSex" round position="bottom">
+            <van-picker
+                    title="性别"
+                    show-toolbar
+                    :columns="sexList"
+                    @confirm="sexConfirm"
+                    @cancel="sexCancel"
+            />
+        </van-popup>
+    </div>
+    <div>
+        <van-popup v-model="showAdd" round position="bottom">
+            <van-picker
+                    title="添加渠道"
+                    show-toolbar
+                    :columns="addList"
+                    @confirm="addConfirm"
+                    @cancel="addCancel"
+            />
+        </van-popup>
+    </div>
+</div>
+{include file="components/_tags"/}
+<script src="__CDN__/assets/addons/fastscrm/js/createchat.js"></script>
+{include file="tpl/_footer"/}

@@ -1,0 +1,323 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/welcome.css?v1.0">
+<div id="welcomePage" v-cloak>
+    <div>
+        <van-nav-bar
+                title="{$title}"
+                left-text=""
+                left-arrow
+                fixed
+                border
+                safe-area-inset-top
+                @click-left="onClickLeft"
+                placeholder
+        />
+    </div>
+    <div class="code-body">
+        <div class="code-content">
+            <div class="head-box wlkflex">
+                <div class="head-tag">
+                    <div class="shape"></div>
+                    <div class="ml05 fsx"> 我的欢迎语</div>
+                </div>
+                <div class="create-btn" @click="add">
+                    新建
+                </div>
+            </div>
+            <div class="code-list">
+                <div v-if="finished && listTotal==0" class="center">
+                    <van-empty
+                            class="custom-image"
+                            image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                    />
+                </div>
+                <van-list
+                        v-model="loading"
+                        :error.sync="error"
+                        error-text="请求失败，点击重新加载"
+                        :finished="finished"
+                        finished-text="没有更多了"
+                        :immediate-check="false"
+                        @load="getData"
+                >
+                    <van-cell
+                            v-for="(item,index) in list"
+                            icon="chat-o"
+                    >
+                        {{item.title}}
+                        <template #right-icon>
+                            <div class="show-btn bg7A" @click="viewImage(item)">预览</div>
+                            <div class="now-btn ml05" v-if="item.is_now">当前</div>
+                            <div class="show-btn ml05" v-else @click="setWelcome(item.id)">设置</div>
+                        </template>
+                    </van-cell>
+                </van-list>
+
+            </div>
+            <div class="head-box wlkflex">
+                <div class="head-tag">
+                    <div class="shape"></div>
+                    <div class="ml05 fsx"> 企业欢迎语</div>
+                </div>
+
+            </div>
+            <div class="code-list">
+                <div v-if="finishedCo && listTotalCo==0" class="center">
+                    <van-empty
+                            class="custom-image"
+                            image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                    />
+                </div>
+                <van-list
+                        v-model="loadingCo"
+                        :error.sync="errorCo"
+                        error-text="请求失败，点击重新加载"
+                        :finished="finishedCo"
+                        finished-text="没有更多了"
+                        :immediate-check="false"
+                        @load="getCoData"
+                >
+                    <van-cell
+                            v-for="(item,index) in listCo"
+                            icon="chat-o"
+                    >
+                        {{item.title}}
+                        <template #right-icon>
+                            <div class="show-btn bg7A" @click="viewImage(item)">预览</div>
+                            <div class="now-btn ml05" v-if="item.is_now">当前</div>
+                            <div class="show-btn ml05" v-else @click="setWelcome(item.id)">设置</div>
+                        </template>
+                    </van-cell>
+                </van-list>
+            </div>
+        </div>
+    </div>
+    <van-popup safe-area-inset-bottom v-model="addShow" round closeable position="bottom" :style="{ height: '70%' }" >
+        <div class="mt2">
+            <van-form @submit="onSubmit">
+                <van-field
+                        colon
+                        v-model="searchForm.title"
+                        label="标题"
+                        :error="false"
+                        placeholder="请输入标题"
+                        type="textarea"
+                        rows="1"
+                        autosize
+                        :maxlength="titleLength"
+                        show-word-limit
+                        :rules="[{ required: true, message: '请输入欢迎语标题' }]"
+                ></van-field>
+                <van-field
+                        colon
+                        :error="false"
+                        v-model="searchForm.content"
+                        rows="5"
+                        autosize
+                        maxlength="2000"
+                        show-word-limit
+                        label="文本消息"
+                        type="textarea"
+                        placeholder="请输入文本消息"
+                        :rules="[{ validator, message: '文本和附件不能同时为空' }]"
+                >
+                </van-field>
+                <div class="ml1 pd05 van-hairline--bottom wlkflex" style="justify-content: flex-start">
+                    <div class="br02 pd05 bg7A fcf fsm" @click="addContent(1)">插入客户昵称</div>
+                    <div class="br02 pd05 bg57 fcf fsm ml05" @click="addContent(2)">插入员工姓名</div>
+                </div>
+                <van-field
+                        colon
+                        readonly
+                        clickable
+                        name="picker"
+                        :value="searchForm.typeData.text"
+                        label="附件类型"
+                        placeholder="点击选择附件类型"
+                        @click="showTypePicker = true"
+                >
+                </van-field>
+                <van-popup v-model="showTypePicker" position="bottom">
+                    <van-picker
+                            show-toolbar
+                            :columns="types"
+                            @confirm="onConfirm"
+                            @cancel="showTypePicker = false"
+                    />
+                </van-popup>
+                <van-field colon name="image" :label="imgLabel" v-if="searchForm.typeData.value==1 || searchForm.typeData.value==3 || searchForm.typeData.value==6"
+                           :rules="[{ required: true, message: '请上传图片' }]">
+                    <template #input>
+                        <van-uploader max-count="1" :max-size="isOverSize"  :before-read="beforeRead" :after-read="afterRead" v-model="searchForm.image"></van-uploader>
+                    </template>
+                </van-field>
+                <van-field
+                        colon
+                        :error="false"
+                        v-model="searchForm.link_url"
+                        label="链接地址"
+                        placeholder="请输入链接地址"
+                        :rules="[{ required: true, message: '请输入链接地址' }]"
+                        v-if="searchForm.typeData.value==3"
+                >
+                </van-field>
+                <van-field
+                        colon
+                        :error="false"
+                        v-model="searchForm.remark"
+                        label="描述"
+                        placeholder="请输入描述"
+                        :rules="[{ required: true, message: '请输入描述' }]"
+                        v-if="searchForm.typeData.value==3"
+                >
+                </van-field>
+                <van-field
+                        colon
+                        :error="false"
+                        v-model="searchForm.appid"
+                        label="小程序appid"
+                        placeholder="必须是关联到企业的小程序应用"
+                        :rules="[{ required: true, message: '请输入小程序appid' }]"
+                        v-if="searchForm.typeData.value==6"
+                >
+                </van-field>
+                <van-field
+                        colon
+                        :error="false"
+                        v-model="searchForm.path"
+                        label="页面路径"
+                        placeholder="如/page/index/index"
+                        :rules="[{ required: true, message: '请输入小程序page路径' }]"
+                        v-if="searchForm.typeData.value==6"
+                >
+                </van-field>
+                <van-field colon name="video" label="视频" v-if="searchForm.typeData.value==5"
+                           :rules="[{ required: true, message: '请上传视频' }]">
+                    <template #input>
+                        <van-uploader accept="video/*" max-count="1" :max-size="isOverSize"  :before-read="beforeRead" :after-read="afterRead" v-model="searchForm.video"></van-uploader>
+                    </template>
+                </van-field>
+                <van-field colon name="file" label="文件" v-if="searchForm.typeData.value==7"
+                           :rules="[{ required: true, message: '请上传文件' }]">
+                    <template #input>
+                        <van-uploader accept="*" max-count="1" :max-size="isOverSize"  :before-read="beforeRead" :after-read="afterRead" v-model="searchForm.file"></van-uploader>
+                    </template>
+                </van-field>
+                <div class="bz"></div>
+                <div class="wd90 fixed fixed-left5">
+                    <van-button round block type="info" color="#5771F9" native-type="submit">提交</van-button>
+                </div>
+            </van-form>
+        </div>
+    </van-popup>
+    <van-popup v-model="showView" round closeable :style="{ height: '80%',width:'90%',backgroundColor:'#F5F6FA' }" >
+        <div class="center mt15">效果预览</div>
+        <div class="welcome-chat wd95">
+            <div class="fc9 center fsm mb2">今天 12:00</div>
+            <div class="fc9 center fsm mb2">你已经添加了XXX，现在可以开始聊天了</div>
+            <div>
+                <van-popover
+                        v-model="showView"
+                        trigger="click"
+                        placement="right-start"
+                        :offset="[0,10]"
+                >
+                    <div class="fsm pd05 chat-list">我已经添加了你，现在我们可以开始聊天了。</div>
+                    <template #reference>
+                        <img class="avatar" src="__CDN__/assets/addons/fastscrm/img/avatar.png" alt="">
+                    </template>
+                </van-popover>
+            </div>
+            <div class="mt2 right" v-if="choseItem.content">
+                <van-popover
+                        v-model="showView"
+                        trigger="click"
+                        placement="left-start"
+                        :offset="[0,10]"
+                >
+                    <div class="fsm pd05 chat-list">{{choseItem.content}}</div>
+                    <template #reference>
+                        <img class="avatar" src="{$user.avatar?$user.avatar:'__CDN__/assets/addons/fastscrm/img/avatar.png'}" alt="">
+                    </template>
+                </van-popover>
+            </div>
+            <div class="mt2 right" v-if="choseItem.item_id">
+                <van-popover
+                        v-model="showView"
+                        trigger="click"
+                        placement="left-start"
+                        :offset="[0,10]"
+                >
+             <!--       1=图片,3=链接,5=视频,6=小程序,7=文件-->
+                    <div class="fsm pd05" v-if="choseItem.material.type==1">
+                        <van-image
+                                width="10rem"
+                                height="10rem"
+                                fit="cover"
+                                :src="choseItem.material.image"
+                                radius="5"
+                        />
+                    </div>
+                    <div class="fsm pd05" style="width: 15rem;" v-if="choseItem.material.type==3">
+                        <div>
+                            {{choseItem.material.title}}
+                        </div>
+                        <div class="wlkflex mt05" style="align-items: flex-start">
+                            <div class="fc9 fsm">
+                                {{choseItem.material.remark}}
+                            </div>
+                            <div class="pdright05">
+                                <van-image
+                                        width="4rem"
+                                        height="4rem"
+                                        fit="cover"
+                                        :src="choseItem.material.image"
+                                        radius="5"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fsm pd05" v-if="choseItem.material.type==5">
+                        <div class="video-box br05">
+                            <video style="width: 100%" :src="choseItem.material.video" ></video>
+                            <div class="video-icon"><van-icon name="play-circle-o" /></div>
+                        </div>
+                    </div>
+                    <div class="fsm pd05" v-if="choseItem.material.type==6">
+                        <div class="wxapp-box bg-white">
+                            <div>{{choseItem.material.title}}</div>
+                            <div class="mt05">
+                                <van-image
+                                        width="13rem"
+                                        height="10rem"
+                                        fit="cover"
+                                        :src="choseItem.material.image"
+                                />
+                            </div>
+                            <van-divider   :style="{ margin: '5px 0' }"></van-divider>
+                            <div class="wlkflex" style="justify-content: flex-start">
+                                <iconpark-icon size="20" color="#605ab0" name="weixin-mini-app"></iconpark-icon>
+                                <div class="ml05">小程序</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fsm pd05" v-if="choseItem.material.type==7">
+                        <div class="wlkflex">
+                            <div> {{choseItem.material.filename}}</div>
+                            <div class="ml1">
+                                <iconpark-icon size="35" color="#605ab0" name="file-cabinet"></iconpark-icon>
+                            </div>
+                        </div>
+                        <div class="fc9">{{choseItem.material.filesize}}K</div>
+                    </div>
+                    <template #reference>
+                        <img class="avatar" src="{$user.avatar?$user.avatar:'__CDN__/assets/addons/fastscrm/img/avatar.png'}" alt="">
+                    </template>
+                </van-popover>
+            </div>
+        </div>
+    </van-popup>
+</div>
+<script src="__CDN__/assets/addons/fastscrm/js/welcome.js"></script>
+{include file="tpl/_footer"/}

@@ -1,0 +1,66 @@
+.group{
+    padding-bottom: .5rem;
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    z-index: 98;
+    top: 0;
+}
+
+.content .search{
+
+}
+.content .item-box .item{
+    background-color: white;
+    padding: 1rem .7rem;
+    margin-top: .5rem;
+    border-radius: .5rem;
+}
+.content .item-box .item .title{
+    font-weight: bold;
+}
+.content .item-box .item .bz{
+    line-height: 2rem;
+    font-size: .8rem;
+    border-bottom: 1px solid #F9F9F9;
+}
+.content .item-box .item .info{
+    background-color: #f1f4f6;
+    width: 75%;
+    padding: 1rem .5rem;
+    border-radius: .1rem;
+}
+.content .item-box .item .info .video-box{
+    width: 8rem;
+    height: 8rem;
+    overflow: hidden;
+    position: relative;
+}
+.content .item-box .item .info .video-box .video-icon{
+    position: absolute;
+    top: 2rem;
+    font-size: 4rem;
+    left: 2rem;
+    color: #999999;
+}
+.content .item-box .item .info .wxapp-box{
+    background-color: #f1f4f6;
+    width: 75%;
+}
+.content .item-box .item .info-btn{
+    width: 13%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.content .item-box .item .info-btn .btn-bg{
+    width: 3rem;
+    height: 3rem;
+    color: #002FA7;
+    background-color: #f1f4f6;
+    border-radius: 50%;
+    line-height: 3rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+

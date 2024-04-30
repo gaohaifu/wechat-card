@@ -1,0 +1,118 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/reply.css">
+<div id="replyPage" v-cloak>
+    <div class="group">
+        <van-tabs sticky v-model="groupTab" @change="changeGroupTab" line-width="25px" title-active-color="#5771F9" color="#5771F9" title-inactive-color="black">
+            <van-tab title="全部"></van-tab>
+            <van-tab v-for="item in groupList" :title="item.title"></van-tab>
+        </van-tabs>
+    </div>
+    <div class="content">
+        <div class="words-nav">
+            <div class="search">
+                <van-search v-model="keyword"  @input="onSearch"  @search="onSearch" placeholder="请输入搜索关键词" />
+            </div>
+        </div>
+        <div>
+            <div v-if="finished && total==0" class="center">
+                <van-empty
+                        class="custom-image"
+                        image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                />
+            </div>
+            <van-list
+                    v-model="loading"
+                    :error.sync="error"
+                    error-text="请求失败，点击重新加载"
+                    :finished="finished"
+                    finished-text="没有更多了"
+                    :immediate-check="false"
+                    @load="getData"
+            >
+                <div class="item-box wd95">
+                    <div class="item"  v-for="item in list">
+                        <div class="title ell">{{item.title?item.title:'未命名'}}</div>
+                        <div class="wlkflex bz" style="justify-content: flex-start">
+                            <div class="fc9"><van-icon name="contact"></van-icon> <span>{{item.admin_nickname}}</span></div>
+                            <div class="fc9 ml1"><van-icon name="clock-o"></van-icon> <span>{{item.createtime}}</span></div>
+                        </div>
+                        <div class="wlkflex mt1" v-if="item.material">
+                            <div class="info" v-if="item.typedata==2 && item.material.type==1">
+                                <van-image
+                                        width="5rem"
+                                        height="5rem"
+                                        fit="cover"
+                                        :src="item.material.image"
+                                        radius="5"
+                                />
+                            </div>
+                            <div class="info" v-else-if="item.typedata==2 && item.material.type==3">
+                                <div class="bg-white pd15 br05">
+                                    <div>
+                                        {{item.material.title}}
+                                    </div>
+                                    <div class="wlkflex mt05" style="align-items: flex-start">
+                                        <div class="fc9 fsm">
+                                            {{item.material.remark}}
+                                        </div>
+                                        <div>
+                                            <van-image
+                                                    width="4rem"
+                                                    height="4rem"
+                                                    fit="cover"
+                                                    :src="item.material.image"
+                                                    radius="5"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info" v-else-if="item.typedata==2 && item.material.type==5">
+                                <div class="video-box br05">
+                                    <video style="width: 100%" :src="item.material.video" ></video>
+                                    <div class="video-icon"><van-icon name="play-circle-o" /></div>
+                                </div>
+                            </div>
+                            <div class="info" v-else-if="item.typedata==2 && item.material.type==6">
+                                <div class="wxapp-box bg-white pd15 br05">
+                                    <div>{{item.material.title}}</div>
+                                    <div class="mt05">
+                                        <van-image
+                                                width="10rem"
+                                                height="10rem"
+                                                fit="cover"
+                                                :src="item.material.image"
+                                        />
+                                    </div>
+                                    <van-divider   :style="{ margin: '5px 0' }"></van-divider>
+                                    <div class="wlkflex" style="justify-content: flex-start">
+                                        <iconpark-icon size="20" color="#605ab0" name="weixin-mini-app"></iconpark-icon>
+                                        <div class="ml05">小程序</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info wlkflex"style="justify-content: flex-start" v-else-if="item.typedata==2 && item.material.type==7">
+                                <div> <iconpark-icon size="20" color="#605ab0" name="file-cabinet"></iconpark-icon></div>
+                                <div class="ml05"> {{item.material.filename}}</div>
+
+                            </div>
+                            <div class="info-btn" @click="checkMessage(item)">
+                                <div class="btn-bg"><van-icon name="share-o" color="#5771F9" /></div>
+                            </div>
+                        </div>
+                        <div class="wlkflex mt1" v-if="item.typedata==1">
+                            <div class="info">{{item.content}}</div>
+                            <div class="info-btn" @click="checkMessage(item)">
+                                <div class="btn-bg"><van-icon name="share-o" color="#5771F9" /></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </van-list>
+        </div>
+
+    </div>
+</div>
+<script src="__CDN__/assets/addons/fastscrm/js/reply.js"></script>
+{include file="tpl/_footer"/}
