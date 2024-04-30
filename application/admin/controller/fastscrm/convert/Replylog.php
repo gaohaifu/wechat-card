@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\convert;
+namespace app\myadmin\controller\fastscrm\convert;
 
 use app\common\controller\Backend;
 

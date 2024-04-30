@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\sale;
+namespace app\myadmin\controller\fastscrm\sale;
 
 use app\common\controller\Backend;
 use think\Db;

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\message;
+namespace app\myadmin\controller\fastscrm\message;
 
 use addons\fastscrm\library\WeWork;
 use app\common\controller\Backend;

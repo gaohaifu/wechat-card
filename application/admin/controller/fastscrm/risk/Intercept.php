@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\risk;
+namespace app\myadmin\controller\fastscrm\risk;
 
 use addons\fastscrm\library\WeWork;
 use app\common\controller\Backend;

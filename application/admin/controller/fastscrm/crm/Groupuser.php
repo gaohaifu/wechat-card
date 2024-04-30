@@ -1,8 +1,8 @@
 <?php
 
-namespace app\admin\controller\fastscrm\crm;
+namespace app\myadmin\controller\fastscrm\crm;
 
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 
 /**
  * 群成员

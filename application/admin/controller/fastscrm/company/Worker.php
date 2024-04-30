@@ -1,10 +1,10 @@
 <?php
 
-namespace app\admin\controller\fastscrm\company;
+namespace app\myadmin\controller\fastscrm\company;
 
 use addons\fastscrm\library\Job\AddJob;
 use addons\fastscrm\library\WeWork;
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use fast\Http;
 use fast\Tree;
 use GuzzleHttp\Client;

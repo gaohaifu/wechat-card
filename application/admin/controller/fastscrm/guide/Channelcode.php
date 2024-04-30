@@ -1,9 +1,9 @@
 <?php
 
-namespace app\admin\controller\fastscrm\guide;
+namespace app\myadmin\controller\fastscrm\guide;
 
 use addons\fastscrm\library\WeWork;
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use think\Db;

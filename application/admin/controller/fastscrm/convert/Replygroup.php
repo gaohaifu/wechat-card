@@ -1,8 +1,8 @@
 <?php
 
-namespace app\admin\controller\fastscrm\convert;
+namespace app\myadmin\controller\fastscrm\convert;
 
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use app\common\controller\Backend;
 use think\Db;
 

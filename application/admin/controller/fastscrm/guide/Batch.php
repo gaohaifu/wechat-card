@@ -1,11 +1,11 @@
 <?php
 
-namespace app\admin\controller\fastscrm\guide;
+namespace app\myadmin\controller\fastscrm\guide;
 
 use addons\fastscrm\library\Export;
 use addons\fastscrm\library\Job\AddJob;
 use app\admin\library\Auth;
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;

@@ -1,8 +1,8 @@
 <?php
 
-namespace app\admin\controller\fastscrm\guide;
+namespace app\myadmin\controller\fastscrm\guide;
 
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use think\Db;
 
 /**

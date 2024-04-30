@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\crm;
+namespace app\myadmin\controller\fastscrm\crm;
 
 use addons\fastscrm\library\Job\AddJob;
 use app\common\controller\Backend;

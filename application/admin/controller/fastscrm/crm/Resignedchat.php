@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\crm;
+namespace app\myadmin\controller\fastscrm\crm;
 
 use app\common\controller\Backend;
 

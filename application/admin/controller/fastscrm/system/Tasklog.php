@@ -1,8 +1,8 @@
 <?php
 
-namespace app\admin\controller\fastscrm\system;
+namespace app\myadmin\controller\fastscrm\system;
 
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 
 /**
  * 同步任务日志管理

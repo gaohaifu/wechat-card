@@ -1,9 +1,9 @@
 <?php
 
-namespace app\admin\controller\fastscrm\sale;
+namespace app\myadmin\controller\fastscrm\sale;
 
 use addons\fastscrm\library\Job\AddJob;
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use fast\Http;
 use think\Db;
 use think\exception\PDOException;

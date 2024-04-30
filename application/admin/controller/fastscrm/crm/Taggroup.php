@@ -1,9 +1,9 @@
 <?php
 
-namespace app\admin\controller\fastscrm\crm;
+namespace app\myadmin\controller\fastscrm\crm;
 
 use addons\fastscrm\library\WeWork;
-use app\admin\controller\fastscrm\Scrmbackend;
+use app\myadmin\controller\fastscrm\Scrmbackend;
 use think\Db;
 use think\exception\PDOException;
 use think\exception\ValidateException;

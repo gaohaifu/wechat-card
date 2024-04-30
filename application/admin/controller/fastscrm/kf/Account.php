@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm\kf;
+namespace app\myadmin\controller\fastscrm\kf;
 
 use addons\fastscrm\library\Job\AddJob;
 use addons\fastscrm\library\WeWork;

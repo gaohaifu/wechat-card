@@ -1,6 +1,6 @@
 <?php
 
-namespace app\admin\controller\fastscrm;
+namespace app\myadmin\controller\fastscrm;
 
 use app\common\controller\Backend;
 use fast\Tree;
