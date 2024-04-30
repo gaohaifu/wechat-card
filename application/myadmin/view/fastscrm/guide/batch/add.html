@@ -1,0 +1,86 @@
+{include file="fastscrm/template/_vue"/}
+<style>
+    .tags-box,.workers-box{
+        border: 1px solid #ccc;
+        min-height: 40px;
+    }
+    .el-tag{
+        margin: 3px;
+    }
+    .element{
+        display: none;
+    }
+    .scrm-foot{
+        padding: 8px 20px;
+        height: auto;
+        text-align: inherit !important;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-size: 100% 100%;
+        background-color: #ecf0f1;
+        margin-bottom: 0!important;
+    }
+</style>
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    <div  id="batchadd">
+        <div class="form-group">
+            <label for="c-file" class="control-label col-xs-12 col-sm-2">导入模板:</label>
+            <div class="col-xs-12 col-sm-8 element">
+                <a href="export"><el-button type="primary" icon="el-icon-download">点击下载</el-button></a>
+                <div class="help-block">
+                    若导入内容有重复手机号或空行将会自动过滤
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="c-file" class="control-label col-xs-12 col-sm-2">导入EXCEL:</label>
+            <div class="col-xs-12 col-sm-8">
+                <div class="input-group">
+                    <input id="c-file" data-rule="" class="form-control" size="50" name="file" type="text" value="">
+                    <div class="input-group-addon no-border no-padding">
+                        <span><button type="button" id="faupload-file" class="btn btn-danger faupload" data-input-id="c-file" data-mimetype="csv,xls,xlsx" data-multiple="false" data-preview-id="p-file"><i class="fa fa-upload"></i> 上传</button></span>
+                    </div>
+                    <span class="msg-box n-right" for="c-file"></span>
+                </div>
+                <ul class="row list-inline faupload-preview" id="p-file"></ul>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="c-file" class="control-label col-xs-12 col-sm-2">分配员工:</label>
+            <div class="col-xs-12 col-sm-8 element">
+                <el-button   @click="addworkers" v-if="workers.length==0" type="primary" icon="el-icon-user">选择员工</el-button>
+                <el-button   @click="addworkers" v-else type="primary" icon="el-icon-user" plain>已选择{{workers.length}}人</el-button>
+                <div class="help-block">
+                    多选员工则一条手机号生成多条记录,自动过滤重复员工
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group">
+            <label for="c-file" class="control-label col-xs-12 col-sm-2">客户标签:</label>
+            <div class="col-xs-12 col-sm-8 element" @click="addtags">
+                <div class="tags-box">
+                    <el-tag
+                            v-for="tag in tags"
+                            :key="tag.id"
+                            closable
+                            @close="deltag"
+                    >
+                        {{tag.name}}
+                    </el-tag>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-group scrm-foot">
+            <label class="control-label col-xs-12 col-sm-2"></label>
+            <div class="col-xs-12 col-sm-8">
+                <button class="btn btn-primary btn-embossed" @click="submit">{:__('OK')}</button>
+                <button type="reset" @click="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+            </div>
+        </div>
+    </div>
+
+</form>

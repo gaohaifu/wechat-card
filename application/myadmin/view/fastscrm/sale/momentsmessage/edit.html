@@ -1,0 +1,61 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Title')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-title" class="form-control" name="row[title]" type="text" value="{$row.title|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Content')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-content" class="form-control" rows="5" name="row[content]" cols="50">{$row.content|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Item_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-item_id" data-select-only="true" data-params='{"custom":{"type":["in","1,3,5"]}}' data-multiple="true" data-field="title" data-source="fastscrm/material/item/index" class="form-control selectpage" name="row[item_id]" type="text" value="{$row.item_id|htmlentities}">
+            <div class="help-block">
+                发布文案与素材附件不能同时为空,最多支持9个图片类型，或者1个视频，或者1个链接,图片大小不超过10M
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Typedata')}:</label>
+        <div class="col-xs-12 col-sm-8">
+
+            <div class="radio">
+                {foreach name="typedataList" item="vo"}
+                <label for="row[typedata]-{$key}"><input id="row[typedata]-{$key}" name="row[typedata]" type="radio" value="{$key}" {in name="key" value="$row.typedata"}checked{/in} /> {$vo}</label>
+                {/foreach}
+            </div>
+
+        </div>
+    </div>
+    <div class="form-group group-box">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Worker_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-worker_id" data-select-only="true" data-field="name"  data-source="fastscrm/company/worker/index?iscustomer=1" data-multiple="true" data-primary-key="userid" class="form-control selectpage" name="row[worker_id]" type="text" value="{$row.worker_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group depart-box">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Depart_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-depart_id" data-select-only="true" data-order-by="depart_id" data-field="name" data-primary-key="depart_id"  data-source="fastscrm/company/depart/find" data-multiple="true" class="form-control selectpage" name="row[depart_id]" type="text" value="{$row.depart_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group store-box">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Store_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-store_id" data-select-only="true" data-field="store_name"  data-source="fastscrm/company/store/index" data-multiple="true" class="form-control selectpage" name="row[store_id]" type="text" value="{$row.store_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
