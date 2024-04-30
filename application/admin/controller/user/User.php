@@ -24,7 +24,7 @@ class User extends Backend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = model('User');
+        $this->model = new \app\admin\model\User;
     }
 
     /**
