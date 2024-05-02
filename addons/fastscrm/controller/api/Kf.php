@@ -21,7 +21,7 @@ class Kf extends Base
 
     public function init()
     {
-        $config         = get_addon_config('fastscrm');
+        $config         = get_fastscrm_config_by_server($_SERVER);
         $corpId         = $config['corp_id'];
         $token          = $config['kf_Token'];
         $encodingAesKey = $config['kf_EncodingAESKey'];

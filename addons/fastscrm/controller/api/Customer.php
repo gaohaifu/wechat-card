@@ -7,6 +7,8 @@ use addons\fastscrm\library\WeWork;
 use app\admin\library\Auth;
 use think\Db;
 use addons\fastscrm\library\callback\WXBizMsgCrypt;
+use addons\myadmin\model\Domain;
+use app\common\service\CompanyService;
 
 /**
  * 微信授权
@@ -25,7 +27,7 @@ class Customer extends Base
 
     public function init()
     {
-        $config         = get_addon_config('fastscrm');
+        $config         = get_fastscrm_config_by_server($_SERVER);
         $corpId         = $config['corp_id'];
         $token          = $config['Ext_Token'];
         $encodingAesKey = $config['Ext_EncodingAESKey'];

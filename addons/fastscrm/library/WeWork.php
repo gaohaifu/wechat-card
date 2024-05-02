@@ -22,7 +22,7 @@ class WeWork extends Backend
      */
     public function __construct($default = '')
     {
-        $config = get_addon_config('fastscrm');
+        $config = get_fastscrm_config_by_server($_SERVER);
         $default ? $secret = $config[$default . '_' . 'address_secret'] : $secret = $config['address_secret'];
         $default == 'H5' ? $agent_id = $config[$default . '_' . 'agent_id'] : $agent_id = 0;
         $param     = [
@@ -657,7 +657,7 @@ class WeWork extends Backend
      */
     public function getSdkConfig($url)
     {
-        $config = get_addon_config('fastscrm');
+        $config = get_fastscrm_config_by_server($_SERVER);
         return $this->app->getAgentConfig(array(
             'url' => $url,
             'corp_id' => $config['corp_id'],
@@ -685,7 +685,7 @@ class WeWork extends Backend
      */
     public function getOAuthRedirectUrl(string $redirectUri = '', string $scope = 'snsapi_base', string $state = null)
     {
-        $config = get_addon_config('fastscrm');
+        $config = get_fastscrm_config_by_server($_SERVER);
         $params = [
             'appid' => $config['corp_id'],
             'redirect_uri' => $redirectUri,
@@ -717,7 +717,7 @@ class WeWork extends Backend
      */
     public function sendMessage($param, $admin_id, $username, $ip)
     {
-        $config                          = get_addon_config('fastscrm');
+        $config                          = get_fastscrm_config_by_server($_SERVER);
         $data['touser']                  = $param['workers'];
         $data['msgtype']                 = 'textcard';
         $data['agentid']                 = $config['H5_agent_id'];

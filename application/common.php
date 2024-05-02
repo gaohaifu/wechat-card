@@ -2,6 +2,8 @@
 
 // 公共助手函数
 
+use app\common\model\fastscrm\Setting;
+use app\common\service\CompanyService;
 use think\exception\HttpResponseException;
 use think\Response;
 
@@ -505,5 +507,91 @@ if (!function_exists('build_suffix_image')) {
         </svg>
 EOT;
         return $icon;
+    }
+}
+if (!function_exists('get_fastscrm_config')) {
+    /**
+     * 获取fastscrm配置文件
+     * @param string $suffix 后缀
+     * @param null   $background
+     * @return string
+     */
+    function get_fastscrm_config($company_id,$type = 'value')
+    {
+        $config = Setting::where('company_id',$company_id)->find();
+        if(!$config){
+            return false;
+        }
+        if($type == 'value'){
+            return json_decode($config['config'],true);
+        }else{
+            return json_decode($config['full_config'],true);
+        }
+    }
+}
+if (!function_exists('get_fastscrm_config_by_server')) {
+    /**
+     * 获取fastscrm配置文件
+     * @param string $suffix 后缀
+     * @param null   $background
+     * @return string
+     */
+    function get_fastscrm_config_by_server($server,$type = 'value')
+    {
+        $service =  new CompanyService();
+        $re = $service->getCompanyByHost($server);
+        if($re['code'] == 1){
+            $domains = $re['data'];
+            //var_dump($domains);exit;
+            $company_id = $domains['company_id'];
+            return get_fastscrm_config($company_id,$type);
+        }
+        
+    }
+}
+
+
+/**
+ * 获取顶级域名
+ */
+if (!function_exists('get_first_host')) {
+    /**
+     * 获取顶级域名
+     * @return [type]
+     * 比如reserve.applinzi.com返回applinzi.com
+     */
+    function get_first_host($to_virify_url = ''){
+
+        $url   = $to_virify_url ? $to_virify_url : $_SERVER['HTTP_HOST'];
+        $data = explode('.', $url);
+        $co_ta = count($data);
+
+        //判断是否是双后缀
+        $zi_tow = true;
+        $host_cn = 'com.cn,net.cn,org.cn,gov.cn';
+        $host_cn = explode(',', $host_cn);
+        foreach($host_cn as $host){
+            if(strpos($url,$host)){
+                $zi_tow = false;
+            }
+        }
+
+        //如果是返回FALSE ，如果不是返回true
+        if($zi_tow == true){
+
+            // 是否为当前域名
+            if($url == 'localhost'){
+                $host = $data[$co_ta-1];
+            }
+            else{
+                $host = $data[$co_ta-2].'.'.$data[$co_ta-1];
+            }
+
+        }
+        else{
+            $host = $data[$co_ta-3].'.'.$data[$co_ta-2].'.'.$data[$co_ta-1];
+        }
+
+        return $host;
     }
 }

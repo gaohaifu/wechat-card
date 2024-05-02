@@ -26,7 +26,7 @@ class User extends Base
     {
         $AccessToken = Cache::get('fastscrm_AccessToken');
         if (false === $AccessToken) {
-            $config     = get_addon_config('fastscrm');
+            $config     = get_fastscrm_config_by_server($_SERVER);
             $corpid     = $config['corp_id'];
             $corpsecret = $config['App_address_secret'];
 

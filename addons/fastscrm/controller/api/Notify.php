@@ -20,7 +20,7 @@ class Notify extends Base
 
     public function init()
     {
-        $config = get_addon_config('fastscrm');
+        $config = get_fastscrm_config_by_server($_SERVER);
         $corpId = $config['corp_id'];
         $token = $config['address_Token'];
         $encodingAesKey = $config['address_EncodingAESKey'];

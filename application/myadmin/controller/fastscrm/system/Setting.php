@@ -2,6 +2,7 @@
 
 namespace app\myadmin\controller\fastscrm\system;
 
+use app\common\model\fastscrm\Setting as FastscrmSetting;
 use app\myadmin\controller\fastscrm\Scrmbackend;
 use think\addons\Service;
 use think\Exception;
@@ -22,8 +23,8 @@ class Setting extends Scrmbackend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new \app\admin\model\fastscrm\system\Tasklog;
-        $this->view->assign("statusList", $this->model->getStatusList());
+        $this->model = new FastscrmSetting();
+        //$this->view->assign("statusList", $this->model->getStatusList());
     }
 
 
@@ -50,8 +51,8 @@ class Setting extends Scrmbackend
         }
         if ($this->request->isPost()) {
             $params = $this->request->post("row/a", [], 'trim');
-            var_dump(111);exit;
             if ($params) {
+                $valueConfig = [];
                 foreach ($config as $k => &$v) {
                     if (isset($params[$v['name']])) {
                         if ($v['type'] == 'array') {
@@ -62,16 +63,22 @@ class Setting extends Scrmbackend
                         }
                         $v['value'] = $value;
                     }
+                    $valueConfig[$v['name']] = $v['value'];
                 }
+                //var_dump($config);exit;
                 try {
-                    $addon = get_addon_instance($name);
-                    //插件自定义配置实现逻辑
-                    if (method_exists($addon, 'config')) {
-                        $addon->config($name, $config);
-                    } else {
-                        //更新配置文件
-                        set_addon_fullconfig($name, $config);
-                        Service::refresh();
+                    $row = $this->model->where('company_id',COMPANY_ID)->find();
+                    if($row){
+                        $row->save([
+                            'full_config' => json_encode($config),
+                            'config'      => json_encode($valueConfig),
+                        ]);
+                    }else{
+                        $this->model->insert([
+                            'company_id'  => COMPANY_ID,
+                            'full_config' => json_encode($config),
+                            'config'      => json_encode($valueConfig),
+                        ]);
                     }
                 } catch (Exception $e) {
                     $this->error(__($e->getMessage()));
