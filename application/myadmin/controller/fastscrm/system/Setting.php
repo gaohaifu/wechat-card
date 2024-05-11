@@ -45,7 +45,8 @@ class Setting extends Scrmbackend
             $this->error(__('Addon name incorrect'));
         }
         $info = get_addon_info($name);
-        $config = get_addon_fullconfig($name);
+        //$config = get_addon_fullconfig($name);
+        $config = get_fastscrm_config(COMPANY_ID,'full');
         if (!$info) {
             $this->error(__('Addon not exists'));
         }
