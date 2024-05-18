@@ -89,7 +89,7 @@ function isLogin() {
 		console.log("user: ",user);
 		db.del('user');
 		db.del('auth');
-		toLogin()
+		// toLogin()
 		return false
 	}
 }

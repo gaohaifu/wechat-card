@@ -5,7 +5,7 @@
 				<block slot="backText">返回</block>
 				<block slot="content">首页</block>
 			</cu-custom>
-			<view class="header_padding">
+			<view class="header_padding" @click="test">
 				<view class="header_message" :style="{'background-image':'url('+cdnUrl + cardimage+')'}">
 					<view class="flex_layout userImg">
 						<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
@@ -170,7 +170,7 @@
 			</view>
 		</view>
 		<!--  #ifdef  MP-WEIXIN	 -->
-		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom"></bottomSheet>
+		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom" @cancelBottom="cancelBottom"></bottomSheet>
 		<!--  #endif -->
 		<myCardCode ref="myCardCode"></myCardCode>
 	</view>
@@ -179,7 +179,7 @@
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
-	import {smartcardBG,smartcardObj, weixinShare} from '@/config/common.js'
+	import {smartcardBG,smartcardObj, weixinShare, isLogin} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
@@ -397,7 +397,22 @@
 			}
 		},
 		methods: {
+			test() {
+				return;
+				// uni.navigateTo({
+				// 	url: '/pages/webView/webView?url=http://www.baidu.com/'
+				// })
+			},
+			checkUser() {
+				const flag = isLogin()
+				if(!flag) {
+					this.isShowBottom=true
+					this.user_id='';
+				}
+				return flag
+			},
 			linkToCert(type) {
+				if(!this.checkUser()) return;
 				if(type === 1 && this.userData.is_authentication !== 2) { // 企业负责人（管理员）
 					uni.navigateTo({
 						url: '/pages/company-attestation/index'
@@ -412,12 +427,14 @@
 				this.$refs.myCardCode && this.$refs.myCardCode.open();
 			},
 			linkToCard(row) {
+				if(!this.checkUser()) return;
 				if(row !== 'more') return; // 暂时只有查看更多能跳转
 				uni.switchTab({
 					url: '/pages/mycard-data/index'
 				})
 			},
 			sendCard() {
+				if(!this.checkUser()) return;
 				this.$api.sendCard({
 					staff_id: this.staffInfo.id
 				}, res => {
@@ -431,6 +448,7 @@
 				})
 			},
 			resendCard() {
+				if(!this.checkUser()) return;
 				if(this.userData.save_status !== '0') return
 				this.$api.resendCard({staff_id: this.staff_id}, res => {
 					if(res.code === 1) {
@@ -448,6 +466,7 @@
 			},
 			// 点击会计工具
 			toolsClick(row) {
+				if(!this.checkUser()) return;
 				// 打电话
 				if(row.id === 1 && this.staffInfo.mobile) {
 					uni.makePhoneCall({
@@ -540,10 +559,8 @@
 						console.log("小程序: ",1);
 						this.isShowBottom=true
 						this.user_id='';
-						// this.getIndex();
 						// #endif						
-					}
-					
+					}					
 				})
 			},
 			//改版后小程序登录规则
@@ -611,6 +628,9 @@
 			closeBottom(){
 				this.isShowBottom = false;
 				this.onGetUserProfile()
+			},
+			cancelBottom() {
+				this.isShowBottom = false;
 			},
 			getIndex() {
 				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || 0 // 分享进来？分享要去share页面不公用
@@ -711,6 +731,7 @@
 				})
 			},
 			linkToService(row) {
+				if(!this.checkUser()) return;
 				if(row.url) {
 					uni.navigateTo({
 						url: `${row.url}?user_id=${this.user_id}`
