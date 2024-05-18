@@ -1,0 +1,38 @@
+<style>
+    .sentence_li{
+        color: white;
+        background-color: #605ca8;
+        border-radius: 3px;
+        margin-right: 5px;
+        padding: 3px 3px;
+
+    }
+</style>
+<div class="panel panel-default panel-intro">
+    {:build_heading()}
+
+    <div class="panel-body">
+        <div class="alert alert-success-light">
+            <b>功能介绍:</b><br>
+            1.客户同步：初次同步客户，需等待员工同步完成后再进行客户同步
+        </div>
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                        <a href="javascript:;" class="btn btn-primary btn-refresh" title="{:__('Refresh')}" ><i class="fa fa-refresh"></i> </a>
+                        <a href="javascript:;"  class="btn btn-info btn-disabled disabled btn-addtags {:$auth->check('fastscrm/crm/customer/addtags')?'':'hide'}" ><i class="fa fa-leaf"></i> 打标签</a>
+                        <a href="javascript:;"  class="btn btn-info btn-disabled disabled btn-deltags {:$auth->check('fastscrm/crm/customer/deltags')?'':'hide'}" ><i class="fa fa-leaf"></i> 删标签</a>
+                        <a href="javascript:;" class="btn btn-success btn-sync {:$auth->check('fastscrm/crm/customer/sync')?'':'hide'}" data-url="fastscrm/crm/customer/sync" ><i class="fa fa-arrow-down"></i> 客户同步</a>
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-edit="{:$auth->check('fastscrm/crm/customer/edit')}"
+                           data-operate-del="{:$auth->check('fastscrm/crm/customer/del')}"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

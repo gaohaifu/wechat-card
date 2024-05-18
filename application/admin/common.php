@@ -18,8 +18,8 @@ if (!function_exists('build_select')) {
      */
     function build_select($name, $options, $selected = [], $attr = [])
     {
-        $options = is_array($options) ? $options : explode(',', $options);
-        $selected = is_array($selected) ? $selected : explode(',', $selected);
+        $options = is_array($options) ? $options : explode(',', $options ?? '');
+        $selected = is_array($selected) ? $selected : explode(',', $selected ?? '');
         return Form::select($name, $options, $selected, $attr);
     }
 }
@@ -121,7 +121,7 @@ if (!function_exists('build_toolbar')) {
         $html = [];
         foreach ($btns as $k => $v) {
             //如果未定义或没有权限
-            if (!isset($btnAttr[$v]) || ($v !== 'refresh' && !$auth->check("{$controller}/{$v}"))) {
+            if (!isset($btnAttr[$v]) || ($v !== 'refresh' && !$auth->check("{$controller}/{$v}", $auth->id))) {
                 continue;
             }
             list($href, $class, $icon, $text, $title) = $btnAttr[$v];

@@ -1,0 +1,65 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/page.css">
+<style>
+    body{
+        background-color: white !important;
+    }
+</style>
+
+<div id="indexPage" v-cloak>
+    <div class="content">
+        <div class="userinfo">
+             <img class="avatar" :src="worker.avatar?worker.avatar:'__CDN__/assets/img/avatar.png'" alt="">
+             <div class="user-name">{{worker.name}}</div>
+             <div class="depart">所属部门：{{worker.department}}</div>
+        </div>
+        <div class="customer wlkflex">
+            <div class="add">
+                <div class="info">
+                    <div class="num">{{worker.cus_num?worker.cus_num:0}}</div>
+                    <div>今日新增（人）</div>
+                </div>
+            </div>
+            <div class="lose">
+                <div class="info">
+                    <div class="num">{{worker.cus_lose?worker.cus_lose:0}}</div>
+                    <div>今日流失（人）</div>
+                </div>
+            </div>
+        </div>
+        <div class="head-tag mt2">
+            <iconpark-icon size="20" color="#5771F9" name="ranking"></iconpark-icon>
+            <div class="ml05"> 招募排名</div>
+        </div>
+        <div class="ranks wlkflex mt1" v-for="(item,index) in ranks">
+            <div class="info wlkflex">
+                <img class="avatar" :src="item.avatar?item.avatar:'__CDN__/assets/img/avatar.png'" alt="">
+                <div class="ml1">
+                    <div class="fxl" style="line-height: 2.4rem">{{item.name}}</div>
+                    <div class="fc9">招募：{{item.count}}</div>
+                </div>
+            </div>
+            <div v-if="index==0" class="gold"><img class="rank-icon" src="__CDN__/assets/addons/fastscrm/img/first.png" alt=""></div>
+            <div v-else-if="index==1" class="gold"><img class="rank-icon" src="__CDN__/assets/addons/fastscrm/img/two.png" alt=""></div>
+            <div v-else-if="index==2" class="gold"><img class="rank-icon" src="__CDN__/assets/addons/fastscrm/img/three.png" alt=""></div>
+            <div v-else class="gold fxl">{{index+1}}</div>
+        </div>
+    </div>
+    <van-tabbar v-model="active" active-color="#5771f9"  placeholder safe-area-inset-bottom>
+        <van-tabbar-item  url="{:addon_url('fastscrm/index', [], false, true)}">
+            <span>工作台</span>
+            <template #icon="props">
+                <img :src="props.active ? '__CDN__/assets/addons/fastscrm/img/workbench-active.png': '__CDN__/assets/addons/fastscrm/img/workbench.png'" />
+            </template>
+        </van-tabbar-item>
+        <van-tabbar-item  url="{:addon_url('fastscrm/tools/index', [], false, true)}">
+            <span>运营工具</span>
+            <template #icon="props">
+                <img :src="props.active ? '__CDN__/assets/addons/fastscrm/img/tool-active.png': '__CDN__/assets/addons/fastscrm/img/tool.png'" />
+            </template>
+        </van-tabbar-item>
+    </van-tabbar>
+</div>
+<script src="__CDN__/assets/addons/fastscrm/js/index.js"></script>
+{include file="tpl/_footer"/}

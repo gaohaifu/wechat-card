@@ -1,0 +1,17 @@
+body{
+    background-color: white !important;
+}
+.batch-body{
+    position: relative;
+}
+.batch-group{
+    padding-bottom: .5rem;
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    z-index: 98;
+    top: 3rem;
+}
+.batch-content{
+    margin-top: 4rem;
+}

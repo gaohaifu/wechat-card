@@ -1,0 +1,84 @@
+body{
+
+}
+.code-body{
+    position: relative;
+}
+.code-content{
+
+}
+.head-box{
+    width: 92%;
+    margin: .5rem auto;
+
+}
+.code-list{
+    height: 19rem;
+    background-color: white;
+    overflow-y: auto;
+}
+.create-btn{
+    background-color: #5771F9;
+    padding: .4rem 1.2rem;
+    border-radius: .2rem;
+    color: white;
+    font-size: .7rem;
+}
+.show-btn{
+    background-color: #5771F9;
+    border: 1px solid #5771F9;
+    padding: .1rem 1rem;
+    border-radius: .2rem;
+    color: white;
+    font-size: .7rem;
+}
+.now-btn{
+    border: 1px solid #5771F9;
+    padding: .1rem 1rem;
+    border-radius: .2rem;
+    color: #5771F9;
+    font-size: .7rem;
+}
+.custom-image .van-empty__image {
+    width: 20rem;
+    /*height: 10rem;*/
+}
+.code-content .last-info{
+    margin-top: 1.5rem;
+}
+.code-content .last-label{
+    margin-bottom: .7rem;
+}
+.welcome-chat{
+    margin-top: 5rem;
+}
+.chat-list{
+    line-height: 1.2rem;
+
+}
+.van-popover--light{
+    max-width: 58%;
+    /*left: 23%!important;*/
+}
+.avatar{
+    width: 3rem;
+    height: 3rem;
+    object-fit: cover;
+    border-radius: .6rem;
+}
+.video-box{
+    width: 8rem;
+    height: 8rem;
+    overflow: hidden;
+    position: relative;
+}
+.video-box .video-icon{
+    position: absolute;
+    top: 2rem;
+    font-size: 4rem;
+    left: 2rem;
+    color: white;
+}
+.bz{
+    height: 7rem;
+}

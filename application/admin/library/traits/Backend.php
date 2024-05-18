@@ -460,7 +460,7 @@ trait Backend
             if ($has_admin_id) {
                 $auth = Auth::instance();
                 foreach ($insert as &$val) {
-                    if (!isset($val['admin_id']) || empty($val['admin_id'])) {
+                    if (empty($val['admin_id'])) {
                         $val['admin_id'] = $auth->isLogin() ? $auth->id : 0;
                     }
                 }

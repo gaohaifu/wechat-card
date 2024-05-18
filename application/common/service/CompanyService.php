@@ -7,6 +7,7 @@ use app\admin\model\Xccmsmenuinfo;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use addons\kefu\library\gatewayworker\start;
+use addons\myadmin\model\Domain;
 use AlibabaCloud\SDK\Videoenhan\V20200320\Videoenhan;
 use AlibabaCloud\Tea\Exception\TeaError;
 use AlibabaCloud\Tea\Utils\Utils;
@@ -53,4 +54,19 @@ class CompanyService extends Base
 
         return true;
     }
+
+    public function getCompanyByHost($server){
+        if (!isset($server['HTTP_HOST'])){
+             return ['code'=>'0','msg'=>'未获取到域名'];
+        }
+        
+        $domain = get_first_host($server['HTTP_HOST']);
+        $domains = Domain::where(['name'=>$domain])->find()->toArray();
+            if(!$domains){
+                return ['code'=>'0','msg'=>'该企业已被删除'];
+            }
+        
+        return ['code'=>'1','msg'=>'','data'=>$domains];
+    }
 }
+

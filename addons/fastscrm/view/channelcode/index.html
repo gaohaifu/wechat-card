@@ -1,0 +1,191 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/channelcode.css?v1.0">
+<div id="codePage" v-cloak>
+    <div>
+        <van-nav-bar
+                title="渠道活码"
+                left-text=""
+                left-arrow
+                fixed
+                border
+                safe-area-inset-top
+                @click-left="onClickLeft"
+                placeholder
+        />
+    </div>
+    <div class="code-body">
+        <div class="code-content">
+            <div class="head-box wlkflex">
+                <div class="head-tag">
+                    <div class="shape"></div>
+                    <div class="ml05 fsx"> 我的渠道活码</div>
+                </div>
+                <div class="create-btn" @click="add">
+                    新建
+                </div>
+            </div>
+            <div class="code-list">
+                <div v-if="finished && listTotal==0" class="center">
+                    <van-empty
+                            class="custom-image"
+                            image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                    />
+                </div>
+                <van-list
+                        v-model="loading"
+                        :error.sync="error"
+                        error-text="请求失败，点击重新加载"
+                        :finished="finished"
+                        finished-text="没有更多了"
+                        :immediate-check="false"
+                        @load="getData"
+                >
+                    <van-cell
+                            v-for="(item,index) in list"
+                            icon="qr"
+                    >
+                        {{item.name}}
+                        <template #right-icon>
+                            <div class="show-btn" @click="viewImage(item.qr_code)">预览</div>
+                        </template>
+                    </van-cell>
+                </van-list>
+
+            </div>
+            <div class="head-box wlkflex">
+                <div class="head-tag">
+                    <div class="shape"></div>
+                    <div class="ml05 fsx"> 企业渠道活码</div>
+                </div>
+
+            </div>
+            <div class="code-list">
+                <div v-if="finishedCo && listTotalCo==0" class="center">
+                    <van-empty
+                            class="custom-image"
+                            image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                    />
+                </div>
+                <van-list
+                        v-model="loadingCo"
+                        :error.sync="errorCo"
+                        error-text="请求失败，点击重新加载"
+                        :finished="finishedCo"
+                        finished-text="没有更多了"
+                        :immediate-check="false"
+                        @load="getCoData"
+                >
+                    <van-cell
+                            v-for="(item,index) in listCo"
+                            icon="qr"
+                    >
+                        {{item.name}}
+                        <template #right-icon>
+                            <div class="show-btn" @click="viewImage(item.qr_code)">预览</div>
+                        </template>
+                    </van-cell>
+                </van-list>
+            </div>
+        </div>
+    </div>
+    <van-popup v-model="addShow" round closeable position="bottom" :style="{ height: '70%' }" >
+        <div class="mt2">
+            <van-form @submit="onSubmit">
+                <van-field
+                        colon
+                        v-model="searchForm.name"
+                        name="活码名称"
+                        label="活码名称"
+                        :error="false"
+                        placeholder="请输入活码名称"
+                        :rules="[{ required: true, message: '请输入活码名称' }]"
+                ></van-field>
+                <van-field name="radio" label="类型" colon>
+                    <template #input>
+                        <van-radio-group v-model="searchForm.type" direction="horizontal" checked-color="#5771F9">
+                            <van-radio name="1">单人</van-radio>
+                            <van-radio name="2">多人</van-radio>
+                        </van-radio-group>
+                    </template>
+                </van-field>
+                <van-field
+                        v-model="searchForm.tagsText"
+                        is-link
+                        colon
+                        center
+                        readonly
+                        arrow-direction="down"
+                        placeholder="请选择标签"
+                        name="客户标签"
+                        label="客户标签"
+                        @click="choseTags"
+                >
+                </van-field>
+                <van-field
+                        v-model="searchForm.workersText"
+                        is-link
+                        colon
+                        center
+                        readonly
+                        arrow-direction="down"
+                        placeholder="请选择员工"
+                        name="企业员工"
+                        label="企业员工"
+                        :error="false"
+                        @click="choseWorkers"
+                        :rules="[{ required: true, message: '请选择员工' }]"
+                >
+                </van-field>
+                <van-field
+                        v-model="searchForm.remark"
+                        colon
+                        name="备注"
+                        label="备注"
+                        placeholder="请输入备注信息"
+                        maxlength="30"
+                        show-word-limit
+                ></van-field>
+                <van-field colon name="switch" label="无需验证">
+                    <template #input>
+                        <van-switch v-model="searchForm.skip_verify" size="20" active-color="#5771F9"></van-switch>
+                    </template>
+                    <template #button>
+                        <van-popover
+                                v-model="verifyTip"
+                                trigger="click"
+                        >
+                            <div class="fc9 fsm pd05">开启后，客户添加该企业微信时，员工无需好友验证，将会自动添加成功</div>
+                            <template #reference>
+                                <van-icon name="question-o" size="17" color="#969799" />
+                            </template>
+                        </van-popover>
+                    </template>
+                </van-field>
+                <van-field colon name="switch" label="统一跟进人">
+                    <template #input>
+                        <van-switch v-model="searchForm.is_exclusive" size="20" active-color="#5771F9" />
+                    </template>
+                    <template #button>
+                        <van-popover
+                                v-model="exclusiveTip"
+                                trigger="click"
+                        >
+                            <div class="fc9 fsm pd05">开启后，同一个企业的客户会优先添加到同一个员工</div>
+                            <template #reference>
+                                <van-icon name="question-o" size="17" color="#969799" />
+                            </template>
+                        </van-popover>
+                    </template>
+                </van-field>
+                <div class="wd90 fixed fixed-left5">
+                    <van-button round block type="info" color="#5771F9" native-type="submit">提交</van-button>
+                </div>
+            </van-form>
+        </div>
+    </van-popup>
+    <wlk-tags ref="tags"></wlk-tags>
+</div>
+{include file="components/_tags"/}
+<script src="__CDN__/assets/addons/fastscrm/js/channelcode.js"></script>
+{include file="tpl/_footer"/}
