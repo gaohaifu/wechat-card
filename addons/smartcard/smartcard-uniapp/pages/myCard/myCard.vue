@@ -494,8 +494,8 @@
 					})
 				} else if (row.id === 4 && this.companyInfo.latitude && this.companyInfo.longitude) {
 					uni.openLocation({
-						latitude: this.companyInfo.latitude,
-						longitude: this.companyInfo.longitude
+						latitude: Number(this.companyInfo.latitude),
+						longitude: Number(this.companyInfo.longitude)
 					})
 				} else if(row.id === 5) { // 发名片
 					
