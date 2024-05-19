@@ -292,6 +292,7 @@
 				myselfstatus: false,
 				theme: {},
 				origin: 1, // 来源:1=我向对方发出了名片,2=对方的名片夹,3=对方的名片浏览记录
+				shareCardInfo: {}
 			}
 		},
 		onLoad(e) {
@@ -363,6 +364,7 @@
 				// ]
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
+			this.getShareCardInfo()
 		},
 		onShow() {
 			this.refreshUser()
@@ -389,10 +391,12 @@
 			console.info('this.companyInfo', this.companyInfo, 'share staff_id: ', this.staffInfo.id, 'share user_id: ', this.user_id)
 			const staff_id = this.staffInfo.id; // 9
 			const user_id = this.user_id; // 11
+			let greeting = (this.companyInfo.name ? `我是${this.companyInfo.name}名片，很高兴认识你` : "名片夹")
+			if (this.shareCardInfo.greetings) greeting = this.shareCardInfo.greetings
 			return {
-			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
+			  title: greeting,
 			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + staff_id + '&user_id='+ user_id + '&pageTitle='+this.userData.name,
-			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
+			  imageUrl: this.shareCardInfo.backgroundimage, // "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: weixinShare.type, // 0正式版 2体验版 1开发板
 			}
 		},
@@ -402,6 +406,16 @@
 				// uni.navigateTo({
 				// 	url: '/pages/webView/webView?url=http://www.baidu.com/'
 				// })
+			},
+			getShareInfo() {
+				
+			},
+			getShareCardInfo() {
+				this.$api.shareCardInfo({}, res => {
+					if(res.code === 1) {
+						this.shareCardInfo = res.shareCardInfo || {}
+					}
+				})
 			},
 			checkUser() {
 				const flag = isLogin()

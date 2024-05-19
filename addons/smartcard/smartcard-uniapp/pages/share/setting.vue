@@ -217,13 +217,15 @@
 							})
 						}
 						this.greetingsList = greetingsList
-						this.backgroundimageList = (data.backgroundimageList || []).map((i, inx) => {
-							return {
-								id: inx,
-								active: i === this.shareCardInfo.backgroundimage,
-								value: i
-							}
-						})
+						let backgroundimageList = []
+						for(let key in (data.backgroundimageList || {})) {
+							backgroundimageList.push(({
+								id: key,
+								active: data.backgroundimageList[key] === this.shareCardInfo.backgroundimage,
+								value: data.backgroundimageList[key]
+							}))
+						}
+						this.backgroundimageList = backgroundimageList
 						// console.info(this.backgroundimageList, this.greetings, this.shareCardInfo, '=======>', res)
 					}
 				})
