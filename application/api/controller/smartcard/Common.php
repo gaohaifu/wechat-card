@@ -913,7 +913,7 @@ class Common extends Base
             ->where(['user_id'=>$user_id,'is_default'=>1])
             ->field('s.id as staff_id,s.name,s.position,c.name as companyname,mobile,wechat,qq,email')
             ->find();
-var_dump($staff);
+
         $gfirstKey = '';
         $bfirstKey = '';
         foreach ($greetingsList as $k=>&$item) {
