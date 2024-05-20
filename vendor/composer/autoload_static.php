@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita171a4a837511915e525c40585d599c6
+class ComposerStaticInitf3106b6ef3260b6914241eab0bed11c1
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -109,8 +109,8 @@ class ComposerStaticInita171a4a837511915e525c40585d599c6
         'think\\' => 
         array (
             0 => __DIR__ . '/../..' . '/thinkphp/library/think',
-            1 => __DIR__ . '/..' . '/karsonzhang/fastadmin-addons/src',
-            2 => __DIR__ . '/..' . '/topthink/think-queue/src',
+            1 => __DIR__ . '/..' . '/topthink/think-queue/src',
+            2 => __DIR__ . '/..' . '/karsonzhang/fastadmin-addons/src',
         ),
         'ZipStream\\' => 
         array (
@@ -178,8 +178,8 @@ class ComposerStaticInita171a4a837511915e525c40585d599c6
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -281,10 +281,10 @@ class ComposerStaticInita171a4a837511915e525c40585d599c6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita171a4a837511915e525c40585d599c6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita171a4a837511915e525c40585d599c6::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInita171a4a837511915e525c40585d599c6::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInita171a4a837511915e525c40585d599c6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitf3106b6ef3260b6914241eab0bed11c1::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitf3106b6ef3260b6914241eab0bed11c1::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitf3106b6ef3260b6914241eab0bed11c1::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitf3106b6ef3260b6914241eab0bed11c1::$classMap;
 
         }, null, ClassLoader::class);
     }

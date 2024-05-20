@@ -3,3 +3,18 @@ php think migrate:create MyadminKeyword1222
 php think migrate:run
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+php think crud -t mod_fastscrm_setting --local=0 -c fastscrm/system/Setting -m fastscrm/Setting --force=true
+php think menu -c fastscrm/system/Setting --force=true

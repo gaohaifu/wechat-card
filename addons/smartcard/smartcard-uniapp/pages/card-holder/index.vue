@@ -80,18 +80,25 @@
 				</view>
 			</view>
 		</view>
+		<!--  #ifdef  MP-WEIXIN	 -->
+		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom" @cancelBottom="cancelBottom"></bottomSheet>
+		<!--  #endif -->
 	</view>
 </template>
 
 <script>
 	import NoData from '../../components/no-data/no-data.vue'
+	import bottomSheet from '@/components/bbh-sheet/bottomSheet.vue';
+	import {isLogin} from '@/config/common.js'
 	export default {
 		name: 'cardHolder',
 		components: {
-			NoData
+			NoData,
+			bottomSheet
 		},
 		data() {
 			return {
+				isShowBottom: false,
 				searchList: [],
 				exchangeCardNum: 0,
 				exchangeCards: [],
@@ -99,7 +106,15 @@
 			}
 		},
 		onShow() {
-			this.getData()
+			
+			if (!this.checkUser()) {
+				this.refreshUser()
+				// #ifdef MP-WEIXIN
+				this.wxLogin();
+				// #endif
+			}else {
+				this.getData()
+			}
 		},
 		methods: {
 			getData() {
@@ -147,7 +162,190 @@
 						this.searchList = []
 					}
 				}, 500)
-			}
+			},
+			// 以下都是检测登录逻辑===============参考首页
+			checkUser() {
+				const flag = isLogin()
+				console.info(flag, '=========>>>>flag')
+				if(!flag) {
+					this.isShowBottom=true
+					this.user_id='';
+				}
+				return flag
+			},
+			wxLogin(){
+				uni.login({
+					success:(res) => {
+						this.code = res.code;
+						console.log("res.code: ",res.code);
+					},
+					fail: function (error) {
+						console.log('login failed ' + error);
+					}
+				});
+			},
+			refreshUser(){
+				console.log('index调用onshow');
+				this.$api.refreshUser(
+				 {},
+				data => {
+					console.log(data);
+					if(data.code==1){
+						this.user_id=data.data.user.id;
+						// 是否已填写个人资料
+						if(data.isStaff === 0) {
+							uni.navigateTo({
+								url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+							})
+							return
+						}
+						this.getIndex();
+					}else{
+						//微信小程序端
+						// #ifdef MP-WEIXIN
+						console.log("小程序: ",1);
+						this.isShowBottom=true
+						this.user_id='';
+						// #endif						
+					}					
+				})
+			},
+			//改版后小程序登录规则
+			//小程序登录
+			onGetUserProfile() {
+				var platform='wechat';
+				var fid=uni.getStorageSync('parentid')?uni.getStorageSync('parentid'):''; 
+				uni.getUserProfile({
+					 desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+					success: res => {
+						console.log(res)
+						this.$api.third(
+							{
+								code: this.code,
+								platform:platform,
+								encrypted_data: res.encryptedData,
+								iv: res.iv,
+								raw_data: res.rawData,
+								signature: res.signature
+							},
+							data => {
+								console.log(data);
+								//console.log(data.data.userinfo) 
+								var res=data.data;
+								if (data.code == 1) {
+									this.$common.successToShow('登录成功!');
+									try {
+										this.$db.set('upload',1)
+										this.$db.set('login', 1)
+										this.$db.set('auth',res.auth)
+										this.$db.set('user', res.userinfo)
+										this.user_id=res.userinfo.id
+										this.getIndex()
+									} catch (e) {
+										console.log("e: ",e);
+									}
+								}else{
+									this.wxLogin();
+								}
+							}
+						);
+					},
+					fail: (res) => {
+						console.log("res: ",res);
+						this.wxLogin();//重新获取登录code
+						uni.hideLoading()
+						if (res.errMsg == "getUserInfo:cancel" || res.errMsg == "getUserInfo:fail auth deny") {
+							uni.showModal({
+								title: '用户授权失败',
+								showCancel: false,
+								content: '请点击重新授权，如果未弹出授权，请尝试长按删除小程序，重新进入!',
+								success: function(res) {
+									if (res.confirm) {
+										console.log('用户点击确定')
+										//uni.navigateBack()
+										this.isShowBottom = true;
+									}
+								}
+							})
+						}	
+					}
+				})
+			},
+			//底部开关
+			closeBottom(){
+				this.isShowBottom = false;
+				this.onGetUserProfile()
+			},
+			cancelBottom() {
+				this.isShowBottom = false;
+			},
+			getIndex() {
+				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || 0 // 分享进来？分享要去share页面不公用
+				let condition = {
+					staff_id: this.staff_id,
+					// user_id: this.user_id
+				}
+				let api = this.$api.doIndex
+				if(this.isShare) {
+					api = this.$api.doIndexShare
+					condition.origin = this.origin
+				}
+				api(condition, (res) => {
+					if(res.code === 1) {
+						if(res.isStaff === 0) {
+							uni.navigateTo({
+								url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+							})
+							return
+						}
+						this.allData=res.data
+						console.log(this.allData);
+						this.userData = this.staffInfo = this.allData.staffInfo || {};
+						this.color=this.staffInfo?this.staffInfo.smartcardtheme.colour:''
+						this.backgroundImg=this.staffInfo?this.staffInfo.smartcardtheme.backgroundimage:''
+						this.cardimage=this.staffInfo?this.staffInfo.smartcardtheme.cardimage:''
+						this.fontcolor=this.staffInfo?this.staffInfo.smartcardtheme.fontcolor:''          
+						if(uni.getStorageSync('color')==this.color){
+							console.log('已有color');
+						}else{
+							uni.setStorageSync('color',this.color)
+						}
+						if(uni.getStorageSync('backgroundImg')==this.backgroundImg){
+							console.log('已有backgroundImg');
+						}else{
+							uni.setStorageSync('backgroundImg',this.backgroundImg)
+						}
+						this.staff_id=this.staffInfo.id
+						this.nickname=this.userData.name
+						this.userData.save_status = `${this.allData.save_status}`
+						this.userData.usertype = `${this.allData.usertype}`
+						uni.setStorage({
+							key: 'userData',
+							data: this.userData
+						})
+						this.theme = {
+							color: this.color,
+							backgroundimage: this.backgroundImg,
+							cardimage: this.cardimage,
+							fontcolor: this.fontcolor
+						}
+						uni.setStorage({
+							key: 'themeData',
+							data: this.theme
+						})
+						this.getData()
+						
+						console.info('首页请求的接口名称： ', api, 
+							'allData', this.allData, 'isShare', this.isShare, 
+							'services', this.services)
+					}else {
+						uni.navigateTo({
+							url:'/pages/userInfo/userInfo?user_id=' + this.user_id
+						})
+					}
+				})
+			},
+			
 		}
 	}
 </script>

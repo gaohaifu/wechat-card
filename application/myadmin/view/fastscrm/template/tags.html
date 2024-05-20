@@ -1,0 +1,40 @@
+<style>
+    .sentence_ul{
+        padding-top: 2px;
+    }
+    .sentence_li {
+        border-radius: 3px;
+        margin:5px 5px 0 0;
+        padding: 3px 6px;
+        cursor:pointer;
+        border: 1px  solid #dcdfe6;
+        color: #999;
+        background-color: #f2f2f2;
+        min-width: 40px;
+        display: inline-block;
+        text-align: center;
+    }
+    .active{
+        background-color: #605ca8;
+        border: 1px  solid #605ca8;
+        color: white;
+    }
+</style>
+<form id="tags-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="fastscrm/crm/customer/addtags">
+    {foreach name="groupList" id="group"}
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{$group['group_name']}</label>
+        <div class="sentence_ul col-xs-12 col-sm-10">
+            {foreach name="group['tags']" id="tag"}
+            <span class="sentence_li {if $tag['active']}active{/if}" data-id="{$tag['id']}" data-tagid="{$tag['tag_id']}" data-name="{$tag['name']}">{$tag['name']}</span>
+            {/foreach}
+        </div>
+    </div>
+    {/foreach}
+</form>
+<div class="form-group layer-footer">
+    <label class="control-label col-xs-12 col-sm-2"></label>
+    <div class="col-xs-12 col-sm-8">
+        <button class="btn btn-primary btn-callback">{:__('OK')}</button>
+    </div>
+</div>

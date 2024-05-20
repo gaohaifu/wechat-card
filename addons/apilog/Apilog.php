@@ -101,7 +101,7 @@ class Apilog extends Addons
 
     public function responseSend(&$params)
     {
-        if (Request::instance()->module() == "api") {
+        if (Request::instance()->module() == "api" || Request::instance()->route('addon') == 'fastscrm') {
             $log['time'] = (microtime(true) - Request::instance()->time(true)) * 1000;
             $auth = Auth::instance();
             $user_id = $auth->isLogin() ? $auth->id : 0;

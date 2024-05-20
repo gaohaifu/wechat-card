@@ -1,0 +1,102 @@
+{include file="fastscrm/template/_vue"/}
+<style>
+    .search{
+        width: 90%;
+        margin: 10px auto;
+
+    }
+    .el-col-4{
+        text-align: center!important;
+    }
+    .scrm-foot{
+        padding: 8px 20px;
+        height: auto;
+        text-align: inherit !important;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-size: 100% 100%;
+        background-color: #ecf0f1;
+        margin-bottom: 0!important;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+    .scrm-flex{
+        display: flex;align-items: center;justify-content: center;
+        height: 100%;
+    }
+</style>
+<div id="workers" style="display: none">
+    <el-container style="height:380px; border: 1px solid #eee">
+        <el-aside width="50%">
+
+             <div class="search">
+                <el-input
+                        placeholder="输入关键字"
+                        suffix-icon="el-icon-search"
+                        v-model="filterText">
+                </el-input>
+             </div>
+             <el-tree
+                     class="filter-tree"
+                     :data="data"
+                     :props="defaultProps"
+                     show-checkbox
+                     node-key="id"
+                     :default-expanded-keys="expanded"
+                     :filter-node-method="filterNode"
+                     ref="tree"
+                     @check="check"
+             >
+                    <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <span v-if="data.userid">
+                            <i class="el-icon-user"></i>
+                        </span>
+                        <span v-else>
+                             <i class="el-icon-folder"></i>
+                        </span>
+                        <span>{{ node.label }}</span>
+                    </span>
+             </el-tree>
+
+        </el-aside>
+        <el-container>
+            <el-header style="" height="60px" direction="vertical">
+                <el-row :gutter="20" type="flex" align="middle">
+                    <el-col :span="16"><div style="text-align: left;line-height: 60px">已选择（{{tableData.length}}/{{total}}）</div></el-col>
+                    <el-col :span="8">
+                        <div @click="delAll" style="text-align: right;line-height: 60px;color: #409eff;cursor: pointer">
+                            <i class="el-icon-delete"></i> 清空全部
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-header>
+            <el-main style="padding-top: 10px">
+                <div class="scrm-flex"  v-if="tableData.length==0" >
+                    <el-empty description="未选择员工" :image-size="100"></el-empty>
+                </div>
+                <div>
+                    <el-row :gutter="20" v-for="(item,index) in tableData" type="flex" align="middle" justify="end">
+                        <el-col :span="4">
+                            <div>
+                                <el-avatar size="large" :src="item.avatar" @error="errorHandler">
+                                    <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"/>
+                                </el-avatar>
+                            </div>
+                        </el-col>
+                        <el-col :span="16"><div>{{item.name}}</div></el-col>
+                        <el-col :span="4"><i @click="del(index)" class="el-icon-close" style="font-size: 20px;cursor: pointer"></i></el-col>
+                    </el-row>
+                </div>
+
+            </el-main>
+        </el-container>
+    </el-container>
+    <div class="form-group scrm-foot">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button class="btn btn-primary " @click="backData">{:__('OK')}</button>
+        </div>
+    </div>
+</div>
+

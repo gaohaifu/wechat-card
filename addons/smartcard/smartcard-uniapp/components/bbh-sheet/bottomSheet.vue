@@ -12,7 +12,10 @@
 						</checkbox-group>
 						<view class="flex_layout">同意授权获取</view>你的微信昵称和头像
 					</view>
-					<view class="empower" @click="cancelTap"><button>微信授权</button></view>
+					<view class="flex flex-vc empower">
+						<button @click="cancelTap">取消授权</button>
+						<button @click="authTap">微信授权</button>
+					</view>
 				</view>
 			</view>
 		</view>
@@ -50,8 +53,26 @@
 			closeSheet(){
 				this.$emit('closeBottom');
 			},
+			cancelTap() {
+				uni.showModal({
+					title: '提示',
+					content: '如您不同意授权使用名片夹，我们将无法为您提供完整功能，为获得更好的服务体验，您也可以点击同意，即体验名片夹小程序完整功能',
+					confirmText: '同意',
+					cancelText: '再想想',
+					success: (res) => {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							this.authTap()
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+							this.$emit('cancelBottom')
+						}
+					}
+				})
+				// this.$emit('cancelBottom')
+			},
 			//授权按钮
-			cancelTap(){
+			authTap(){
 				this.$emit('closeBottom');
 			},
 			stopEvent(){						//@click.stop防止事件冒泡
@@ -112,7 +133,14 @@
 	.content1{color: #333; font-size: 32rpx; margin-top: 50rpx;}
 	.content2{color: #333; font-size: 24rpx; margin-top: 20rpx;}
 	.empower{margin-top: 30rpx;}
-	.empower button{color: #fff; font-size: 30rpx; background: #07c15e; height: 85rpx; line-height: 85rpx; width: 100%;}
+	.empower button{
+		color: #fff; font-size: 30rpx; background: #07c15e;
+		height: 85rpx; line-height: 85rpx; width: 50%; margin: 0 20rpx;
+		box-sizing: border-box;
+	}
+	.empower button:first-child {
+		background-color: #999;
+	}
 	.radio_content{margin-top: 80rpx; color: #ccc;}
 	.radio_content view{margin-left: 15rpx;}
 	.radio_content text{display: flex; color: #999;}

@@ -1,0 +1,70 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/tools.css?v1.0">
+<div id="indexPage" v-cloak>
+    <div class="content">
+        <div class="customers mt1 wlkflex">
+            <div class="info wlkflex">
+                <div class="center num">{{item.cus_total?item.cus_total:0}}</div>
+                <div class="center name">全部客户</div>
+            </div>
+            <div class="info wlkflex">
+                <div class="center num">{{item.cus_num?item.cus_num:0}}</div>
+                <div class="center name">今日新增</div>
+            </div>
+            <div class="info wlkflex">
+                <div class="center num">{{item.cus_lose?item.cus_lose:0}}</div>
+                <div class="center name">今日流失</div>
+            </div>
+        </div>
+        <div class="head-tag mt2">
+            <iconpark-icon size="20" color="#5771F9" name="toolkit"></iconpark-icon>
+            <div class="ml05"> 运营工具</div>
+        </div>
+        <div>
+            <van-grid :border="false" :column-num="4">
+                <van-grid-item url="{:addon_url('fastscrm/batch/index', [], false, true)}">
+                    <iconpark-icon class="icon-park" style="background-color: #73d0e6" size="2rem" color="white" name="add-user"></iconpark-icon>
+                    <div class="icon-title">批量加客户</div>
+                </van-grid-item>
+                <van-grid-item url="{:addon_url('fastscrm/createchat/index', [], false, true)}">
+                    <iconpark-icon class="icon-park" style="background-color: #7399e6" size="2rem" color="white" name="peoples"></iconpark-icon>
+                    <div class="icon-title">一键拉群</div>
+                </van-grid-item>
+                <van-grid-item url="{:addon_url('fastscrm/channelcode/index', [], false, true)}">
+                    <iconpark-icon class="icon-park" style="background-color: #3ec962" size="2rem" color="white" name="two-dimensional-code-two"></iconpark-icon>
+                    <div class="icon-title">渠道活码</div>
+                </van-grid-item>
+                <van-grid-item url="{:addon_url('fastscrm/welcome/index', [], false, true)}">
+                    <iconpark-icon class="icon-park" style="background-color: #c8a2f1" size="2rem" color="white" name="message-emoji"></iconpark-icon>
+                    <div class="icon-title">欢迎语</div>
+                </van-grid-item>
+                <van-grid-item url="{:addon_url('fastscrm/groupmessage/index', [], false, true)}">
+                    <iconpark-icon class="icon-park" style="background-color: #fac68f" size="2rem" color="white" name="peoples-two"></iconpark-icon>
+                    <div class="icon-title">客户群群发</div>
+                </van-grid-item>
+                <van-grid-item url="{:addon_url('fastscrm/customermessage/index', [], false, true)}">
+                    <iconpark-icon class="icon-park" style="background-color: #9fc972" size="2rem" color="white" name="send"></iconpark-icon>
+                    <div class="icon-title">客户群发</div>
+                </van-grid-item>
+            </van-grid>
+        </div>
+    </div>
+
+    <van-tabbar v-model="active" active-color="#5771f9" placeholder safe-area-inset-bottom>
+        <van-tabbar-item  url="{:addon_url('fastscrm/index', [], false, true)}">
+            <span>工作台</span>
+            <template #icon="props">
+                <img :src="props.active ? '__CDN__/assets/addons/fastscrm/img/workbench-active.png': '__CDN__/assets/addons/fastscrm/img/workbench.png'" />
+            </template>
+        </van-tabbar-item>
+        <van-tabbar-item  url="{:addon_url('fastscrm/tools/index', [], false, true)}">
+            <span>运营工具</span>
+            <template #icon="props">
+                <img :src="props.active ? '__CDN__/assets/addons/fastscrm/img/tool-active.png': '__CDN__/assets/addons/fastscrm/img/tool.png'" />
+            </template>
+        </van-tabbar-item>
+    </van-tabbar>
+</div>
+<script src="__CDN__/assets/addons/fastscrm/js/tools.js"></script>
+{include file="tpl/_footer"/}

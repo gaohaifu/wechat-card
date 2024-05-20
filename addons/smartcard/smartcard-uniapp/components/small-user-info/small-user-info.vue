@@ -14,12 +14,12 @@
 						<text :style="{color:theme.fontcolor}">{{companyInfo.name || userData.companyname}}</text>
 					</view>
 				</view>
-				<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-					:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
+				<!-- <view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
+					:style="{'background-image':'url('+ cdnUrl +(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
 								color:(certificateStatus ? 'white' : theme.fontcolor)}"
 					@click="linkToCert">
 					{{!certificateStatus? '未认证' : '已认证'}}
-				</view>
+				</view> -->
 				<view class="extra">
 					<view class="flex_layout"><i :style="{color:theme.fontcolor}" class="iconfont icon-dianhua"></i><text
 							:style="{color:theme.fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
@@ -101,7 +101,7 @@
 					position: ''
 				},
 				allData: {},
-				certificateStatus: true
+				certificateStatus: false
 			};
 		},
 		watch: {
@@ -143,17 +143,19 @@
 				this.userData = uni.getStorageSync('userData') || {}
 				const themeData = uni.getStorageSync('themeData') || {}
 				if(themeData.cardimage) this.theme = themeData
-				if(this.userData.is_certified === 0){
-					this.certificateStatus=false;
-				}
+				this.userData.smartcardcompany = this.userData.smartcardcompany || {}
+				// 企业负责人
+				if(this.userData.usertype === 1 && this.userData.smartcardcompany.is_authentication === 1) this.certificateStatus=true;
+				// 普通用户
+				if(this.userData.usertype === 0 && this.userData.is_certified === 1) this.certificateStatus=true;
 			},
 			linkToCert() {
 				// console.info(this.certificateStatus, '=====', this.userData.usertype, '====usertype')
-				if(!this.certificateStatus && this.userData.usertype === '1') { // 企业负责人（管理员）
+				if(!this.certificateStatus && this.userData.usertype === 1) { // 企业负责人（管理员）
 					uni.navigateTo({
 						url: '/pages/company-attestation/index'
 					})
-				} else if(!this.certificateStatus && this.userData.usertype === '0') { // 普通用户
+				} else if(!this.certificateStatus && this.userData.usertype === 0) { // 普通用户
 					uni.navigateTo({
 						url: '/pages/user-attestation/index'
 					})

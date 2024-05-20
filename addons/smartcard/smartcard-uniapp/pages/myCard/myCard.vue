@@ -5,7 +5,7 @@
 				<block slot="backText">返回</block>
 				<block slot="content">首页</block>
 			</cu-custom>
-			<view class="header_padding">
+			<view class="header_padding" @click="test">
 				<view class="header_message" :style="{'background-image':'url('+cdnUrl + cardimage+')'}">
 					<view class="flex_layout userImg">
 						<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
@@ -14,12 +14,6 @@
 							<text :style="{color:fontcolor}">{{userData.position}}</text>
 							<text :style="{color:fontcolor}">{{companyInfo.name || userData.companyname}}</text>
 						</view>
-					</view>
-					<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-						:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
-									color:(certificateStatus ? 'white' : fontcolor)}"
-						@click="linkToCert">
-						{{!certificateStatus? '未认证' : '已认证'}}
 					</view>
 					<view class="extra">
 						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
@@ -50,6 +44,23 @@
 					@click="toolsClick(item)">
 					<text class="iconfont" :class="item.icon" :style="{color: item.color}"></text>
 					<text>{{item.label}}</text>
+				</view>
+			</view>
+			<!-- 认证状态 -->
+			<view class="flex flex-hsb flex-vc cert-box">
+				<view class="flex flex-vc left-box">
+					<image src="../../static/images/cert-status.png" mode=""></image>
+					<text>Ta的认证</text>
+				</view>
+				<view class="flex right-box">
+					<view class="flex flex-vc flex-hc enterprise-cert" @click="linkToCert(1)">
+						<image src="../../static/images/enterprise-cert.png" mode=""></image>
+						<text>企业认证</text>
+					</view>
+					<view class="flex flex-vc flex-hc personal-cert" @click="linkToCert(2)">
+						<image src="../../static/images/personal-cert.png" mode=""></image>
+						<text>个人认证</text>
+					</view>
 				</view>
 			</view>
 			<!-- 快捷服务 -->
@@ -159,7 +170,7 @@
 			</view>
 		</view>
 		<!--  #ifdef  MP-WEIXIN	 -->
-		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom"></bottomSheet>
+		<bottomSheet :isShowBottom="isShowBottom" @closeBottom="closeBottom" @cancelBottom="cancelBottom"></bottomSheet>
 		<!--  #endif -->
 		<myCardCode ref="myCardCode"></myCardCode>
 	</view>
@@ -168,7 +179,7 @@
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
-	import {smartcardObj, weixinShare} from '@/config/common.js'
+	import {smartcardBG,smartcardObj, weixinShare, isLogin} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
@@ -180,7 +191,9 @@
 		data() {
 			return {
 				cdnUrl,
-				certificateStatus: false,
+				smartcardBG,
+				is_authentication: '', // 企业负责人 0=未认证,1=待审核,2=已审核,3=审核失败
+				is_certified: '',
 				isShare: false,
 				bgColor:'bg-gradual-custom',
 				backGround:'',
@@ -279,6 +292,7 @@
 				myselfstatus: false,
 				theme: {},
 				origin: 1, // 来源:1=我向对方发出了名片,2=对方的名片夹,3=对方的名片浏览记录
+				shareCardInfo: {}
 			}
 		},
 		onLoad(e) {
@@ -350,6 +364,7 @@
 				// ]
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
+			this.getShareCardInfo()
 		},
 		onShow() {
 			this.refreshUser()
@@ -376,21 +391,47 @@
 			console.info('this.companyInfo', this.companyInfo, 'share staff_id: ', this.staffInfo.id, 'share user_id: ', this.user_id)
 			const staff_id = this.staffInfo.id; // 9
 			const user_id = this.user_id; // 11
+			let greeting = (this.companyInfo.name ? `我是${this.companyInfo.name}名片，很高兴认识你` : "名片夹")
+			if (this.shareCardInfo.greetings) greeting = this.shareCardInfo.greetings
 			return {
-			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
+			  title: greeting,
 			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + staff_id + '&user_id='+ user_id + '&pageTitle='+this.userData.name,
-			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
+			  imageUrl: this.shareCardInfo.backgroundimage, // "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: weixinShare.type, // 0正式版 2体验版 1开发板
 			}
 		},
 		methods: {
-			linkToCert() {
-				// console.info(this.certificateStatus, '=====', this.userData.usertype, '====usertype')
-				if(!this.certificateStatus && this.userData.usertype === '1') { // 企业负责人（管理员）
+			test() {
+				return;
+				// uni.navigateTo({
+				// 	url: '/pages/webView/webView?url=http://www.baidu.com/'
+				// })
+			},
+			getShareInfo() {
+				
+			},
+			getShareCardInfo() {
+				this.$api.shareCardInfo({}, res => {
+					if(res.code === 1) {
+						this.shareCardInfo = res.shareCardInfo || {}
+					}
+				})
+			},
+			checkUser() {
+				const flag = isLogin()
+				if(!flag) {
+					this.isShowBottom=true
+					this.user_id='';
+				}
+				return flag
+			},
+			linkToCert(type) {
+				if(!this.checkUser()) return;
+				if(type === 1 && this.userData.is_authentication !== 2) { // 企业负责人（管理员）
 					uni.navigateTo({
 						url: '/pages/company-attestation/index'
 					})
-				} else if(!this.certificateStatus && this.userData.usertype === '0') { // 普通用户
+				} else if(type === 2 && this.userData.is_certified !== 2) { // 普通用户
 					uni.navigateTo({
 						url: '/pages/user-attestation/index'
 					})
@@ -400,12 +441,14 @@
 				this.$refs.myCardCode && this.$refs.myCardCode.open();
 			},
 			linkToCard(row) {
+				if(!this.checkUser()) return;
 				if(row !== 'more') return; // 暂时只有查看更多能跳转
 				uni.switchTab({
 					url: '/pages/mycard-data/index'
 				})
 			},
 			sendCard() {
+				if(!this.checkUser()) return;
 				this.$api.sendCard({
 					staff_id: this.staffInfo.id
 				}, res => {
@@ -419,6 +462,7 @@
 				})
 			},
 			resendCard() {
+				if(!this.checkUser()) return;
 				if(this.userData.save_status !== '0') return
 				this.$api.resendCard({staff_id: this.staff_id}, res => {
 					if(res.code === 1) {
@@ -436,6 +480,7 @@
 			},
 			// 点击会计工具
 			toolsClick(row) {
+				if(!this.checkUser()) return;
 				// 打电话
 				if(row.id === 1 && this.staffInfo.mobile) {
 					uni.makePhoneCall({
@@ -463,8 +508,8 @@
 					})
 				} else if (row.id === 4 && this.companyInfo.latitude && this.companyInfo.longitude) {
 					uni.openLocation({
-						latitude: this.companyInfo.latitude,
-						longitude: this.companyInfo.longitude
+						latitude: Number(this.companyInfo.latitude),
+						longitude: Number(this.companyInfo.longitude)
 					})
 				} else if(row.id === 5) { // 发名片
 					
@@ -528,10 +573,8 @@
 						console.log("小程序: ",1);
 						this.isShowBottom=true
 						this.user_id='';
-						// this.getIndex();
 						// #endif						
-					}
-					
+					}					
 				})
 			},
 			//改版后小程序登录规则
@@ -599,6 +642,9 @@
 			closeBottom(){
 				this.isShowBottom = false;
 				this.onGetUserProfile()
+			},
+			cancelBottom() {
+				this.isShowBottom = false;
 			},
 			getIndex() {
 				var staff_id_c=this.staff_id || uni.getStorageSync('staff_id') || 0 // 分享进来？分享要去share页面不公用
@@ -682,9 +728,11 @@
 						if(this.isShare) {
 							this.services = this.allData.services || []
 						}
-						if(this.userData.is_certified === 0){
-							this.certificateStatus=false;
-						}
+						this.userData.is_authentication = this.companyInfo.is_authentication
+						// 企业负责人 0=未认证,1=待审核,2=已审核,3=审核失败
+						if(this.userData.usertype === 1 && this.companyInfo.is_authentication === 2) this.certificateStatus=true;
+						// 普通用户:0=未实名,1=待审核,2=认证成功
+						if(this.userData.usertype === 0 && this.userData.is_certified === 2) this.certificateStatus=true;
 						
 						console.info('首页请求的接口名称： ', api, 
 							'allData', this.allData, 'isShare', this.isShare, 
@@ -697,6 +745,7 @@
 				})
 			},
 			linkToService(row) {
+				if(!this.checkUser()) return;
 				if(row.url) {
 					uni.navigateTo({
 						url: `${row.url}?user_id=${this.user_id}`

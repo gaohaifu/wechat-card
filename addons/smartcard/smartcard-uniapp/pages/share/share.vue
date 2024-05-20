@@ -15,12 +15,12 @@
 							<text :style="{color:fontcolor}">{{companyInfo.name}}</text>
 						</view>
 					</view>
-					<view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
+					<!-- <view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
 						:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
 									color:(certificateStatus ? 'white' : fontcolor)}"
 						@click="linkToCert">
 						{{!certificateStatus? '未认证' : '已认证'}}
-					</view>
+					</view> -->
 					<view class="extra">
 						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
 								:style="{color:fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
@@ -57,11 +57,11 @@
 					<text>Ta的认证</text>
 				</view>
 				<view class="flex right-box">
-					<view class="flex flex-vc flex-hc enterprise-cert">
+					<view class="flex flex-vc flex-hc enterprise-cert" :class="{'disabled' : userData.is_authentication !== 2}">
 						<image src="../../static/images/enterprise-cert.png" mode=""></image>
 						<text>企业认证</text>
 					</view>
-					<view class="flex flex-vc flex-hc personal-cert">
+					<view class="flex flex-vc flex-hc personal-cert" :class="{'disabled' : userData.is_certified !== 2}">
 						<image src="../../static/images/personal-cert.png" mode=""></image>
 						<text>个人认证</text>
 					</view>
@@ -76,7 +76,8 @@
 					<view class="flex flex-v flex-vc flex-hc flex-wrap service-item"
 						v-for="(item, inx) in services" :key="inx"
 						@click="linkToService(item)">
-						<text class="iconfont" :class="item.icon"></text>
+						<text class="iconfont" :class="item.icon" v-if="item.icon && item.icon.indexOf('http') === -1"></text>
+						<img class="iconfont" :src="item.icon" :alt="item.label" v-else>
 						<text>{{item.label}}</text>
 					</view>
 				</view>
@@ -179,7 +180,6 @@
 		data() {
 			return {
 				cdnUrl,
-				certificateStatus: false,
 				isShare: false,
 				bgColor:'bg-gradual-custom',
 				backGround:'',
@@ -672,6 +672,7 @@
 						})
 						this.userData.save_status = `${this.allData.save_status}`
 						this.userData.usertype = `${this.allData.usertype}`
+						this.userData.is_authentication = this.companyInfo.is_authentication
 						// uni.setStorage({
 						// 	key: 'userData',
 						// 	data: this.userData
@@ -688,12 +689,9 @@
 						// })
 						
 						if(this.isShare) {
-							this.services = this.allData.services || []
+							this.services = (this.allData.services || [])
 						}
-						if(this.userData.is_certified === 0){
-							this.certificateStatus=false;
-						}
-						
+												
 						console.info('首页请求的接口名称： ', api, 
 							'allData', this.allData, 'isShare', this.isShare, 
 							'services', this.services)
@@ -953,6 +951,8 @@
 	}
 	.cert-box .right-box .enterprise-cert { background: #0256FF; margin-right: 8rpx;}
 	.cert-box .right-box .personal-cert { background: #EAB863;}
+	.cert-box .right-box .enterprise-cert.disable,
+	.cert-box .right-box .personal-cert.disabled { background: #999;}
 	.cert-box .right-box image {
 		width: 24rpx;
 		height: 24rpx;

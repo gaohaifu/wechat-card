@@ -2,6 +2,8 @@
 
 // 公共助手函数
 
+use app\common\model\fastscrm\Setting;
+use app\common\service\CompanyService;
 use think\exception\HttpResponseException;
 use think\Response;
 
@@ -10,7 +12,7 @@ if (!function_exists('__')) {
     /**
      * 获取语言变量值
      * @param string $name 语言变量名
-     * @param array  $vars 动态变量值
+     * @param string | array  $vars 动态变量值
      * @param string $lang 语言
      * @return mixed
      */
@@ -40,7 +42,7 @@ if (!function_exists('format_bytes')) {
     function format_bytes($size, $delimiter = '', $precision = 2)
     {
         $units = array('B', 'KB', 'MB', 'GB', 'TB', 'PB');
-        for ($i = 0; $size >= 1024 && $i < 6; $i++) {
+        for ($i = 0; $size >= 1024 && $i < 5; $i++) {
             $size /= 1024;
         }
         return round($size, $precision) . $delimiter . $units[$i];
@@ -248,9 +250,10 @@ if (!function_exists('addtion')) {
             if ($v['model']) {
                 $model = new $v['model'];
             } else {
-                $model = $v['name'] ? \think\Db::name($v['name']) : \think\Db::table($v['table']);
+                // 优先判断使用table的配置
+                $model = $v['table'] ? \think\Db::table($v['table']) : \think\Db::name($v['name']);
             }
-            $primary = $v['primary'] ? $v['primary'] : $model->getPk();
+            $primary = $v['primary'] ?: $model->getPk();
             $result[$v['field']] = isset($ids[$v['field']]) ? $model->where($primary, 'in', $ids[$v['field']])->column($v['column'], $primary) : [];
         }
 
@@ -279,60 +282,6 @@ if (!function_exists('var_export_short')) {
     function var_export_short($data, $return = true)
     {
         return var_export($data, $return);
-        $replaced = [];
-        $count = 0;
-
-        //判断是否是对象
-        if (is_resource($data) || is_object($data)) {
-            return var_export($data, $return);
-        }
-
-        //判断是否有特殊的键名
-        $specialKey = false;
-        array_walk_recursive($data, function (&$value, &$key) use (&$specialKey) {
-            if (is_string($key) && (stripos($key, "\n") !== false || stripos($key, "array (") !== false)) {
-                $specialKey = true;
-            }
-        });
-        if ($specialKey) {
-            return var_export($data, $return);
-        }
-        array_walk_recursive($data, function (&$value, &$key) use (&$replaced, &$count, &$stringcheck) {
-            if (is_object($value) || is_resource($value)) {
-                $replaced[$count] = var_export($value, true);
-                $value = "##<{$count}>##";
-            } else {
-                if (is_string($value) && (stripos($value, "\n") !== false || stripos($value, "array (") !== false)) {
-                    $index = array_search($value, $replaced);
-                    if ($index === false) {
-                        $replaced[$count] = var_export($value, true);
-                        $value = "##<{$count}>##";
-                    } else {
-                        $value = "##<{$index}>##";
-                    }
-                }
-            }
-            $count++;
-        });
-
-        $dump = var_export($data, true);
-
-        $dump = preg_replace('#(?:\A|\n)([ ]*)array \(#i', '[', $dump); // Starts
-        $dump = preg_replace('#\n([ ]*)\),#', "\n$1],", $dump); // Ends
-        $dump = preg_replace('#=> \[\n\s+\],\n#', "=> [],\n", $dump); // Empties
-        $dump = preg_replace('#\)$#', "]", $dump); //End
-
-        if ($replaced) {
-            $dump = preg_replace_callback("/'##<(\d+)>##'/", function ($matches) use ($replaced) {
-                return $replaced[$matches[1]] ?? "''";
-            }, $dump);
-        }
-
-        if ($return === true) {
-            return $dump;
-        } else {
-            echo $dump;
-        }
     }
 }
 
@@ -520,7 +469,7 @@ if (!function_exists('check_url_allowed')) {
         }
 
         //如果是站外链接则需要判断HOST是否允许
-        if (preg_match("/((http[s]?:\/\/)+(?>[a-z\-0-9]{2,}\.){1,}[a-z]{2,8})(?:\s|\/)/i", $url)) {
+        if (preg_match("/((http[s]?:\/\/)+((?>[a-z\-0-9]{2,}\.)+[a-z]{2,8}|((?>([0-9]{1,3}\.)){3}[0-9]{1,3}))(:[0-9]{1,5})?)(?:\s|\/)/i", $url)) {
             $chkHost = parse_url(strtolower($url), PHP_URL_HOST);
             if ($chkHost && in_array($chkHost, $allowedHostArr)) {
                 return true;
@@ -558,6 +507,46 @@ if (!function_exists('build_suffix_image')) {
         </svg>
 EOT;
         return $icon;
+    }
+}
+if (!function_exists('get_fastscrm_config')) {
+    /**
+     * 获取fastscrm配置文件
+     * @param string $suffix 后缀
+     * @param null   $background
+     * @return string
+     */
+    function get_fastscrm_config($company_id,$type = 'value')
+    {
+        $config = Setting::where('company_id',$company_id)->find();
+        if(!$config){
+            return false;
+        }
+        if($type == 'value'){
+            return json_decode($config['config'],true);
+        }else{
+            return json_decode($config['full_config'],true);
+        }
+    }
+}
+if (!function_exists('get_fastscrm_config_by_server')) {
+    /**
+     * 获取fastscrm配置文件
+     * @param string $suffix 后缀
+     * @param null   $background
+     * @return string
+     */
+    function get_fastscrm_config_by_server($server,$type = 'value')
+    {
+        $service =  new CompanyService();
+        $re = $service->getCompanyByHost($server);
+        if($re['code'] == 1){
+            $domains = $re['data'];
+            //var_dump($domains);exit;
+            $company_id = $domains['company_id'];
+            return get_fastscrm_config($company_id,$type);
+        }
+        
     }
 }
 
@@ -604,69 +593,5 @@ if (!function_exists('get_first_host')) {
         }
 
         return $host;
-    }
-}
-
-if (!function_exists('microtime_float')) {
-    /**
-     * 获取毫秒和微秒
-     * @return float
-     */
-    function microtimeFloat()
-    {
-        list($usec, $sec) = explode(" ", microtime());
-        return ((float)$usec + (float)$sec);
-    }
-}
-if (!function_exists('search_arr')) {
-    /**
-     * 在数组中模糊搜索给定的值
-     * @param $data
-     * @param $keyword
-     * @return array
-     */
-    function searchArr($data,$keyword){
-        $arr = array();
-        foreach($data as $key=>$values){
-            if (strstr( $values , $keyword ) !== false ){
-                $arr[$key] = $values;
-            }
-        }
-        return $arr;
-    }
-}
-if (!function_exists('split_array')) {
-    /**
-     * 分割数组
-     * @param $data
-     * @param $keyword
-     * @return array
-     */
-    function split_array($arr, $size) {
-        $result = array();
-        $total = count($arr);
-        for ($i = 0; $i < $total; $i += $size) {
-            $result[] = array_slice($arr, $i, $size);
-        }
-        return $result;
-    }
-}
-
-if (!function_exists('imgsavefromstring')) {
-    /**
-     * 图片保存
-     * @param string $imgstring 图片字符串
-     * @param string $filename 文件保存地址
-     */
-    function imgsavefromstring($imgstring, $filename)
-    {
-        $img = imagecreatefromstring($imgstring);
-        $filename = str_replace('\\', '/', $filename);
-        $dir = mb_substr($filename, 0, strrpos($filename, '/'));
-        if ( ! is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-        imagepng($img,$filename);
-        imagedestroy($img);
     }
 }

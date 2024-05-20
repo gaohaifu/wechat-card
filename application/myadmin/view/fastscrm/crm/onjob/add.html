@@ -1,0 +1,101 @@
+{include file="fastscrm/template/_vue"/}
+<style>
+    .tags-box,.workers-box{
+        border: 1px solid #ccc;
+        min-height: 40px;
+    }
+    .el-tag{
+        margin: 3px;
+    }
+    #channelAdd{
+        display: none;
+    }
+    .el-radio-group {
+        vertical-align: baseline !important;
+    }
+    .scrm-foot{
+        padding: 8px 20px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-size: 100% 100%;
+        background-color: #ecf0f1;
+        margin-bottom: 0!important;
+        z-index: 999;
+    }
+    .tip-title{
+        color: #409eff;margin-top: 10px
+    }
+    #picurl,#file{
+        display: none;
+    }
+    [v-cloak] {display: none;}
+</style>
+<div id="onjobAdd" v-cloak>
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="原跟进员工">
+            <div v-if="handover_workers.length>0" @click="addHandoverWorkers">
+                <el-tag
+                        v-for="item in handover_workers"
+                        :key="item.id"
+                        closable
+                        @close="delHandoverWorkers"
+                >
+                    {{item.name}}
+                </el-tag>
+            </div>
+            <el-button   @click="addHandoverWorkers" v-else type="primary" icon="el-icon-user">选择员工</el-button>
+        </el-form-item>
+        <el-form-item label="接替员工">
+            <div v-if="takeover_workers.length>0" @click="addTakeoverWorkers">
+                <el-tag
+                        v-for="item in takeover_workers"
+                        :key="item.id"
+                        closable
+                        @close="delTakeoverWorkers"
+                >
+                    {{item.name}}
+                </el-tag>
+            </div>
+            <el-button   @click="addTakeoverWorkers" v-else type="primary" icon="el-icon-user">选择员工</el-button>
+        </el-form-item>
+        <el-form-item label="{:__('Type')}">
+            <el-radio-group v-model="ruleForm.type">
+                {foreach name="typeList" item="vo"}
+                <el-radio label="{$key}">{$vo}</el-radio>
+                {/foreach}
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="ruleForm.type=='customer'" label="转移客户">
+            <el-button @click="choseCustomer" v-if="customers.length==0" type="primary" icon="el-icon-user">选择客户</el-button>
+            <el-button @click="choseCustomer" v-else type="primary" plain icon="el-icon-user">已选择{{customers.length}}个客户</el-button>
+        </el-form-item>
+        <el-form-item v-else label="转移群聊">
+            <el-button @click="addChat" v-if="chats.length==0" type="primary" icon="el-icon-chat-dot-square">选择群聊</el-button>
+            <el-button @click="addChat" v-else type="primary" plain icon="el-icon-chat-dot-square">已选择{{chats.length}}个群聊</el-button>
+        </el-form-item>
+    </el-form>
+    <el-dialog
+            top="20%"
+            title="筛选方式"
+            :visible.sync="showChoseCustomer"
+            width="30%"
+            :close-on-click-modal="false"
+            center>
+        <el-row type="flex" class="row-bg" justify="center">
+            <el-button @click="addtags" type="primary" plain icon="el-icon-collection-tag">标签选择</el-button>
+            <el-button @click="addCustomer('')" type="success" plain icon="el-icon-s-custom">全部客户</el-button>
+        </el-row>
+
+
+    </el-dialog>
+    <div style="height: 50px"></div>
+    <div class="form-group scrm-foot">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button  class="btn btn-primary" @click="submitForm('ruleForm')">保存</button>
+            <button  class="btn btn-default" @click="resetForm('ruleForm')">{:__('Reset')}</button>
+        </div>
+    </div>
+</div>

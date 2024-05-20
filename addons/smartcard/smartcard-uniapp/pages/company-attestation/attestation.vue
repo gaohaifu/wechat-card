@@ -8,7 +8,9 @@
 			</view>
 		</view>
 		<view class="company-label">企业名称</view>
-		<view class="company-name">{{ companyname }}</view>
+		<view class="company-name">
+			<input type="text" v-model="companyname" placeholder="请输入公司名称" />
+		</view>
 		<view class="company-label">
 			<text>企业地址</text>
 			<view class="flex flex-vc example-text" @click="addressClick">

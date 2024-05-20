@@ -5,6 +5,7 @@ return [
     'hooks' => [
         'app_init' => [
             'alioss',
+            'fastscrm',
             'myadmin',
             'xccms',
         ],
@@ -30,6 +31,9 @@ return [
         ],
         'response_send' => [
             'apilog',
+        ],
+        'upgrade' => [
+            'fastscrm',
         ],
         'action_begin' => [
             'geetest',

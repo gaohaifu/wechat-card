@@ -1,0 +1,101 @@
+{include file="fastscrm/template/_vue"/}
+<style>
+    .flex-start{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+    .flex-end{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .el-tag{
+        margin-left: 5px;
+    }
+    .label-style{
+        color: #303133;
+    }
+    [v-cloak] {display: none;}
+</style>
+<div id="customer" v-cloak>
+    <el-container>
+        <el-container>
+            <el-main>
+                <el-row type="flex" justify="space-between">
+                    <el-col>
+                        <el-button @click="backAllData" type="primary">全部（{{page_data.total}}名客户）</el-button>
+                        <el-button @click="backData" :disabled="multipleSelection.length==0" type="success">确定</el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-alert
+                            :title="'已选中'+multipleSelection.length+'名客户'"
+                            type="info"
+                            :closable="false"
+                            show-icon>
+                        </el-alert>
+                    </el-col>
+
+                </el-row>
+                <el-table
+                        v-loading="loading"
+                        ref="multipleTable"
+                        :data="tableData"
+                        tooltip-effect="dark"
+                        style="width: 100%;margin-top: 10px"
+                        stripe
+                        fit
+                        border
+                        @selection-change="handleSelectionChange"
+                >
+                    <el-table-column
+                            type="selection"
+                            width="55">
+                    </el-table-column>
+                    <el-table-column
+                            label-class-name="label-style"
+                            prop="name"
+                            label="客户名称">
+                    </el-table-column>
+                    <el-table-column
+                            label-class-name="label-style"
+                            prop="handover_name"
+                            label="原添加人">
+                    </el-table-column>
+                    <el-table-column
+                            label-class-name="label-style"
+                            prop="handover_department"
+                            label="原添加人所属部门"
+                    >
+                        <template slot-scope="scope">
+                            <div class="flex-start">
+                                <el-tag  v-for="(item,index) in scope.row.handover_department" size="medium">{{item }}</el-tag>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                            label-class-name="label-style"
+                            prop="resigned_time"
+                            label="离职时间">
+                    </el-table-column>
+                </el-table>
+            </el-main>
+            <el-footer class="flex-end">
+                <el-row>
+                    <el-button @click="backAllData" type="primary">全部（{{page_data.total}}名客户）</el-button>
+                    <el-button @click="backData" :disabled="multipleSelection.length==0" type="success">确定</el-button>
+                </el-row>
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="page_data.page"
+                        :page-sizes="[10, 20, 30, 40, 50, 200]"
+                        :page-size="page_data.limit"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="page_data.total">
+                </el-pagination>
+            </el-footer>
+        </el-container>
+    </el-container>
+</div>
+

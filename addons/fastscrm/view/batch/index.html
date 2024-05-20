@@ -1,0 +1,77 @@
+{include file="tpl/_header"/}
+{:token()}
+<link rel="stylesheet" href="__CDN__/assets/addons/fastscrm/css/batch.css">
+<div id="batchPage" v-cloak>
+    <div>
+        <van-nav-bar
+                title="批量添加客户"
+                left-text=""
+                left-arrow
+                fixed
+                border
+                safe-area-inset-top
+                @click-left="onClickLeft"
+                placeholder
+        />
+    </div>
+    <div class="batch-body">
+        <div class="batch-group">
+            <van-tabs sticky v-model="groupTab" @change="changeGroupTab" line-width="25px" title-active-color="#5771F9" color="#5771F9" title-inactive-color="black">
+                <van-tab title="全部"></van-tab>
+                <van-tab title="待添加"></van-tab>
+                <van-tab title="待通过"></van-tab>
+                <van-tab title="已添加"></van-tab>
+            </van-tabs>
+        </div>
+
+        <div class="batch-content">
+                <div>
+                    <div v-if="finished && total==0" class="center">
+                        <van-empty
+                                class="custom-image"
+                                image="__CDN__/assets/addons/fastscrm/img/empty.png"
+                        />
+                    </div>
+                    <van-list
+                            v-model="loading"
+                            :error.sync="error"
+                            error-text="请求失败，点击重新加载"
+                            :finished="finished"
+                            finished-text="没有更多了"
+                            :immediate-check="false"
+                            @load="getData"
+                    >
+                    <div class="wd90">
+                        <div class="pd05 wlkflex border-bottom"  v-for="item in list">
+                           <div class="wlkflex" style="justify-content: flex-start">
+                               <div>
+                                   <van-icon name="user-o" color="#5771F9"  />
+                               </div>
+                               <div class="ml05">{{item.mobile}}</div>
+                           </div>
+                           <div v-if="item.status==3">
+                                <van-button disabled color="#5771F9" plain size="small">
+                                    已添加
+                                </van-button>
+                           </div>
+                            <div v-else-if="item.status==2">
+                                <van-button disabled color="#5771F9" plain size="small">
+                                    待通过
+                                </van-button>
+                            </div>
+                            <div class="copy" @click="toAdd(item.id)" v-else-if="item.status==1" :data-clipboard-text="item.mobile">
+                                <van-button  color="#002FA7" plain size="small" icon="plus">
+                                    添加
+                                </van-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    </van-list>
+                </div>
+            </div>
+    </div>
+
+</div>
+<script src="__CDN__/assets/addons/fastscrm/js/batch.js"></script>
+{include file="tpl/_footer"/}

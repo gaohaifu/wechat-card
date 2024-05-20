@@ -18,7 +18,7 @@ return [
     // 应用命名空间
     'app_namespace'          => 'app',
     // 应用调试模式
-    'app_debug'              => Env::get('app.debug', true),
+    'app_debug'              => Env::get('app.debug', false),
     // 应用Trace
     'app_trace'              => Env::get('app.trace', false),
     // 应用模式状态
@@ -302,7 +302,7 @@ return [
         //允许跨域的域名,多个以,分隔
         'cors_request_domain'   => 'localhost,127.0.0.1',
         //版本号
-        'version'               => '1.4.0.20230711',
+        'version'               => '1.5.0.20240328',
         //API接口地址
         'api_url'               => 'https://api.fastadmin.net',
     ],

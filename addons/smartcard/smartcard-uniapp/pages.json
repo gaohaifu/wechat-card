@@ -196,6 +196,16 @@
             }
             
         }
+        ,{
+            "path" : "pages/webView/webView",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "官网",
+				"navigationStyle": "custom",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
