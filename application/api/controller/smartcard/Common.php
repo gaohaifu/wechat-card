@@ -582,7 +582,7 @@ class Common extends Base
         }
         $data['companyInfo'] = [
             'companyname'=>isset($staff->smartcardcompany->name)?$staff->smartcardcompany->name:$staff->companyname,
-            'position'=>$staff->position,
+            'position'=>$staff['position'],
         ];
         $data['memberInfo'] = [
             'allNum'=>$Staff->where(['company_id'=>$user_id, 'statusdata'=>1])->count(),
@@ -909,22 +909,22 @@ class Common extends Base
         $Share = new Share();
 
         $user_id = $this->user_id;
-        $staff = $Staff->alias('s')->join('myadmin_company c','s.company_id=c.id')
+        $staff = $Staff->alias('s')->join('myadmin_company c','s.company_id=c.id','left')
             ->where(['user_id'=>$user_id,'is_default'=>1])
             ->field('s.id as staff_id,s.name,s.position,c.name as companyname,mobile,wechat,qq,email')
             ->find();
-
+var_dump($staff);
         $gfirstKey = '';
         $bfirstKey = '';
         foreach ($greetingsList as $k=>&$item) {
             if($gfirstKey=='') $gfirstKey = $k;
-            $item = str_replace('XXX',$staff->name,$item);
+            $item = str_replace('XXX',$staff['name'],$item);
         }
 
-        $text_4 =['text_0'=>'手机：'.$staff->mobile];
-        if($staff->wechat) $text_4['text_1'] = '微信：'.$staff->wechat;
-        if($staff->email) $text_4['text_'.count($text_4)] = '邮箱：'.$staff->email;
-        if($staff->qq) $text_4['text_'.count($text_4)] = 'QQ ：'.$staff->qq;
+        $text_4 =['text_0'=>'手机：'.$staff['mobile']];
+        if($staff['wechat']) $text_4['text_1'] = '微信：'.$staff['wechat'];
+        if($staff['email']) $text_4['text_'.count($text_4)] = '邮箱：'.$staff['email'];
+        if($staff['qq']) $text_4['text_'.count($text_4)] = 'QQ ：'.$staff['qq'];
         $count = count($text_4);
         for ($count;$count<4;$count++){
             $text_4['text_'.$count] = '';
@@ -935,11 +935,11 @@ class Common extends Base
                 'image_0' => '/assets/addons/posters/img/bg1.png',
                 'image_1' => \app\common\model\User::where(['id' =>$this->user_id])->value('avatar'),
                 'text_2' => [
-                    'name' => $staff->name,
+                    'name' => $staff['name'],
                 ],
                 'text_3' => [
-                    'companyname' => $staff->companyname,
-                    'position' => $staff->position,
+                    'companyname' => $staff['companyname'],
+                    'position' => $staff['position'],
                 ],
                 'text_4' => $text_4,
             ],
@@ -953,11 +953,11 @@ class Common extends Base
                 'image_0' => '/assets/addons/posters/img/bg2.png',
                 'image_1' => \app\common\model\User::where(['id' =>$this->user_id])->value('avatar'),
                 'text_2' => [
-                    'name' => $staff->name,
+                    'name' => $staff['name'],
                 ],
                 'text_3' => [
-                    'companyname' => $staff->companyname,
-                    'position' => $staff->position,
+                    'companyname' => $staff['companyname'],
+                    'position' => $staff['position'],
                 ],
                 'text_4' => $text_4,
             ],
