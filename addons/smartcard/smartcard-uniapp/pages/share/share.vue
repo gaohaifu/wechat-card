@@ -126,12 +126,16 @@
 			</view>
 		</view>
 		<!-- 偷懒直接设置空的div块 -->
-		<view style="height: 110rpx;" v-if="isShare"></view>
+		<view style="height: 110rpx;"></view>
 		<!-- 分享栏 -->
 		<view class="flex flex-vc share-box" v-if="isShare">
-			<view class="flex flex-v flex-vc left-box" @click="createPhoneMan" v-if="staffInfo.mobile">
+			<view class="flex flex-v flex-vc left-box" @click="createPhoneMan" v-if="staffInfo.mobile && origin!='2'">
 				<text class="iconfont icon-tongxunlu01-F"></text>
 				<text>导入通讯录</text>
+			</view>
+			<view class="flex flex-v flex-vc left-box" @click="manageCard" v-if="origin=='2'">
+				<text class="iconfont icon-tongxunlu01-F"></text>
+				<text>管理名片</text>
 			</view>
 			<view class="flex-1 flex">
 				<button open-type="share" class="flex-1 plain-btn">分享Ta的名片</button>
@@ -298,6 +302,7 @@
 				
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
+			this.origin = e.origin || '1'
 		},
 		onShow() {
 			this.refreshUser()
@@ -394,9 +399,9 @@
 					})
 				})
 			},
-			linkToUserInfo() {
+			linkToUserInfo(user_id) {
 				uni.navigateTo({
-					url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+					url: '/pages/userInfo/userInfo?user_id=' + user_id || this.user_id
 				})
 			},
 			openCode() {
@@ -407,6 +412,22 @@
 				uni.switchTab({
 					url: '/pages/mycard-data/index'
 				})
+			},
+			manageCard() {
+				uni.showActionSheet({
+					itemList: ['编辑名片', '保存到通讯录'],
+					success: (res) => {
+						console.log('选中了第' + (res.tapIndex + 1) + '个按钮');
+						if(res.tapIndex === 0) {
+							this.linkToUserInfo(this.s_user_id)
+						} else if (res.tapIndex === 1) {
+							this.createPhoneMan()
+						}
+					},
+					fail: function (res) {
+						console.log(res.errMsg);
+					}
+				});
 			},
 			sendCard() {
 				this.$api.sendCard({

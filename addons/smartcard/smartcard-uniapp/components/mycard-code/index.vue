@@ -52,9 +52,11 @@
 				]
 			}
 		},
-		mounted() {
+		created() {
 			// this.open()
 			this.getImageCode()
+			console.info('11111111111111111')
+			
 		},
 		methods: {
 			getImageCode() {
@@ -67,7 +69,7 @@
 					console.log(res, 'miniCode', res.data.img)
 					this.base64Code = res.data.img;
 					// this.base64Code = 'data:image/png;base64,' + uni.arrayBufferToBase64(res.data.img).replace(/[\r\n]/g, '');
-					console.info(this.base64Code, '=====>')
+					console.info(this.base64Code, '=====>base img')
 				})
 			},
 			sizeChange(index) {

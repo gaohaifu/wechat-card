@@ -29,7 +29,7 @@
 			</view>
 			<view v-for="item in exchangeCards" :key="item">
 				<view class="card-item">
-					<image :src="item.avatar"></image>
+					<image :src="item.avatar" @click="linkTo(item)"></image>
 					<view class="card-content">
 						<view class="card-user">
 							<view>{{item.name}}</view>
@@ -54,7 +54,7 @@
 		<view class="section-two" v-show="searchList.length === 0">
 			<view class="section-title">所有名片（{{allCards.length}}）</view>
 			<view class="card-item" v-for="item in allCards" :key="item">
-				<image :src="item.avatar"></image>
+				<image :src="item.avatar" @click="linkTo(item)"></image>
 				<view class="card-content">
 					<view class="card-user">
 						<view>{{item.name}}</view>
@@ -69,7 +69,7 @@
 		<view class="section-two" v-show="searchList.length > 0">
 			<view class="section-title">搜索结果</view>
 			<view class="card-item" v-for="item in searchList" :key="item">
-				<image :src="item.avatar"></image>
+				<image :src="item.avatar" @click="linkTo(item)"></image>
 				<view class="card-content">
 					<view class="card-user">
 						<view>{{item.name}}</view>
@@ -89,7 +89,7 @@
 <script>
 	import NoData from '../../components/no-data/no-data.vue'
 	import bottomSheet from '@/components/bbh-sheet/bottomSheet.vue';
-	import {isLogin} from '@/config/common.js'
+	import {isLogin, weixinShare} from '@/config/common.js'
 	export default {
 		name: 'cardHolder',
 		components: {
@@ -118,7 +118,8 @@
 		},
 		methods: {
 			getData() {
-				this.$api.cardHolder({}, res => {
+				this.$api.cardHolder({}, response => {
+					const res = response.data;
 					(res.exchangeCards || []).forEach(it => {
 						it.myStaff = it.myStaff || [] // 识别不了...
 					})
@@ -162,6 +163,20 @@
 						this.searchList = []
 					}
 				}, 500)
+			},
+			linkTo(row) {
+				// console.info(row, '=============')
+				if(!row.id || !row.user_id) {
+					uni.showToast({
+						icon: 'none',
+						title: '无效的员工id和用户id，请检查'
+					})
+					return;
+				}
+				// console.info(weixinShare.url + '?staff_id='+row.id + '&user_id='+row.user_id+'&origin=2')
+				uni.navigateTo({
+					url: weixinShare.url + '?staff_id='+row.id + '&user_id='+row.user_id+'&origin=2'
+				})
 			},
 			// 以下都是检测登录逻辑===============参考首页
 			checkUser() {

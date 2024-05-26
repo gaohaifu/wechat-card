@@ -78,7 +78,7 @@
 			return {
 				isShowBottom: false,
 				smartcardObj: smartcardObj,
-				current: 0,
+				current: 1,
 				allVisitNum: 0,
 				todayVisitNum: 0,
 				allSendNum: 0,
@@ -127,6 +127,8 @@
 			tabHandle(val) {
 				if (this.current === val) return
 				this.current = val
+				this.myCardList = []
+				this.getMyCardList()
 			},
 			getStatistics() {
 				this.$api.myCardVisit({}, res => {
