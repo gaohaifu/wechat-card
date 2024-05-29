@@ -229,12 +229,21 @@
 					// 	label: '发名片',
 					// 	shareCode: '0' // 是否分享页还是默认页独有 0 无 1有 2都有
 					// },
+					// {
+					// 	id: 6,
+					// 	disabled: false,
+					// 	icon: 'icon-baocunmingpian',
+					// 	color: '#0256FF',
+					// 	label: '保存名片',
+					// 	shareCode: '1' // 是否分享页还是默认页独有
+					// },
 					{
 						id: 6,
 						disabled: false,
-						icon: 'icon-baocunmingpian',
+						icon: 'icon-QQ',
 						color: '#0256FF',
-						label: '保存名片',
+						label: 'QQ',
+						hidden: false,
 						shareCode: '1' // 是否分享页还是默认页独有
 					},
 				],
@@ -515,7 +524,16 @@
 					});
 				} else if(row.id === 6) {
 					// 保存名片
-					this.saveCard()
+					// this.saveCard()
+					uni.setClipboardData({
+						data: this.staffInfo.QQ,
+						success() {
+							uni.showToast({
+								icon:'none',
+								title: '复制成功，可前往添加好友'
+							})
+						}
+					})
 				}
 			},
 			toggleCardBox(dataProp) {
@@ -688,6 +706,10 @@
 							this.staffInfo.smartcardcompany.latitude || 
 							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
+						if(!this.staffInfo.QQ) {
+							this.tools.find(i => i.id === 6).hidden = true
+							this.tools = this.tools.filter(i => !i.hidden)
+						}
 						this.tools.forEach(it => {
 							if(it.disabled) it.color = '#999';
 						})
