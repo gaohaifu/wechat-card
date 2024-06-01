@@ -27,9 +27,9 @@
 					<image src="../../static/images/right.png" />
 				</view>
 			</view>
-			<view v-for="item in exchangeCards" :key="item">
+			<view v-for="item in exchangeCards" :key="item" @click="linkTo(item)">
 				<view class="card-item">
-					<image :src="item.avatar" @click="linkTo(item)"></image>
+					<image :src="item.avatar"></image>
 					<view class="card-content">
 						<view class="card-user">
 							<view>{{item.name}}</view>
@@ -53,8 +53,8 @@
 		</view>
 		<view class="section-two" v-show="searchList.length === 0">
 			<view class="section-title">所有名片（{{allCards.length}}）</view>
-			<view class="card-item" v-for="item in allCards" :key="item">
-				<image :src="item.avatar" @click="linkTo(item)"></image>
+			<view class="card-item" v-for="item in allCards" :key="item" @click="linkTo(item)">
+				<image :src="item.avatar"></image>
 				<view class="card-content">
 					<view class="card-user">
 						<view>{{item.name}}</view>
@@ -68,8 +68,8 @@
 		</view>
 		<view class="section-two" v-show="searchList.length > 0">
 			<view class="section-title">搜索结果</view>
-			<view class="card-item" v-for="item in searchList" :key="item">
-				<image :src="item.avatar" @click="linkTo(item)"></image>
+			<view class="card-item" v-for="item in searchList" :key="item" @click="linkTo(item)">
+				<image :src="item.avatar"></image>
 				<view class="card-content">
 					<view class="card-user">
 						<view>{{item.name}}</view>
