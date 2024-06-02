@@ -136,12 +136,13 @@
 				})
 			},
 			agreeExchange(row) {
-				this.$api.agreeExchange({su_id: row.self_staff_id}, res => {
+				this.$api.agreeExchange({staff_id: row.id}, res => {
 					if(res.code === 1) {
 						uni.showToast({
 							icon: 'success',
 							title: res.msg || '名片交换成功'
 						})
+						this.getData()
 					}else {
 						uni.showToast({
 							icon: 'none',
