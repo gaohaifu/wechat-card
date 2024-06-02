@@ -160,13 +160,25 @@ class Common extends Base
                             'staff_user_id'=>$staff['user_id'],
                         ]);
                     }else{
+                        //己方已保存
                         $Su->save([
                             'user_id'=>$user_id,
                             'self_staff_id'=>$self_staff_id,
                             'staff_id'=>$staff_id,
-                            'status'=>1,
+                            'status'=>2,
                             'staff_user_id'=>$staff['user_id'],
                         ]);
+                        //对方待同意
+                        $su = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$self_staff_id])->find();
+                        if(!$su){
+                            $Su->save([
+                                'user_id'=>$staff['user_id'],
+                                'self_staff_id'=>$staff_id,
+                                'staff_id'=>$self_staff_id,
+                                'status'=>1,
+                                'staff_user_id'=>$user_id,
+                            ]);
+                        }
                     }
                 }
                 $this->success('名片保存成功');
