@@ -391,7 +391,7 @@
 			console.info('this.companyInfo', this.companyInfo, 'share staff_id: ', this.staffInfo.id, 'share user_id: ', this.user_id)
 			const staff_id = this.staffInfo.id; // 9
 			const user_id = this.user_id; // 11
-			let greeting = (this.companyInfo.name ? `我是${this.companyInfo.name}名片，很高兴认识你` : "名片夹")
+			let greeting = (this.companyInfo.name || this.userData.companyname ? `我是${this.companyInfo.name || this.userData.companyname}名片，很高兴认识你` : "名片夹")
 			if (this.shareCardInfo.greetings) greeting = this.shareCardInfo.greetings
 			return {
 			  title: greeting,
