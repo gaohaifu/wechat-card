@@ -398,7 +398,7 @@
 				})
 			},
 			saveCard() {
-				console.info(this.userData.save_status, '===========')
+				// console.info(this.userData.save_status, '===========')
 				if (this.userData.save_status != 0) return;
 				this.$api.saveCard({
 					staff_id: this.s_staff_id,
