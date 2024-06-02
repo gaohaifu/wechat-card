@@ -259,7 +259,7 @@ class Common extends Base
   
         $exchangeCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
             ->where(['u.user_id'=>$user_id,'u.status'=>1])
-            ->field('u.id su_id,s.id,s.user_id,s.name,s.company_id,s.companyname,s.position,u.createtime,self_staff_id')->select();
+            ->field('s.id,s.user_id,s.name,s.company_id,s.companyname,s.position,u.createtime,self_staff_id')->select();
         foreach ($exchangeCards as &$exchangeCard) {
             $exchangeCard['createtime'] = date('Y-m-d H:i:s',$exchangeCard['createtime']);
             $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
@@ -326,15 +326,15 @@ class Common extends Base
      */
     public function agreeExchange()
     {
-        $su_id = $this->request->request('su_id')?:'';
+        $staff_id = $this->request->request('staff_id')?:'';
         $user_id = $this->user_id;
         
         $Staff = new Staff();
-        if($su_id == ''){
+        if($staff_id == ''){
             $this->error('名片夹id不能为空');
         }else{
             //己方保存的名片
-            $su = Su::where(['id'=>$su_id,'user_id'=>$user_id])->find();
+            $su = Su::where(['staff_id'=>$staff_id,'user_id'=>$user_id])->find();
             if($su){
                 //对方保存的名片
                 $othersu = Su::where(['user_id'=>$su['staff_user_id'],'staff_id'=>$su['self_staff_id']])->find();
