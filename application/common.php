@@ -550,6 +550,49 @@ if (!function_exists('get_fastscrm_config_by_server')) {
     }
 }
 
+if (!function_exists('address_to_coordinate')) {
+    /**
+     * 地址转坐标
+     * @param string $address 地址
+     * @param null   $type api类型 tencent腾讯
+     * @return string
+     */
+    function address_to_coordinate($address,$type = 'tencent')
+    {
+        $cacheName = md5($address);
+        $value = cache($cacheName);
+        if ($value){
+            return $value;
+        }
+
+        $config = get_addon_config('address');
+        if ($type == 'tencent'){
+            $key = $config['tencentkey'];
+            // 构建请求参数
+            $params = [
+                'key' => $key, // 替换为你的API Key
+                'address' => urlencode($address), // 替换为需要转换的地址
+                'output' => 'json' // 返回数据格式
+            ];
+
+            $response = \fast\Http::get('https://apis.map.qq.com/ws/geocoder/v1/',$params);
+            $data = json_decode($response, true);
+            // 检查是否成功获取数据
+            if (isset($data['status']) && $data['status'] == 0) {
+                // 成功获取经纬度
+                $latitude = $data['result']['location']['lat'];
+                $longitude = $data['result']['location']['lng'];
+                $redata = ['lat' => $latitude,'lng'=>$longitude];
+                cache($cacheName,$redata,24*3600);
+                return $redata;
+            } else {
+                // 处理错误情况
+                abort(0,$data['message']);
+            }
+        }
+    }
+}
+
 
 /**
  * 获取顶级域名

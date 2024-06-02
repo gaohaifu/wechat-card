@@ -94,6 +94,10 @@ class Base extends Api
                 //判断是否需要企业认证
                 if($staffInfo['company_id']==0 || $staffInfo['smartcardcompany']['is_authentication']==3 || $staffInfo['smartcardcompany']['is_authentication']==0){
                     $data['usertype'] = 1;
+
+                    $lng = address_to_coordinate($staffInfo['address']);
+                    $staffInfo['longitude'] = $lng['lng'];
+                    $staffInfo['latitude'] = $lng['lat'];
                 }
 
                 //访问类型:1=访问员工主页,2=访问企业主页,3=访问企业宣传册,4=访问案例,5=查看企业商品,6=查看企业动态,7=点赞员工,8=点赞其他备用,9=点赞其他备用2

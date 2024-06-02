@@ -18,6 +18,7 @@ class Index extends Api
      */
     public function index()
     {
+        var_dump(1);exit();
         $this->success('请求成功');
     }
 }
