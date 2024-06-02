@@ -326,15 +326,15 @@ class Common extends Base
      */
     public function agreeExchange()
     {
-        $su_id = $this->request->request('su_id')?:'';
+        $staff_id = $this->request->request('staff_id')?:'';
         $user_id = $this->user_id;
         
         $Staff = new Staff();
-        if($su_id == ''){
+        if($staff_id == ''){
             $this->error('名片夹id不能为空');
         }else{
             //己方保存的名片
-            $su = Su::where(['id'=>$su_id,'user_id'=>$user_id])->find();
+            $su = Su::where(['staff_id'=>$staff_id,'user_id'=>$user_id])->find();
             if($su){
                 //对方保存的名片
                 $othersu = Su::where(['user_id'=>$su['staff_user_id'],'staff_id'=>$su['self_staff_id']])->find();
