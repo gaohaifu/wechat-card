@@ -164,7 +164,7 @@ class Common extends Base
                             'user_id'=>$user_id,
                             'self_staff_id'=>$self_staff_id,
                             'staff_id'=>$staff_id,
-                            'status'=>2,
+                            'status'=>1,
                             'staff_user_id'=>$staff['user_id'],
                         ]);
                     }
