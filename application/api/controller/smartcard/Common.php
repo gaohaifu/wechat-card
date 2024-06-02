@@ -152,7 +152,7 @@ class Common extends Base
                     if($staffdata){
                         $staffdata->status = 4;
                         $staffdata->save();
-                        $Su->save([
+                        $Su->create([
                             'user_id'=>$user_id,
                             'self_staff_id'=>$self_staff_id,
                             'staff_id'=>$staff_id,
@@ -161,7 +161,7 @@ class Common extends Base
                         ]);
                     }else{
                         //己方已保存
-                        $Su->save([
+                        $aa = $Su->create([
                             'user_id'=>$user_id,
                             'self_staff_id'=>$self_staff_id,
                             'staff_id'=>$staff_id,
@@ -171,7 +171,7 @@ class Common extends Base
                         //对方待同意
                         $su = Su::where(['user_id'=>$staff['user_id'],'staff_id'=>$self_staff_id])->find();
                         if(!$su){
-                            $Su->save([
+                            $Su->create([
                                 'user_id'=>$staff['user_id'],
                                 'self_staff_id'=>$staff_id,
                                 'staff_id'=>$self_staff_id,
@@ -229,7 +229,7 @@ class Common extends Base
                     $this->success('名片已回递');
                 }else{
                     $Su = new Su();
-                    $Su->save([
+                    $Su->create([
                         'user_id'=>$staff['user_id'],
                         'self_staff_id'=>$staff_id,
                         'staff_id'=>$selfstaff['id'],
