@@ -40,7 +40,7 @@
 			</view> -->
 			<view v-for="(it, inx) in myCardList" :key="inx">
 				<view class="card-date">{{it.date}}</view>
-				<view class="card-item" v-for="(sit, sinx) in it.data" :key="sinx">
+				<view class="card-item" v-for="(sit, sinx) in it.data" :key="sinx" @click="linkTo(sit)">
 					<view class="photo-box">
 						<image :src="sit.avatar"></image>
 						<!-- <view class="visit-first" v-if="it===3">首次访问</view> -->
@@ -49,12 +49,12 @@
 					<view class="card-content">
 						<view class="flex-1">
 							<view class="card-user">{{sit.name}}</view>
-							<view>{{sit.position}}</view>
-							<view>{{sit.companyname}}</view>
-							<view class="card-source">来源 | {{smartcardObj.origin[`${sit.origin}`]}} {{sit.time}}</view>
+							<view v-if="sit.position">{{sit.position}}</view>
+							<view v-if="sit.companyname">{{sit.companyname}}</view>
+							<view class="card-source">来源： {{smartcardObj.origin[`${sit.origin}`] || ''}} {{sit.time || ''}}</view>
 						</view>
 						<view :class="{'card-exchange' : sit.status === 1, 'await-text': sit.status !== 1}"
-							 @click="resendCard(sit)">{{smartcardObj.status[`${sit.status}`]}}</view>
+							 @click.stop="resendCard(sit)">{{smartcardObj.status[`${sit.status}`] || ''}}</view>
 					</view>
 				</view>
 			</view>
@@ -68,7 +68,7 @@
 
 <script>
 	import { formatDate } from "@/uni_modules/uni-dateformat/components/uni-dateformat/date-format.js";
-	import {smartcardObj, isLogin} from '@/config/common.js'
+	import {smartcardObj, isLogin, weixinShare} from '@/config/common.js'
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	export default {
 		components: {
@@ -179,7 +179,14 @@
 			},
 			resendCard(row) {
 				if(row.status !== 1) return;
-				this.$api.resendCard({staff_id: row.user_id}, res => {
+				if(!row.staff_id) {
+					uni.showToast({
+						title: '用户id有问题，请重试',
+						icon: 'none'
+					})
+					return;
+				}
+				this.$api.resendCard({staff_id: row.staff_id}, res => {
 					if(res.code === 1) {
 						uni.showToast({
 							icon: 'success',
@@ -191,6 +198,18 @@
 							title: res.msg || '名片回递失败'
 						})
 					}
+				})
+			},
+			linkTo(row) {
+				if(!row.staff_id) {
+					uni.showToast({
+						title: '用户id有问题，请重试',
+						icon: 'none'
+					})
+					return;
+				}
+				uni.navigateTo({
+					url: weixinShare.url + '?staff_id='+row.staff_id + '&user_id='+row.user_id+'&origin=2'
 				})
 			},
 			// 以下都是检测登录逻辑===============参考首页

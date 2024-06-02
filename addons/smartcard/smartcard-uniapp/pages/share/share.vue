@@ -57,11 +57,11 @@
 					<text>Ta的认证</text>
 				</view>
 				<view class="flex right-box">
-					<view class="flex flex-vc flex-hc enterprise-cert" :class="{'disabled' : userData.is_authentication !== 2}">
+					<view class="flex flex-vc flex-hc enterprise-cert" :class="{'disabled' : userData.is_authentication != 2}">
 						<image src="../../static/images/enterprise-cert.png" mode=""></image>
 						<text>企业认证</text>
 					</view>
-					<view class="flex flex-vc flex-hc personal-cert" :class="{'disabled' : userData.is_certified !== 2}">
+					<view class="flex flex-vc flex-hc personal-cert" :class="{'disabled' : userData.is_certified != 2}">
 						<image src="../../static/images/personal-cert.png" mode=""></image>
 						<text>个人认证</text>
 					</view>
@@ -149,7 +149,7 @@
 					<view class="flex-1 primary-btn" @click="resendCard"
 						:class="{'disabled' : userData.save_status !== '0'}"
 						 v-if="userData.save_status !== '0'">
-						{{smartcardObj.save_status[userData.save_status]}}
+						{{smartcardObj.save_status[userData.save_status || '0']}}
 					</view>
 					<view class="flex-1 primary-btn" @click="saveCard"
 						:class="{'disabled' : userData.save_status !== '0'}"
@@ -494,9 +494,11 @@
 							})
 						}
 					})
-				} else if (row.id === 4 && this.companyInfo.address) {
+				} else if (row.id === 4 && ((this.companyInfo.latitude && this.companyInfo.longitude) ||
+				(this.staffInfo.latitude && this.staffInfo.longitude))) {
 					uni.openLocation({
-						address: this.companyInfo.address
+						latitude: Number(this.companyInfo.latitude) || Number(this.staffInfo.latitude),
+						longitude: Number(this.companyInfo.longitude) || Number(this.staffInfo.longitude)
 					})
 				} else if(row.id === 5) { // 发名片
 					
@@ -702,9 +704,10 @@
 						if(!this.staffInfo.mobile) this.tools.find(i => i.id === 1).disabled = true
 						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
 						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
-						if(!(this.staffInfo.smartcardcompany && (this.staffInfo.smartcardcompany.longitude && 
-							this.staffInfo.smartcardcompany.latitude || 
-							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
+						if(!((this.companyInfo.longitude && this.companyInfo.latitude) ||
+							(this.staffInfo.latitude && this.staffInfo.longitude))) {
+								this.tools.find(i => i.id === 4).disabled = true
+						}
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
 						if(!this.staffInfo.QQ) {
 							this.tools.find(i => i.id === 6).hidden = true
@@ -994,7 +997,7 @@
 	}
 	.cert-box .right-box .enterprise-cert { background: #0256FF; margin-right: 8rpx;}
 	.cert-box .right-box .personal-cert { background: #EAB863;}
-	.cert-box .right-box .enterprise-cert.disable,
+	.cert-box .right-box .enterprise-cert.disabled,
 	.cert-box .right-box .personal-cert.disabled { background: #999;}
 	.cert-box .right-box image {
 		width: 24rpx;
