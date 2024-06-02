@@ -259,7 +259,7 @@ class Common extends Base
   
         $exchangeCards = $staff->alias('s')->join('smartcard_su u','s.id = u.staff_id')
             ->where(['u.user_id'=>$user_id,'u.status'=>1])
-            ->field('s.id,s.user_id,s.name,s.company_id,s.companyname,s.position,u.createtime,self_staff_id')->select();
+            ->field('u.id su_id,s.id,s.user_id,s.name,s.company_id,s.companyname,s.position,u.createtime,self_staff_id')->select();
         foreach ($exchangeCards as &$exchangeCard) {
             $exchangeCard['createtime'] = date('Y-m-d H:i:s',$exchangeCard['createtime']);
             $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
