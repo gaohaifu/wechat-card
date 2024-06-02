@@ -249,7 +249,7 @@ class Common extends Base
             ->where(['u.user_id'=>$user_id,'u.status'=>1])
             ->field('s.id,s.user_id,s.name,s.company_id,s.companyname,s.position,u.createtime,self_staff_id')->select();
         foreach ($exchangeCards as &$exchangeCard) {
-            $exchangeCard['createtime'] = date('Ymd H:i:s',$exchangeCard['createtime']);
+            $exchangeCard['createtime'] = date('Y-m-d H:i:s',$exchangeCard['createtime']);
             $exchangeCard['avatar'] = cdnurl(user::where(['id'=>$exchangeCard->user_id])->value('avatar'),true);
             //$exchangeCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$exchangeCard->company_id])->value('name');
             $mystaff = $staff->where(['id'=>$exchangeCard->self_staff_id])->find();
@@ -267,7 +267,7 @@ class Common extends Base
             ->where(['u.user_id'=>$user_id,'u.status'=>['egt',2]])
             ->field('s.id,s.user_id,s.name,s.company_id,s.companyname,s.position,u.createtime')->select();
         foreach ($allCards as &$allCard) {
-            $allCard['createtime'] = date('Ymd H:i:s',$allCard['createtime']);
+            $allCard['createtime'] = date('Y-m-d H:i:s',$allCard['createtime']);
             $allCard['avatar'] = cdnurl(user::where(['id'=>$allCard->user_id])->value('avatar'),true);
             //$allCard['companyname'] = \addons\myadmin\model\Company::where(['id'=>$allCard->company_id])->value('name');
         }
