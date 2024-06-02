@@ -53,11 +53,15 @@
 					<text>Ta的认证</text>
 				</view>
 				<view class="flex right-box">
-					<view class="flex flex-vc flex-hc enterprise-cert" @click="linkToCert(1)">
+					<view class="flex flex-vc flex-hc enterprise-cert"
+						:class="{'disabled': companyInfo.is_authentication != 2}"
+						@click="linkToCert(1)">
 						<image src="../../static/images/enterprise-cert.png" mode=""></image>
 						<text>企业认证</text>
 					</view>
-					<view class="flex flex-vc flex-hc personal-cert" @click="linkToCert(2)">
+					<view class="flex flex-vc flex-hc personal-cert"
+						:class="{'disabled': staffInfo.is_certified != 2}"
+						@click="linkToCert(2)">
 						<image src="../../static/images/personal-cert.png" mode=""></image>
 						<text>个人认证</text>
 					</view>
@@ -391,7 +395,7 @@
 			console.info('this.companyInfo', this.companyInfo, 'share staff_id: ', this.staffInfo.id, 'share user_id: ', this.user_id)
 			const staff_id = this.staffInfo.id; // 9
 			const user_id = this.user_id; // 11
-			let greeting = (this.companyInfo.name ? `我是${this.companyInfo.name}名片，很高兴认识你` : "名片夹")
+			let greeting = (this.companyInfo.name || this.userData.companyname ? `我是${this.companyInfo.name || this.userData.companyname}名片，很高兴认识你` : "名片夹")
 			if (this.shareCardInfo.greetings) greeting = this.shareCardInfo.greetings
 			return {
 			  title: greeting,
@@ -506,10 +510,11 @@
 							})
 						}
 					})
-				} else if (row.id === 4 && this.companyInfo.latitude && this.companyInfo.longitude) {
+				} else if (row.id === 4 && ((this.companyInfo.latitude && this.companyInfo.longitude) ||
+				(this.staffInfo.latitude && this.staffInfo.longitude))) {
 					uni.openLocation({
-						latitude: Number(this.companyInfo.latitude),
-						longitude: Number(this.companyInfo.longitude)
+						latitude: Number(this.companyInfo.latitude) || Number(this.staffInfo.latitude),
+						longitude: Number(this.companyInfo.longitude) || Number(this.staffInfo.longitude)
 					})
 				} else if(row.id === 5) { // 发名片
 					
@@ -702,8 +707,10 @@
 						if(!this.staffInfo.mobile) this.tools.find(i => i.id === 1).disabled = true
 						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
 						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
-						if(!(this.staffInfo.smartcardcompany && (this.staffInfo.smartcardcompany.longitude && 
-							this.staffInfo.smartcardcompany.latitude))) this.tools.find(i => i.id === 4).disabled = true
+						if(!((this.companyInfo.longitude && this.companyInfo.latitude) ||
+							(this.staffInfo.latitude && this.staffInfo.longitude))) {
+								this.tools.find(i => i.id === 4).disabled = true
+						}
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
 						this.tools.forEach(it => {
 							if(it.disabled) it.color = '#999';
@@ -1001,6 +1008,8 @@
 	}
 	.cert-box .right-box .enterprise-cert { background: #0256FF; margin-right: 8rpx;}
 	.cert-box .right-box .personal-cert { background: #EAB863;}
+	.cert-box .right-box .enterprise-cert.disabled,
+	.cert-box .right-box .personal-cert.disabled { background-color: #999;}
 	.cert-box .right-box image {
 		width: 24rpx;
 		height: 24rpx;

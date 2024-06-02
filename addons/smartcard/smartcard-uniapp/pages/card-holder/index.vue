@@ -27,24 +27,24 @@
 					<image src="../../static/images/right.png" />
 				</view>
 			</view>
-			<view v-for="item in exchangeCards" :key="item">
+			<view v-for="item in exchangeCards" :key="item" @click="linkTo(item)">
 				<view class="card-item">
 					<image :src="item.avatar"></image>
 					<view class="card-content">
 						<view class="card-user">
 							<view>{{item.name}}</view>
-							<view class="exchange-btn" @click="agreeExchange(item)">同意</view>
+							<view class="exchange-btn" @click.stop="agreeExchange(item)">同意</view>
 						</view>
-						<view>{{item.position}}</view>
-						<view>{{item.companyname}}</view>
+						<view v-if="item.position">{{item.position}}</view>
+						<view v-if="item.companyname">{{item.companyname}}</view>
 					</view>
 				</view>
 				<view class="exchange-content">
 					<view class="excontent-text">
-						对方发起与名片 <text>{{item.myStaff.companyname}}｜{{item.myStaff.position}}</text> 的交换
+						对方发起与名片 <text>{{item.mystaff.companyname || ''}}｜{{item.mystaff.position || ''}}</text> 的交换
 					</view>
 					<view class="excontent-text flex flex-hsb">
-						<view>来源：{{item.origin}}</view>
+						<view>来源：{{smartcardObj.origin[`${item.origin}`] || ''}}</view>
 						<view>{{item.createtime}}</view>
 					</view>
 				</view>
@@ -53,30 +53,30 @@
 		</view>
 		<view class="section-two" v-show="searchList.length === 0">
 			<view class="section-title">所有名片（{{allCards.length}}）</view>
-			<view class="card-item" v-for="item in allCards" :key="item">
+			<view class="card-item" v-for="item in allCards" :key="item" @click="linkTo(item)">
 				<image :src="item.avatar"></image>
 				<view class="card-content">
 					<view class="card-user">
 						<view>{{item.name}}</view>
 						<text>{{item.createtime}}</text>
 					</view>
-					<view>{{item.position}}</view>
-					<view>{{item.companyname}}</view>
+					<view v-if="item.position">{{item.position}}</view>
+					<view v-if="item.companyname">{{item.companyname}}</view>
 				</view>
 			</view>
 			<no-data v-if="allCards.length === 0" />
 		</view>
 		<view class="section-two" v-show="searchList.length > 0">
 			<view class="section-title">搜索结果</view>
-			<view class="card-item" v-for="item in searchList" :key="item">
+			<view class="card-item" v-for="item in searchList" :key="item" @click="linkTo(item)">
 				<image :src="item.avatar"></image>
 				<view class="card-content">
 					<view class="card-user">
 						<view>{{item.name}}</view>
 						<text>{{item.createtime}}</text>
 					</view>
-					<view>{{item.position}}</view>
-					<view>{{item.companyname}}</view>
+					<view v-if="item.position">{{item.position}}</view>
+					<view v-if="item.companyname">{{item.companyname}}</view>
 				</view>
 			</view>
 		</view>
@@ -89,7 +89,7 @@
 <script>
 	import NoData from '../../components/no-data/no-data.vue'
 	import bottomSheet from '@/components/bbh-sheet/bottomSheet.vue';
-	import {isLogin} from '@/config/common.js'
+	import {isLogin, weixinShare, smartcardObj} from '@/config/common.js'
 	export default {
 		name: 'cardHolder',
 		components: {
@@ -98,6 +98,7 @@
 		},
 		data() {
 			return {
+				smartcardObj,
 				isShowBottom: false,
 				searchList: [],
 				exchangeCardNum: 0,
@@ -118,17 +119,24 @@
 		},
 		methods: {
 			getData() {
-				this.$api.cardHolder({}, res => {
+				this.$api.cardHolder({}, response => {
+					const res = response.data;
 					(res.exchangeCards || []).forEach(it => {
-						it.myStaff = it.myStaff || [] // 识别不了...
+						it.mystaff = it.mystaff || {} // 识别不了...
 					})
 					this.exchangeCardNum = res.exchangeCardNum || 0
-					this.exchangeCards = res.exchangeCards || []
-					this.allCards = res.allCards || []
+					this.exchangeCards = (res.exchangeCards || []).map(it => {
+						// it.createtime = it.createtime ? new Date(it.createtime * 1000) : new Date();
+						return it
+					})
+					this.allCards = (res.allCards || []).map(it=>{
+						// it.createtime = it.createtime ? new Date(it.createtime * 1000) : new Date();
+						return it
+					})
 				})
 			},
 			agreeExchange(row) {
-				this.$api.agreeExchange({su_id: row.id}, res => {
+				this.$api.agreeExchange({su_id: row.self_staff_id}, res => {
 					if(res.code === 1) {
 						uni.showToast({
 							icon: 'success',
@@ -155,13 +163,30 @@
 									title: '搜索不到数据'
 								})
 							} else {
-								this.searchList = res.data
+								this.searchList = (res.data || []).map(it => {
+									// it.createtime = it.createtime ? new Date(it.createtime * 1000) : new Date();
+									return it;
+								})
 							}
 						})
 					} else {
 						this.searchList = []
 					}
 				}, 500)
+			},
+			linkTo(row) {
+				// console.info(row, '=============')
+				if(!row.id || !row.user_id) {
+					uni.showToast({
+						icon: 'none',
+						title: '无效的员工id和用户id，请检查'
+					})
+					return;
+				}
+				// console.info(weixinShare.url + '?staff_id='+row.id + '&user_id='+row.user_id+'&origin=2')
+				uni.navigateTo({
+					url: weixinShare.url + '?staff_id='+row.id + '&user_id='+row.user_id+'&origin=2'
+				})
 			},
 			// 以下都是检测登录逻辑===============参考首页
 			checkUser() {

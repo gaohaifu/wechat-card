@@ -12,7 +12,7 @@
 						<view class="name_position">
 							<view :style="{color:fontcolor}">{{userData.name?userData.name:''}}</view>
 							<text :style="{color:fontcolor}">{{userData.position}}</text>
-							<text :style="{color:fontcolor}">{{companyInfo.name}}</text>
+							<text :style="{color:fontcolor}">{{companyInfo.name || userData.companyname}}</text>
 						</view>
 					</view>
 					<!-- <view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
@@ -57,11 +57,11 @@
 					<text>Ta的认证</text>
 				</view>
 				<view class="flex right-box">
-					<view class="flex flex-vc flex-hc enterprise-cert" :class="{'disabled' : userData.is_authentication !== 2}">
+					<view class="flex flex-vc flex-hc enterprise-cert" :class="{'disabled' : userData.is_authentication != 2}">
 						<image src="../../static/images/enterprise-cert.png" mode=""></image>
 						<text>企业认证</text>
 					</view>
-					<view class="flex flex-vc flex-hc personal-cert" :class="{'disabled' : userData.is_certified !== 2}">
+					<view class="flex flex-vc flex-hc personal-cert" :class="{'disabled' : userData.is_certified != 2}">
 						<image src="../../static/images/personal-cert.png" mode=""></image>
 						<text>个人认证</text>
 					</view>
@@ -126,12 +126,16 @@
 			</view>
 		</view>
 		<!-- 偷懒直接设置空的div块 -->
-		<view style="height: 110rpx;" v-if="isShare"></view>
+		<view style="height: 110rpx;"></view>
 		<!-- 分享栏 -->
 		<view class="flex flex-vc share-box" v-if="isShare">
-			<view class="flex flex-v flex-vc left-box" @click="createPhoneMan" v-if="staffInfo.mobile">
+			<view class="flex flex-v flex-vc left-box" @click="createPhoneMan" v-if="staffInfo.mobile && origin!='2'">
 				<text class="iconfont icon-tongxunlu01-F"></text>
 				<text>导入通讯录</text>
+			</view>
+			<view class="flex flex-v flex-vc left-box" @click="manageCard" v-if="origin=='2'">
+				<text class="iconfont icon-tongxunlu01-F"></text>
+				<text>管理名片</text>
 			</view>
 			<view class="flex-1 flex">
 				<button open-type="share" class="flex-1 plain-btn">分享Ta的名片</button>
@@ -145,9 +149,9 @@
 					<view class="flex-1 primary-btn" @click="resendCard"
 						:class="{'disabled' : userData.save_status !== '0'}"
 						 v-if="userData.save_status !== '0'">
-						{{smartcardObj.save_status[userData.save_status]}}
+						{{smartcardObj.save_status[userData.save_status || '0']}}
 					</view>
-					<view class="flex-1 primary-btn" @click="saveCard"
+					<view class="flex-1 primary-btn" @click.stop="saveCard"
 						:class="{'disabled' : userData.save_status !== '0'}"
 						 v-else>
 						保存名片
@@ -225,12 +229,21 @@
 					// 	label: '发名片',
 					// 	shareCode: '0' // 是否分享页还是默认页独有 0 无 1有 2都有
 					// },
+					// {
+					// 	id: 6,
+					// 	disabled: false,
+					// 	icon: 'icon-baocunmingpian',
+					// 	color: '#0256FF',
+					// 	label: '保存名片',
+					// 	shareCode: '1' // 是否分享页还是默认页独有
+					// },
 					{
 						id: 6,
 						disabled: false,
-						icon: 'icon-baocunmingpian',
+						icon: 'icon-QQ',
 						color: '#0256FF',
-						label: '保存名片',
+						label: 'QQ',
+						hidden: false,
 						shareCode: '1' // 是否分享页还是默认页独有
 					},
 				],
@@ -298,6 +311,7 @@
 				
 				uni.setStorageSync('staff_id',e.staff_id)
 			}
+			this.origin = e.origin || '1'
 		},
 		onShow() {
 			this.refreshUser()
@@ -322,7 +336,7 @@
 			}
 			this.sendCard()
 			return {
-			  title: (this.companyInfo.name ? `${this.companyInfo.name}名片夹` : "名片夹"),
+			  title: (this.companyInfo.name || this.userData.companyname ? `${this.companyInfo.name || this.userData.companyname}名片夹` : "名片夹"),
 			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + this.s_staff_id + '&user_id='+ tbis.s_user_id + '&pageTitle='+this.userData.name,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: weixinShare.type, // 0正式版 2体验版 1开发板
@@ -384,6 +398,7 @@
 				})
 			},
 			saveCard() {
+				if (this.userData.save_status !== 0) return;
 				this.$api.saveCard({
 					staff_id: this.s_staff_id,
 					user_id: this.s_user_id
@@ -392,11 +407,14 @@
 						icon: 'none',
 						title: res.msg
 					})
+					if(res.code === 1) {
+						this.userData.save_status = 1
+					}
 				})
 			},
-			linkToUserInfo() {
+			linkToUserInfo(user_id) {
 				uni.navigateTo({
-					url: '/pages/userInfo/userInfo?user_id=' + this.user_id
+					url: '/pages/userInfo/userInfo?user_id=' + user_id || this.user_id
 				})
 			},
 			openCode() {
@@ -407,6 +425,22 @@
 				uni.switchTab({
 					url: '/pages/mycard-data/index'
 				})
+			},
+			manageCard() {
+				uni.showActionSheet({
+					itemList: ['编辑名片', '保存到通讯录'],
+					success: (res) => {
+						console.log('选中了第' + (res.tapIndex + 1) + '个按钮');
+						if(res.tapIndex === 0) {
+							this.linkToUserInfo(this.s_user_id)
+						} else if (res.tapIndex === 1) {
+							this.createPhoneMan()
+						}
+					},
+					fail: function (res) {
+						console.log(res.errMsg);
+					}
+				});
 			},
 			sendCard() {
 				this.$api.sendCard({
@@ -464,9 +498,11 @@
 							})
 						}
 					})
-				} else if (row.id === 4 && this.companyInfo.address) {
+				} else if (row.id === 4 && ((this.companyInfo.latitude && this.companyInfo.longitude) ||
+				(this.staffInfo.latitude && this.staffInfo.longitude))) {
 					uni.openLocation({
-						address: this.companyInfo.address
+						latitude: Number(this.companyInfo.latitude) || Number(this.staffInfo.latitude),
+						longitude: Number(this.companyInfo.longitude) || Number(this.staffInfo.longitude)
 					})
 				} else if(row.id === 5) { // 发名片
 					
@@ -493,8 +529,15 @@
 						}
 					});
 				} else if(row.id === 6) {
-					// 保存名片
-					this.saveCard()
+					uni.setClipboardData({
+						data: this.staffInfo.QQ,
+						success() {
+							uni.showToast({
+								icon:'none',
+								title: '复制成功，可前往添加好友'
+							})
+						}
+					})
 				}
 			},
 			toggleCardBox(dataProp) {
@@ -663,10 +706,15 @@
 						if(!this.staffInfo.mobile) this.tools.find(i => i.id === 1).disabled = true
 						if(!this.staffInfo.wechat) this.tools.find(i => i.id === 2).disabled = true
 						if(!this.staffInfo.email) this.tools.find(i => i.id === 3).disabled = true
-						if(!(this.staffInfo.smartcardcompany && (this.staffInfo.smartcardcompany.longitude && 
-							this.staffInfo.smartcardcompany.latitude || 
-							this.staffInfo.smartcardcompany.address))) this.tools.find(i => i.id === 4).disabled = true
+						if(!((this.companyInfo.longitude && this.companyInfo.latitude) ||
+							(this.staffInfo.latitude && this.staffInfo.longitude))) {
+								this.tools.find(i => i.id === 4).disabled = true
+						}
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
+						if(!this.staffInfo.QQ) {
+							this.tools.find(i => i.id === 6).hidden = true
+							this.tools = this.tools.filter(i => !i.hidden)
+						}
 						this.tools.forEach(it => {
 							if(it.disabled) it.color = '#999';
 						})
@@ -951,7 +999,7 @@
 	}
 	.cert-box .right-box .enterprise-cert { background: #0256FF; margin-right: 8rpx;}
 	.cert-box .right-box .personal-cert { background: #EAB863;}
-	.cert-box .right-box .enterprise-cert.disable,
+	.cert-box .right-box .enterprise-cert.disabled,
 	.cert-box .right-box .personal-cert.disabled { background: #999;}
 	.cert-box .right-box image {
 		width: 24rpx;

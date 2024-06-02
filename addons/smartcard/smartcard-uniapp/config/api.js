@@ -116,6 +116,11 @@ const post = (method, data, callback,type, failCB) => {
 						})
 					}
 				});
+			} else if(result.msg == '未创建自己的名片') {
+				const user = db.get('userData')
+				uni.navigateTo({
+					url: '/pages/userInfo/userInfo?user_id='+user.user_id
+				})
 			}
 			callback(result);
 		},
