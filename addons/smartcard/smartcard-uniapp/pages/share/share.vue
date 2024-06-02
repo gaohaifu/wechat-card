@@ -151,7 +151,7 @@
 						 v-if="userData.save_status !== '0'">
 						{{smartcardObj.save_status[userData.save_status || '0']}}
 					</view>
-					<view class="flex-1 primary-btn" @click="saveCard"
+					<view class="flex-1 primary-btn" @click.stop="saveCard"
 						:class="{'disabled' : userData.save_status !== '0'}"
 						 v-else>
 						保存名片
@@ -398,6 +398,7 @@
 				})
 			},
 			saveCard() {
+				if (this.userData.save_status !== 0) return;
 				this.$api.saveCard({
 					staff_id: this.s_staff_id,
 					user_id: this.s_user_id
@@ -406,6 +407,9 @@
 						icon: 'none',
 						title: res.msg
 					})
+					if(res.code === 1) {
+						this.userData.save_status = 1
+					}
 				})
 			},
 			linkToUserInfo(user_id) {
@@ -525,8 +529,6 @@
 						}
 					});
 				} else if(row.id === 6) {
-					// 保存名片
-					// this.saveCard()
 					uni.setClipboardData({
 						data: this.staffInfo.QQ,
 						success() {
