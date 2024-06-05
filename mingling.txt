@@ -18,3 +18,6 @@ php think migrate:run
 
 php think crud -t mod_fastscrm_setting --local=0 -c fastscrm/system/Setting -m fastscrm/Setting --force=true
 php think menu -c fastscrm/system/Setting --force=true
+
+php think crud -t mod_ai_knowledge_base --local=0 -c ai/KnowledgeBase -m ai/KnowledgeBase --force=true
+php think menu -c ai/KnowledgeBase --force=true

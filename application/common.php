@@ -595,6 +595,28 @@ if (!function_exists('address_to_coordinate')) {
 
 
 /**
+ * 表转markdown
+ */
+if (!function_exists('table_tomarkdown')) {
+    function table_tomarkdown($tableData) {
+        // 获取所有列名
+        //$headers = array_keys(($tableData));
+        $markdown = '';
+        // 构建表头
+        //$markdown = '| ' . implode(' | ', $headers) . ' |\n';
+        
+        // 添加列分隔线
+        //$markdown .= '| ' . str_repeat('-', strlen($headers[0]) + 2) . ' |' . str_repeat('-', strlen($headers[0]) + 2) . ' |' . PHP_EOL;
+        
+        // 构建表格主体
+        foreach ($tableData as $row) {
+            $markdown .= '| ' . implode(' | ', $row) . ' |\n';
+        }
+
+        return $markdown;
+    }
+}
+/**
  * 获取顶级域名
  */
 if (!function_exists('get_first_host')) {

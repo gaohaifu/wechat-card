@@ -1,0 +1,15 @@
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="" style="display: none">
+    <!--代码输入框（注意请务必设置高度，否则无法显示）-->
+    <pre id="code" class="ace_editor" style="min-height: calc(100vh - 30px);margin-bottom: 0px;"><textarea name="code11" class="ace_text-input">{$code|htmlentities}</textarea></pre>
+    <input type="hidden" name="file" id="file" value="{$filepath}">
+    <div class="form-group layer-footer" style="margin-bottom:0;">
+        <div class="col-xs-12 col-sm-8" style="width: 70%;padding-left:20px;line-height: 30px;">
+            文件大小：{$size|default=0}KB, 最近访问时间：{$fileatime|default=0}, 最近修改时间：{$filectime|default=0}, 状态：<span id="update_file">未修改</span>
+        </div>
+        <div class="col-xs-12 col-sm-8" style="text-align: right;width: 30%;padding-right:20px;">
+            <button type="button" class="btn btn-info btn-copy" data-path="{$filepath}"><i class="fa fa-copy"></i> 拷贝路径</button>
+            <button type="button" id="editpage_btn" class="btn btn-success btn-embossed {if $editpage_config['setreadonly'] == 1}disabled{/if}" {if $editpage_config['setreadonly'] == 1}disabled{/if}><i class="fa fa-save"></i> 保存(Ctrl + S)</button>
+        </div>
+    </div>
+</form>
