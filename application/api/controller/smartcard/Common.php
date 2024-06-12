@@ -961,6 +961,7 @@ class Common extends Base
             'output' => ROOT_PATH . 'public'.'/uploads/share/poster_2_1_'.$user_id.'.png',
         ];
         Hook::listen('posters', $params, null, true);
+        $this->uploadFile('/uploads/share/poster_2_1_'.$user_id.'.png',$params['output']);
         $params = [
             'id' => 2,
             'params' => [
@@ -979,7 +980,7 @@ class Common extends Base
             'output' => ROOT_PATH . 'public'.'/uploads/share/poster_2_2_'.$user_id.'.png',
         ];
         Hook::listen('posters', $params, null, true);
-
+        $this->uploadFile('/uploads/share/poster_2_2_'.$user_id.'.png',$params['output']);
         $backgroundimageList[] = cdnurl('/uploads/share/poster_2_1_'.$user_id.'.png',true);
         $backgroundimageList[] = cdnurl('/uploads/share/poster_2_2_'.$user_id.'.png',true);
         $share = $Share->where(['user_id'=>$user_id])->find();

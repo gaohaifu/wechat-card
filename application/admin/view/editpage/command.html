@@ -1,0 +1,86 @@
+
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="" style="display: none">
+    <!--代码输入框（注意请务必设置高度，否则无法显示）-->
+    <pre id="code" class="ace_editor" style="min-height: calc(100vh - 30px);margin-bottom: 0px;">
+<textarea name="code11" class="ace_text-input">
+*************************使用说明***************************
+
+ 1.每行为一个独立的命令
+ 2.输入命令后按回车执行
+ 3.必须是php think开始且前面不能有空白或其他字符
+ 4.底部的按钮点击可查看对应的常用命令集合
+
+*************************使用说明***************************
+</textarea>
+</pre>
+    <div class="form-group layer-footer" style="margin-bottom:0;">
+        <div class="col-xs-12 col-sm-8" style="text-align: left;width: 100%;padding-left:20px;">
+            <button type="button" class="btn btn-success btn-embossed" data-val="crud">{:__('CRUD命令')}</button>
+            <button type="button" class="btn btn-success btn-embossed" data-val="menu">{:__('菜单命令')}</button>
+            <button type="button" class="btn btn-success btn-embossed" data-val="min">{:__('压缩打包命令')}</button>
+            <button type="button" class="btn btn-success btn-embossed" data-val="api">{:__('生成API文档命令')}</button>
+        </div>
+    </div>
+</form>
+
+<p id="crud" style="display: none">
+    //生成fa_test表的CRUD
+    php think crud -t test
+    //生成fa_test表的CRUD且一键生成菜单
+    php think crud -t test -u 1
+    //删除fa_test表生成的CRUD
+    php think crud -t test -d 1
+    //生成fa_test表的CRUD且控制器生成在二级目录下
+    php think crud -t test -c mydir/test
+    //生成fa_test_log表的CRUD且生成对应的控制器为testlog
+    php think crud -t test_log -c testlog
+    //生成fa_test表的CRUD且对应的模型名为testmodel
+    php think crud -t test -m testmodel
+    //生成fa_test表的CRUD且生成关联模型category，外链为category_id，关联表主键为id
+    php think crud -t test -r category -k category_id -p id
+    //生成fa_test表的CRUD且所有以list或data结尾的字段都生成复选框
+    php think crud -t test --setcheckboxsuffix=list --setcheckboxsuffix=data
+    //生成fa_test表的CRUD且所有以image和img结尾的字段都生成图片上传组件
+    php think crud -t test --imagefield=image --imagefield=img
+    //关联多个表,参数传递时请按顺序依次传递，支持以下几个参数relation/relationmodel/relationforeignkey/relationprimarykey/relationfields/relationmode
+    php think crud -t test --relation=category --relation=admin --relationforeignkey=category_id --relationforeignkey=admin_id
+    //生成v_phealth_db2数据库下的fa_test表的CRUD
+    php think crud -t test --db=v_phealth_db2
+</p>
+
+<p id="menu" style="display: none">
+    //一键生成test控制器的权限菜单
+    php think menu -c test
+    //一键生成mydir/test控制器的权限菜单
+    php think menu -c mydir/test
+    //删除test控制器生成的菜单
+    php think menu -c test -d 1
+    //一键全部重新所有控制器的权限菜单
+    php think menu -c all-controller
+</p>
+
+<p id="min" style="display: none">
+    //一键压缩打包前后台的JS和CSS
+    php think min -m all -r all
+    //一键压缩打包后台的JS和CSS
+    php think min -m backend -r all
+    //一键压缩打包前后台的JS
+    php think min -m all -r js
+    //一键压缩打包后台的CSS
+    php think min -m backend -r css
+</p>
+
+<p id="api" style="display: none">
+    //一键生成API文档
+    php think api --force=true
+    //指定https://www.example.com为API接口请求域名,默认为空
+    php think api -u https://www.example.com --force=true
+    //输出自定义文件为myapi.html,默认为api.html
+    php think api -o myapi.html --force=true
+    //修改API模板为mytemplate.html，默认为index.html
+    php think api -e mytemplate.html --force=true
+    //修改标题为FastAdmin,作者为作者
+    php think api -t FastAdmin -a Karson --force=true
+    //查看API接口命令行帮助
+    php think api -h
+</p>

@@ -18,6 +18,7 @@ use app\admin\model\smartcard\Tags;
 use app\admin\model\smartcard\Favor;
 use app\admin\model\smartcard\Theme;
 use app\admin\model\User;
+use OSS\OssClient;
 use think\Db;
 use think\Config;
 
@@ -1059,6 +1060,21 @@ public function areaJson(){
             //如果都更新就回滚
             $model->rollback();
             return false;
+        }
+    }
+    
+    /*
+     * oss上传
+     */
+    public function uploadFile($url,$filePath){
+        $config = get_addon_config('alioss');
+        $oss = new OssClient($config['accessKeyId'], $config['accessKeySecret'], $config['endpoint']);
+        try {
+            $ret = $oss->uploadFile($config['bucket'], ltrim($url, "/"), $filePath);
+            //成功不做任何操作
+        } catch (\Exception $e) {
+            \think\Log::write($e->getMessage());
+            $this->error("上传失败(1002)");
         }
     }
 }

@@ -567,7 +567,8 @@ class User extends Base
 
         $filename = ROOT_PATH . 'public'.'/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png';
         if($miniCode){
-            imgsavefromstring($miniCode,$filename);
+            file_put_contents($filename, $miniCode);
+            $this->uploadFile('/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png',$filename);
             $data = [
                 'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png',true)
             ];
@@ -614,7 +615,8 @@ class User extends Base
                     $this->success('发送成功',$json);
                 }else{
                     Cache::set('mini_code_'.$user_id.'_'.$hashkey,$result['msg'],3600*24);
-                    imgsavefromstring($result['msg'],$filename);
+                    file_put_contents($filename, $result['msg']);
+                    $this->uploadFile('/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png',$filename);
                     $data = [
                         'img'=>cdnurl('/uploads/minicode/user_'.$user_id.'_'.$hashkey.'.png',true)
                     ];
@@ -630,4 +632,5 @@ class User extends Base
         }
 
     }
+    
 }

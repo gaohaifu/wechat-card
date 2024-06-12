@@ -2,9 +2,15 @@
 
 namespace app\admin\controller;
 
+use addons\myadmin\model\Company;
+use app\admin\model\Xccmscontentinfo;
+use app\admin\model\Xccmsnewsinfo;
+use app\admin\model\Xccmspageinfo;
 use app\common\controller\Backend;
 use app\common\exception\UploadException;
 use app\common\library\Upload;
+use app\common\model\ai\KnowledgeBase;
+use app\common\service\DifyService;
 use fast\Random;
 use think\addons\Service;
 use think\Cache;
@@ -312,4 +318,32 @@ class Ajax extends Backend
         return $response;
     }
 
+    public function knowledge_base(){
+        $id = input('id');
+        $companyId = input('company_id');
+        $company = Company::get($companyId);
+        if(!$company){
+            $this->error('公司不存在');
+        }
+
+        $content = table_tomarkdown([['company_name'=>'我的公司名称为'.$company->name]]);
+        $tableArr = ['xccms_content_info','xccms_news_info','xccms_page_info'];
+        foreach($tableArr as $item){
+            $list = collection(model($item)->where('company_id',$companyId)->select())->toArray();
+            $content.= table_tomarkdown($list);
+            unset($list);
+        }
+        if(!$content){
+            $this->error('错误');
+        }
+        $row = KnowledgeBase::get($id);
+        if($row->document_id){
+            DifyService::updateDocumentFromText($id,$row->document_id,'name',$content);
+        }else{
+            $re = DifyService::createDocumentFromText($id,'name',$content);
+            $row->save(['document_id'=>$re['document']['id']]);
+        }
+
+        $this->success('成功');
+    }
 }

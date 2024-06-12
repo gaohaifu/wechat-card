@@ -32,16 +32,17 @@ return [
         'response_send' => [
             'apilog',
         ],
+        'config_init' => [
+            'editpage',
+            'geetest',
+            'nkeditor',
+            'third',
+        ],
         'upgrade' => [
             'fastscrm',
         ],
         'action_begin' => [
             'geetest',
-            'third',
-        ],
-        'config_init' => [
-            'geetest',
-            'nkeditor',
             'third',
         ],
         'view_filter' => [

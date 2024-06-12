@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\myadmin\company;
 
+use addons\myadmin\model\Company;
 use app\common\controller\Backend;
 
 use think\Db;
@@ -9,6 +10,7 @@ use Exception;
 use think\exception\PDOException;
 use think\exception\ValidateException;
 use addons\myadmin\model\CompanyPlayer;
+use app\common\service\DifyService;
 
 /**
  * 协议管理
@@ -112,6 +114,10 @@ class Agreement extends Backend
                 $player->save($player_data);
             }
             $result = $row->allowField(true)->save($params);
+            
+            if($row->player_id == 4){
+                $re = DifyService::createKnowledgeBase($row->company_id);
+            }
             Db::commit();
         } catch (ValidateException | PDOException | Exception $e) {
             Db::rollback();

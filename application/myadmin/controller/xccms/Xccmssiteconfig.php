@@ -269,7 +269,7 @@ class Xccmssiteconfig extends Backend
 
             $theme = $params['theme'];
 
-            $m = $this->model->find();
+            $m = $this->model->where('company_id',COMPANY_ID)->find();
 
             if (!$m)
             {
