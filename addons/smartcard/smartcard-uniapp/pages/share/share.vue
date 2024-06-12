@@ -753,8 +753,9 @@
 			},
 			linkToService(row) {
 				if(row.url) {
+					row.url = encodeURIComponent(row.url)
 					uni.navigateTo({
-						url: `${row.url}?user_id=${this.user_id}`
+						url: `/pages/webView/webView?url=${row.url}` // `${row.url}?user_id=${this.user_id}`
 					})
 				}
 				if(row.doFun) row.doFun();

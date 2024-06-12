@@ -406,10 +406,10 @@
 		},
 		methods: {
 			test() {
-				return;
-				// uni.navigateTo({
-				// 	url: '/pages/webView/webView?url=http://www.baidu.com/'
-				// })
+				// return;
+				uni.navigateTo({
+					url: '/pages/webView/webView?url=http://www.baidu.com/'
+				})
 			},
 			getShareInfo() {
 				
@@ -717,6 +717,7 @@
 						})
 						this.userData.save_status = `${this.allData.save_status}`
 						this.userData.usertype = `${this.allData.usertype}`
+						this.userData.is_authentication = this.companyInfo.is_authentication
 						uni.setStorage({
 							key: 'userData',
 							data: this.userData
@@ -734,13 +735,7 @@
 						
 						if(this.isShare) {
 							this.services = this.allData.services || []
-						}
-						this.userData.is_authentication = this.companyInfo.is_authentication
-						// 企业负责人 0=未认证,1=待审核,2=已审核,3=审核失败
-						if(this.userData.usertype === 1 && this.companyInfo.is_authentication === 2) this.certificateStatus=true;
-						// 普通用户:0=未实名,1=待审核,2=认证成功
-						if(this.userData.usertype === 0 && this.userData.is_certified === 2) this.certificateStatus=true;
-						
+						}						
 						console.info('首页请求的接口名称： ', api, 
 							'allData', this.allData, 'isShare', this.isShare, 
 							'services', this.services)
@@ -754,9 +749,11 @@
 			linkToService(row) {
 				if(!this.checkUser()) return;
 				if(row.url) {
+					row.url = encodeURIComponent(row.url)
 					uni.navigateTo({
-						url: `${row.url}?user_id=${this.user_id}`
+						url: `/pages/webView/webView?url=${row.url}` //`${row.url}?user_id=${this.user_id}`
 					})
+					return;
 				}
 				if(row.doFun) row.doFun();
 			}

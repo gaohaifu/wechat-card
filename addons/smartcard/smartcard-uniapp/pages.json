@@ -95,6 +95,7 @@
 			"path": "pages/corpCard/corpCard",
 			"style": {
 				"navigationBarTitleText": "企业名片",
+				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
 		
@@ -104,6 +105,7 @@
 			"path": "pages/member/member",
 			"style": {
 				"navigationBarTitleText": "成员列表",
+				"navigationBarTextStyle": "black",
 				"enablePullDownRefresh": false
 			}
 		
@@ -226,6 +228,12 @@
 						   "iconPath": "static/images/menu/home.png",
 						   "selectedIconPath": "static/images/menu/home__selected.png",
 						   "text": "首页"
+					},
+					{
+						"pagePath": "pages/corpCard/corpCard",
+						"iconPath": "static/images/menu/corp.png",
+						"selectedIconPath": "static/images/menu/corp__selected.png",
+						"text": "企业名片"					
 					},
 					{
 						   "pagePath": "pages/card-holder/index",
