@@ -753,10 +753,11 @@
 			},
 			linkToService(row) {
 				if(row.url) {
-					row.url = encodeURIComponent(row.url)
+					row.url = row.url.indexOf('http') > -1 ? `/pages/webView/webView?url=${encodeURIComponent(row.url)}` : row.url
 					uni.navigateTo({
-						url: `/pages/webView/webView?url=${row.url}` // `${row.url}?user_id=${this.user_id}`
+						url: row.url
 					})
+					return;
 				}
 				if(row.doFun) row.doFun();
 			}

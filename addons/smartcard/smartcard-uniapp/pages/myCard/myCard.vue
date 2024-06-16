@@ -407,9 +407,9 @@
 		methods: {
 			test() {
 				// return;
-				uni.navigateTo({
-					url: '/pages/webView/webView?url=http://www.baidu.com/'
-				})
+				// uni.navigateTo({
+				// 	url: '/pages/webView/webView?url=http://www.baidu.com/'
+				// })
 			},
 			getShareInfo() {
 				
@@ -749,9 +749,9 @@
 			linkToService(row) {
 				if(!this.checkUser()) return;
 				if(row.url) {
-					row.url = encodeURIComponent(row.url)
+					row.url = row.url.indexOf('http') > -1 ? `/pages/webView/webView?url=${encodeURIComponent(row.url)}` : row.url
 					uni.navigateTo({
-						url: `/pages/webView/webView?url=${row.url}` //`${row.url}?user_id=${this.user_id}`
+						url: row.url
 					})
 					return;
 				}
