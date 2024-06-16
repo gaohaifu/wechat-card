@@ -190,9 +190,11 @@
 				frontColor: '#ffffff',
 				backgroundColor: this.color
 			})
-			this.user_id = options.user_id;
-			this.staff_id = options.staff_id
-			this.company_id_s = this.company_id = options.company_id;
+			const userData = uni.getStorageSync('userData')
+			this.user_id = userData.user_id;
+			this.staff_id = userData.id
+			userData.smartcardcompany = userData.smartcardcompany || {}
+			this.company_id_s = this.company_id = userData.smartcardcompany.company_id;
 			// this.company_id_s = options.company_id;
 			this.smartcardfind();
 			this.getIndustryData();			
