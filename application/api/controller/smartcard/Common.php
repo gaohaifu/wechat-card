@@ -5,6 +5,8 @@ use addons\myadmin\model\Admin;
 use addons\myadmin\model\AuthGroup;
 use addons\myadmin\model\AuthGroupAccess;
 use addons\myadmin\model\ConfigValue;
+use addons\myadmin\model\UserGroup;
+use addons\myadmin\model\User as MyadminUser;
 use app\admin\model\smartcard\Share;
 use app\admin\model\smartcard\Su;
 use app\admin\model\smartcard\Visitors;
@@ -634,7 +636,13 @@ class Common extends Base
         }else{
             $whereRaw = '1=1';
         }
-        $where = ['company_id'=>$user_id, 'statusdata'=>$statusdata];
+        $staff = $Staff->where(['user_id'=>$user_id])->find();
+        if($staff){
+            $company_id = $staff['company_id'];
+        }else{
+            $company_id = 0;
+        }
+        $where = ['company_id'=>$company_id, 'statusdata'=>$statusdata];
         if($theme_id){
             $where['theme_id'] = $theme_id;
         }
@@ -815,17 +823,42 @@ class Common extends Base
         $staff_id = $this->request->request('staff_id');
         $user_id = $this->user_id;
         $Staff = new Staff();
-        $staff = $Staff->where(['company_id'=>$user_id,'id'=>$staff_id])->find();
+        $staff = $Staff->where(['id'=>$staff_id])->find();
         if(!$staff){
-            $this->error('申请人id错误');
+            $this->error('名片不存在');
         }else{
-            if($staff['statusdata']==1){
-                $this->success('请求成功');
-            }elseif($staff['statusdata']==2){
-                $staff->statusdata = 1;
-                $staff->save();
+            $is_manage = 1;
+            $userGroup = UserGroup::where(['company_id'=>$staff['company_id'],'name'=>'管理员'])->find();
+            if($userGroup){
+                $myadminUser = MyadminUser::where(['company_id'=>$staff['company_id'],'user_id'=>$user_id,'group_id'=>$userGroup['id']])->find();
+                if(!$myadminUser){
+                    $is_manage = 0;
+                }
+            }else{
+                $is_manage = 0;
             }
-            $this->success('请求成功');
+            if($staff['company_id']==$user_id || $is_manage){
+                if($staff['statusdata']==1){
+                    $this->success('请求成功');
+                }elseif($staff['statusdata']==2){
+                    $staff->statusdata = 1;
+                    $staff->save();
+                    $myadminUser1 = MyadminUser::where(['company_id'=>$staff['company_id'],'user_id'=>$staff['user_id']])->find();
+                    if(!$myadminUser1){
+                        MyadminUser::create([
+                            'company_id'=>$staff['company_id'],
+                            'user_id'=>$staff['user_id'],
+                            'group_id'=>0,
+                            'money'=>0,
+                            'score'=>0,
+                            'status'=>'normal',
+                        ]);
+                    }
+                }
+                $this->success('请求成功');
+            }else{
+                $this->error('您没有审核权限!');
+            }
         }
     }
 
