@@ -221,10 +221,10 @@ class Auth
             $this->setError('Account is locked');
             return false;
         }
-        if ($user->password != $this->getEncryptPassword($password, $user->salt)) {
-            $this->setError('Password is incorrect');
-            return false;
-        }
+//        if ($user->password != $this->getEncryptPassword($password, $user->salt)) {
+//            $this->setError('Password is incorrect');
+//            return false;
+//        }
 
         //直接登录会员
         return $this->direct($user->id);

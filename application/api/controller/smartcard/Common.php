@@ -646,14 +646,30 @@ class Common extends Base
         if($theme_id){
             $where['theme_id'] = $theme_id;
         }
-        $staffs = $Staff->where($where)->whereRaw($whereRaw)
-            ->page($page,10)->field('id as staff_id,name,company_id,position,user_id')->select();
 
-        foreach ($staffs as $staff) {
-            $staff->avatar = cdnurl(\app\common\model\User::where(['id' =>$staff->user_id])->value('avatar'),true);
-            $staff->companyname = \addons\myadmin\model\Company::where(['id'=>$staff->company_id])->value('name');
-            $staff->is_owner = ($staff->user_id==$staff->company_id)?1:0;
+        $is_manage = 1;
+        $userGroup = UserGroup::where(['company_id'=>$company_id,'name'=>'管理员'])->find();
+        if($userGroup){
+            $myadminUser = MyadminUser::where(['company_id'=>$company_id,'user_id'=>$user_id,'group_id'=>$userGroup['id']])->find();
+            if(!$myadminUser){
+                $is_manage = 0;
+            }
+        }else{
+            $is_manage = 0;
         }
+        if($company_id==$user_id || $is_manage){
+            $staffs = $Staff->where($where)->whereRaw($whereRaw)
+                ->page($page,10)->field('id as staff_id,name,company_id,position,user_id')->select();
+
+            foreach ($staffs as $staff) {
+                $staff->avatar = cdnurl(\app\common\model\User::where(['id' =>$staff->user_id])->value('avatar'),true);
+                $staff->companyname = \addons\myadmin\model\Company::where(['id'=>$staff->company_id])->value('name');
+                $staff->is_owner = ($staff->user_id==$staff->company_id)?1:0;
+            }
+        }else{
+            $staffs = [];
+        }
+
         $this->success('请求成功', $staffs);
     }
     
@@ -821,6 +837,7 @@ class Common extends Base
      **/
     public function agreeApply(){
         $staff_id = $this->request->request('staff_id');
+        $type = $this->request->request('type');
         $user_id = $this->user_id;
         $Staff = new Staff();
         $staff = $Staff->where(['id'=>$staff_id])->find();
@@ -838,24 +855,32 @@ class Common extends Base
                 $is_manage = 0;
             }
             if($staff['company_id']==$user_id || $is_manage){
-                if($staff['statusdata']==1){
-                    $this->success('请求成功');
-                }elseif($staff['statusdata']==2){
-                    $staff->statusdata = 1;
-                    $staff->save();
-                    $myadminUser1 = MyadminUser::where(['company_id'=>$staff['company_id'],'user_id'=>$staff['user_id']])->find();
-                    if(!$myadminUser1){
-                        MyadminUser::create([
-                            'company_id'=>$staff['company_id'],
-                            'user_id'=>$staff['user_id'],
-                            'group_id'=>0,
-                            'money'=>0,
-                            'score'=>0,
-                            'status'=>'normal',
-                        ]);
+                if($type==1){
+                    if($staff['statusdata']==1){
+                        $this->success('请求成功');
+                    }elseif($staff['statusdata']==2){
+                        $staff->statusdata = 1;
+                        $staff->save();
+                        $myadminUser1 = MyadminUser::where(['company_id'=>$staff['company_id'],'user_id'=>$staff['user_id']])->find();
+                        if(!$myadminUser1){
+                            MyadminUser::create([
+                                'company_id'=>$staff['company_id'],
+                                'user_id'=>$staff['user_id'],
+                                'group_id'=>0,
+                                'money'=>0,
+                                'score'=>0,
+                                'status'=>'normal',
+                            ]);
+                        }
                     }
+                    $this->success('审核成功');
+                }elseif ($type==2){
+                    $staff->statusdata = 3;
+                    $staff->save();
+                    $this->success('拒绝成功');
+                }else{
+                    $this->error('type参数上传错误');
                 }
-                $this->success('请求成功');
             }else{
                 $this->error('您没有审核权限!');
             }
