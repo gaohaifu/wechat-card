@@ -792,7 +792,7 @@ class Common extends Base
                 $founder['password'] = md5(md5('123456') . $founder['salt']);
                 $founder['avatar'] = '/assets/img/avatar.png'; //设置新管理员默认头像。
                 $founder['company_id'] = $Company->id;
-                $founder['username'] = $staff->name;
+                $founder['username'] = $staff->name.(Random::nozero());
                 $founder['nickname'] = $staff->name;
                 $founder['is_founder'] = 1; // 设置为创始人
                 $admin = new Admin;
