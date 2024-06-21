@@ -657,7 +657,7 @@ class Common extends Base
         }else{
             $is_manage = 0;
         }
-        if($company_id==$user_id || $is_manage){
+        if($company_id==$user_id || $is_manage || $type!=2){
             $staffs = $Staff->where($where)->whereRaw($whereRaw)
                 ->page($page,10)->field('id as staff_id,name,company_id,position,user_id')->select();
 
