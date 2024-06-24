@@ -57,7 +57,8 @@ const methodsToken = [
 	'saveShareInfo',
 	'getMiniCode',
 	'getRealnameInfo',
-	'getEnterpriseInfo'
+	'getEnterpriseInfo',
+	'agreeApply'
 ];
 const post = (method, data, callback,type, failCB) => {
 	let userToken = '';
@@ -443,3 +444,5 @@ export const getMiniCode = (data, callback) => post('getMiniCode', data, callbac
 export const getRealnameInfo = (data, callback) => post('getRealnameInfo', data, callback, 'smartcard/Common')
 // 获取企业认证信息
 export const getEnterpriseInfo = (data, callback) => post('getEnterpriseInfo', data, callback, 'smartcard/Common')
+// 企业主同意申请
+export const agreeApply = (data, callback) => post('agreeApply', data, callback, 'smartcard/Common')

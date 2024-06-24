@@ -28,12 +28,19 @@
 				<view class="flex-1">
 					<view class="flex flex-vc">
 						<text class="name">{{ item.name }}</text>
-						<text class="tag">{{ item.is_owner === 1 ? '超级管理员' : '' }}</text>
+						<text class="tag" v-if="item.is_owner === 1">{{ item.is_owner === 1 ? '超级管理员' : '' }}</text>
 					</view>
 					<view class="position">{{ item.position }}</view>
 					<view class="muban">{{ item.companyname }}</view>
 				</view>
-				<text class="iconfont icon-gengduo"></text>
+				<view class="more-box">
+					<text class="iconfont icon-gengduo" @click="showOperate(item)"></text>
+					<view class="more-text" v-if="activeId === '2' && item.show">
+						<text class="iconfont icon-sanjiaoxing"></text>
+						<text @click="agree(item)">通过</text>
+						<text @click="reject(item)">拒绝</text>
+					</view>
+				</view>
 			</view>
 		</view>
 		<uni-load-more :status="status"></uni-load-more>
@@ -117,13 +124,16 @@
 				this.$api.getMemberList({
 					page: this.page, 
 					type: this.activeId,
-					theme_id: this.themeid,
+					theme_id: this.themeid || '',
 					keyword: this.keyword
 				}, 
 				res => {
 					console.log(res, '成员')
 					if(res.code === 1) {
-						res.data = res.data || []
+						res.data = (res.data || []).map(i => {
+							i.show = false
+							return i
+						})
 						this.status = res.data.length < 10 ? 'noMore' : 'more' // nomore待处理
 						this.list = this.list.concat(res.data)
 					}else {
@@ -132,6 +142,46 @@
 				},
 				err => {
 					this.status = 'more'
+				})
+			},
+			showOperate(row) {
+				const temp = row.show
+				this.list.forEach(it => {
+					it.show = false
+				})
+				row.show = !temp
+				console.info(row)
+			},
+			agree(row) {
+				row.show = false
+				this.doOperate(row, '1')
+			},
+			reject(row) {
+				row.show = false
+				this.doOperate(row, '2')
+			},
+			doOperate(row, type) {
+				uni.showModal({
+					title: '提示',
+					content: `请确认是否${type == '1' ? '通过' : '拒绝'}申请`,
+					showCancel:true,
+					success: (res) => {
+						console.info(res)
+						if (res.confirm) {
+							this.$api.agreeApply({
+								staff_id: row.staff_id,
+								type: type
+							}, res => {
+								if (res.code == '1') {
+									uni.showToast({
+										icon: 'none', 
+										text: type == '1' ? '同意申请通过' : '拒绝申请'
+									})
+									this.getMembers()
+								}
+							})
+						}
+					}
 				})
 			},
 			resetData() {
@@ -365,6 +415,29 @@
 		font-size: 24rpx;
 		font-weight: 400;
 		color: #666;
+	}
+	.more-box {
+		position: relative;
+	}
+	.more-box .more-text {
+		position: absolute;
+		top: 50rpx;
+		width: 160rpx;
+		padding: 4px 6px;
+		border: solid 1px #eee;
+		right: 0;
+		display: flex;
+		justify-content: space-between;
+		font-size: 24rpx;
+		color: red;
+	}
+	.more-box .icon-sanjiaoxing {
+		position: absolute;
+		right: 8rpx;
+		top: -24rpx;
+		width: 24rpx;
+		height: 24rpx;
+		color: #eee;
 	}
 	
 </style>
