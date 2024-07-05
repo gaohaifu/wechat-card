@@ -266,35 +266,35 @@ class Base extends Api
             switch($item['menu_type'])
             {
                 case 'index':
-                    $main_menu_item_url = addon_url('xccms/index/index',[],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/index',['cid'=>$company_id],true,true);
                     break;
                 case 'partner':
                 case 'job':
-                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type'],[],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type'],['cid'=>$company_id],true,true);
                     break;
                 case 'page':
-                    $main_menu_item_url = addon_url('xccms/index/page', [':id'=>$item['menu_object_id']],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/page', [':id'=>$item['menu_object_id'],'cid'=>$company_id],true,true);
                     break;
                 case 'news':
-                    $main_menu_item_url = addon_url('xccms/index/news',[],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/news',['cid'=>$company_id],true,true);
                     break;
                 case 'link':
                     $main_menu_item_url = $item['url'];
                     break;
                 case 'product':
-                    $main_menu_item_url = addon_url('xccms/index/product', [':id'=>$item['menu_object_id']],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/product', [':id'=>$item['menu_object_id'],'cid'=>$company_id],true,true);
                     break;
                 case 'content':
-                    $main_menu_item_url = addon_url('xccms/index/info', [':id'=>$item['menu_object_id']],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/info', [':id'=>$item['menu_object_id'],'cid'=>$company_id],true,true);
                     break;
                 case 'aboutus':
-                    $main_menu_item_url = addon_url('xccms/index/about_us',[],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/about_us',['cid'=>$company_id],true,true);
                     break;
                 case 'contactus':
-                    $main_menu_item_url = addon_url('xccms/index/contact_us',[],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/contact_us',['cid'=>$company_id],true,true);
                     break;
                 case 'faq':
-                    $main_menu_item_url = addon_url('xccms/index/faq',[],true,true);
+                    $main_menu_item_url = addon_url('xccms/index/faq',['cid'=>$company_id],true,true);
                     break;
             }
             $sub_menu = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,name,menu_type,menu_object_id,url')
@@ -309,34 +309,34 @@ class Base extends Api
                 switch($sitem['menu_type'])
                 {
                     case 'index':
-                        $sub_menu_item_url = addon_url('xccms/index/index',[],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/index',['cid'=>$company_id],true,true);
                         break;
                     case 'partner':
                     case 'job':
-                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type'],[],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type'],['cid'=>$company_id],true,true);
                         break;
                     case 'page':
-                        $sub_menu_item_url = addon_url('xccms/index/page', [':id'=>$sitem['menu_object_id']],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/page', [':id'=>$sitem['menu_object_id'],'cid'=>$company_id],true,true);
                         break;
                     case 'news':
-                        $sub_menu_item_url = addon_url('xccms/index/news',[],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/news',['cid'=>$company_id],true,true);
                     case 'link':
                         $sub_menu_item_url = $item['url'];
                         break;
                     case 'product':
-                        $sub_menu_item_url = addon_url('xccms/index/product', [':id'=>$sitem['menu_object_id']],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/product', [':id'=>$sitem['menu_object_id'],'cid'=>$company_id],true,true);
                         break;
                     case 'content':
-                        $sub_menu_item_url = addon_url('xccms/index/info', [':id'=>$sitem['menu_object_id']],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/info', [':id'=>$sitem['menu_object_id'],'cid'=>$company_id],true,true);
                         break;
                     case 'aboutus':
-                        $sub_menu_item_url = addon_url('xccms/index/about_us',[],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/about_us',['cid'=>$company_id],true,true);
                         break;
                     case 'contactus':
-                        $sub_menu_item_url = addon_url('xccms/index/contact_us',[],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/contact_us',['cid'=>$company_id],true,true);
                         break;
                     case 'faq':
-                        $sub_menu_item_url = addon_url('xccms/index/faq',[],true,true);
+                        $sub_menu_item_url = addon_url('xccms/index/faq',['cid'=>$company_id],true,true);
                         break;
                 }
                 $sub_menu[$s]['url'] = $sub_menu_item_url;
