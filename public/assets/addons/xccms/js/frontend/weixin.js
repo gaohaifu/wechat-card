@@ -3,15 +3,15 @@ if (ua.match(/MicroMessenger/i) == 'micromessenger') {
     wx.miniProgram.getEnv((res) => {
         if (res.miniprogram) {
             console.log('在小程序内');
-            $('.top').show();
+            document.querySelector('.top').style.display = 'block';
         } else {
             console.log('不在小程序内');
-            $('.top').hide();
+            document.querySelector('.top').style.display = 'none';
         }
     });
 } else {
     console.log('不在微信浏览器内');
-    $('.top').hide();
+    document.querySelector('.top').style.display = 'none';
 }
 function gotIndex(){
     // 小程序跳转方法
