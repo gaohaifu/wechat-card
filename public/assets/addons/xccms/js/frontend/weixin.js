@@ -1,18 +1,24 @@
-const ua = navigator.userAgent.toLowerCase();
-if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-    wx.miniProgram.getEnv((res) => {
-        if (res.miniprogram) {
-            console.log('在小程序内');
-            document.querySelector('.top').style.display = 'block';
-        } else {
-            console.log('不在小程序内');
-            document.querySelector('.top').style.display = 'none';
-        }
-    });
-} else {
-    console.log('不在微信浏览器内');
-    document.querySelector('.top').style.display = 'none';
-}
+document.addEventListener('DOMContentLoaded', function() {
+    // 这里放置你的代码
+    console.log('DOM已加载完成');
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+        wx.miniProgram.getEnv((res) => {
+            if (res.miniprogram) {
+                console.log('在小程序内');
+                document.querySelector('.top').style.display = 'block';
+            } else {
+                console.log('不在小程序内');
+                document.querySelector('.top').style.display = 'none';
+            }
+        });
+    } else {
+        console.log('不在微信浏览器内');
+        document.querySelector('.top').style.display = 'none';
+    }
+});
+
+
 function gotIndex(){
     // 小程序跳转方法
     wx.miniProgram.navigateTo({
