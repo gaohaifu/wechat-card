@@ -1,3 +1,7 @@
+    <div class="top" style="display: none;" onclick="wx.miniProgram.navigateBack();">
+        <span class="backBtn carousel-control-prev-icon"></span>
+        <h1>{$seo_title}</h1>
+    </div>
     <header class="sticky-top">
         <div class="container">
             <nav class="navbar navbar-expand-lg">
@@ -5,7 +9,6 @@
                     <a class="navbar-brand" href="{:addon_url('xccms/index/index')}">
                         <img src="{$site_config['logo']}" alt="{$site_config['name']}logo" title="{$site_config['name']}">
                     </a>
-                    <a href="javascript:void(0);" onclick="wx.miniProgram.navigateBack();">返回</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>

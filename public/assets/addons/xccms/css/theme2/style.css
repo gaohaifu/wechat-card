@@ -244,3 +244,25 @@ footer ul.site_contact {padding: 0;}
 footer ul.site_contact li {list-style: none;}
 .footer-bottom {background: #042d60;color: #fff;}
 .footer-bottom a {color: #fff;}
+
+.top {
+    height: 44px;
+    padding: 0 16px;
+    position: relative;
+    background-color: #BD313F;
+}
+
+.top span.backBtn {
+    width: 20px;
+    height: 20px;
+    top: 12px;
+    position: absolute;
+    left: 16px;
+}
+.top h1 {
+    width: 100%;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    line-height: 44px;
+}
