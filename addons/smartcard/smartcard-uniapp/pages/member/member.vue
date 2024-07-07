@@ -34,11 +34,11 @@
 					<view class="muban">{{ item.companyname }}</view>
 				</view>
 				<view class="more-box">
-					<text class="iconfont icon-gengduo" @click="showOperate(item)"></text>
-					<view class="more-text" v-if="activeId === '2' && item.show">
-						<text class="iconfont icon-sanjiaoxing"></text>
-						<text @click="agree(item)">通过</text>
-						<text @click="reject(item)">拒绝</text>
+					<!-- <text class="iconfont icon-gengduo" @click="showOperate(item)"></text> -->
+					<view class="more-text" v-if="['1', '2'].includes(activeId)">
+						<!-- <text class="iconfont icon-sanjiaoxing"></text> -->
+						<text @click="agree(item)" v-if="activeId === '2'">通过</text>
+						<text @click="reject(item)" v-if="item.is_owner !== 1">{{activeId === '1'? '删除' : '拒绝'}}</text>
 					</view>
 				</view>
 			</view>
@@ -131,7 +131,7 @@
 					console.log(res, '成员')
 					if(res.code === 1) {
 						res.data = (res.data || []).map(i => {
-							i.show = false
+							// i.show = false
 							return i
 						})
 						this.status = res.data.length < 10 ? 'noMore' : 'more' // nomore待处理
@@ -177,6 +177,7 @@
 										icon: 'none', 
 										text: type == '1' ? '同意申请通过' : '拒绝申请'
 									})
+									this.resetData()
 									this.getMembers()
 								}
 							})
@@ -233,10 +234,8 @@
 				data => {
 					if(data.code==1){
 						this.templet1=data.data.map(item=>{
-							return{
-								active: false,
-								...item
-							}
+							item.active = false
+							return item
 						})
 					}else{
 						this.$common.errorToShow(data.msg,function(){
@@ -379,6 +378,7 @@
 	}
 
 	.member-list .right-box {
+		padding-top: 10rpx;
 		padding-bottom: 24rpx;
 		border-bottom: 2rpx solid #E6E6E6;
 	}
@@ -419,7 +419,7 @@
 	.more-box {
 		position: relative;
 	}
-	.more-box .more-text {
+	/* .more-box .more-text {
 		position: absolute;
 		top: 50rpx;
 		width: 160rpx;
@@ -430,6 +430,20 @@
 		justify-content: space-between;
 		font-size: 24rpx;
 		color: red;
+	} */
+	.more-box .more-text {
+		position: absolute;
+		top: 0;
+		width: 160rpx;
+		padding: 4px 6px;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		font-size: 24rpx;
+		color: red;
+	}
+	.more-box .more-text text {
+		margin: 0 10rpx;
 	}
 	.more-box .icon-sanjiaoxing {
 		position: absolute;
