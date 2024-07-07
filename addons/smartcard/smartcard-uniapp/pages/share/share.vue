@@ -43,7 +43,7 @@
 			<!-- 快捷工具 -->
 			<view class="flex_between tools">
 				<view class="flex flex-v flex-vc flex-hc tool-item"
-					v-for="(item, inx) in tools" :key="inx"
+					v-for="(item, inx) in tools_new" :key="inx"
 					:class="{'disabled' : item.disabled}"
 					@click="toolsClick(item)">
 					<text class="iconfont" :class="item.icon" :style="{color: item.color}"></text>
@@ -247,6 +247,7 @@
 						shareCode: '1' // 是否分享页还是默认页独有
 					},
 				],
+				tools_new: [],
 				services: [],
 				visits: [{
 					id: 1,
@@ -711,14 +712,15 @@
 							(this.staffInfo.latitude && this.staffInfo.longitude))) {
 								this.tools.find(i => i.id === 4).disabled = true
 						}
+						console.info('this.tools。。。。。', this.tools)
 						// if(!this.staffInfo.mobile) this.tools.find(i => i.id === 5).disabled = true
 						if(!this.staffInfo.QQ) {
 							this.tools.find(i => i.id === 6).hidden = true
-							this.tools = this.tools.filter(i => !i.hidden)
 						}
 						this.tools.forEach(it => {
 							if(it.disabled) it.color = '#999';
 						})
+						this.tools_new = this.tools.filter(i => !i.hidden)
 						this.userData.save_status = `${this.allData.save_status}`
 						this.userData.usertype = `${this.allData.usertype}`
 						this.userData.is_authentication = this.companyInfo.is_authentication
@@ -752,10 +754,11 @@
 				})
 			},
 			linkToService(row) {
+				// console.info(row, '==========>>>')
 				if(row.url) {
-					row.url = row.url.indexOf('http') > -1 ? `/pages/webView/webView?url=${encodeURIComponent(row.url)}` : row.url
+					const url = row.url.indexOf('http') > -1 ? `/pages/webView/webView?url=${encodeURIComponent(row.url)}` : row.url
 					uni.navigateTo({
-						url: row.url
+						url: url
 					})
 					return;
 				}

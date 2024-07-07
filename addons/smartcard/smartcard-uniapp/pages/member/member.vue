@@ -33,13 +33,13 @@
 					<view class="position">{{ item.position }}</view>
 					<view class="muban">{{ item.companyname }}</view>
 				</view>
-				<view class="more-box">
-					<!-- <text class="iconfont icon-gengduo" @click="showOperate(item)"></text> -->
-					<view class="more-text" v-if="['1', '2'].includes(activeId)">
-						<!-- <text class="iconfont icon-sanjiaoxing"></text> -->
+				<view class="more-box" v-if="(activeId === '1' && item.is_owner !== 1) || activeId === '2'">
+					<text class="iconfont icon-gengduo" @click="showOperate(item)"></text>
+					<!-- <view class="more-text" v-if="['1', '2'].includes(activeId)">
+						<text class="iconfont icon-sanjiaoxing"></text>
 						<text @click="agree(item)" v-if="activeId === '2'">通过</text>
 						<text @click="reject(item)" v-if="item.is_owner !== 1">{{activeId === '1'? '删除' : '拒绝'}}</text>
-					</view>
+					</view> -->
 				</view>
 			</view>
 		</view>
@@ -145,12 +145,41 @@
 				})
 			},
 			showOperate(row) {
-				const temp = row.show
-				this.list.forEach(it => {
-					it.show = false
+				if (!['1', '2'].includes(this.activeId)) return;
+				let itemList = [], itemColor = []
+				if (this.activeId === '1') {
+					itemList = ['删除']
+					itemColor = ['#f00']
+				} else if (this.activeId === '2') {
+					itemList = ['通过', '拒绝']
+					itemColor = ['#333', '#f00']
+				}
+				if (itemList.length === 0) return;
+				uni.showActionSheet({
+					title: '',
+					itemList: itemList,
+					// itemColor: itemColor,
+					success: (res) => {
+						if (this.activeId === '1') {
+							this.reject(row)
+						} else if (this.activeId === '2') {
+							if (res.tapIndex === 0) {
+								this.agree(row)
+							} else {
+								this.reject(row)
+							}
+						}
+					},
+					complete: (com) => {
+						console.info(com, '===========>>>com')
+					}
 				})
-				row.show = !temp
-				console.info(row)
+				// const temp = row.show
+				// this.list.forEach(it => {
+				// 	it.show = false
+				// })
+				// row.show = !temp
+				// console.info(row)
 			},
 			agree(row) {
 				row.show = false
