@@ -211,3 +211,25 @@ footer .footer-top .item:first-child {border-right: 1px solid #82705f;}
 footer .footer-top .item dt {font-weight: normal;font-size: 1.2rem;}
 footer .footer-top .item dd {font-size: 1rem;}
 footer .footer-bottom {text-align: center;}
+
+.top {
+    height: 44px;
+    padding: 0 16px;
+    position: relative;
+    background-color: #BD313F;
+}
+
+.top span.backBtn {
+    width: 20px;
+    height: 20px;
+    top: 12px;
+    position: absolute;
+    left: 16px;
+}
+.top h1 {
+    width: 100%;
+    font-size: 16px;
+    color: #fff;
+    text-align: center;
+    line-height: 44px;
+}

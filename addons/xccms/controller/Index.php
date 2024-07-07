@@ -36,18 +36,23 @@ class Index extends Controller
         if (!isset($_SERVER['HTTP_HOST'])){
             $this->error('域名异常');
         }
-        $domain = get_first_host($_SERVER['HTTP_HOST']);
-        $domains = cache($domain);
-        if(!$domains){
-            $domains = Domain::where(['name'=>$domain])->cache($domain,60)->find();
+        $companyId = input('cid');
+        if ($companyId){
+            $this->company_id = $companyId;
+        }else{
+            $domain = get_first_host($_SERVER['HTTP_HOST']);
+            $domains = cache($domain);
             if(!$domains){
-                $this->error('该企业已被删除');
+                $domains = Domain::where(['name'=>$domain])->cache($domain,60)->find();
+                if(!$domains){
+                    $this->error('该企业已被删除');
+                }
             }
+            $this->company_id = $domains['company_id'];
         }
 
         parent::_initialize();
 
-        $this->company_id = $domains['company_id'];
         $where['company_id'] = $this->company_id;
         //站点配置
         $site_configM = Xccmssiteconfig::where($where)->field('id,json_data')->find();
