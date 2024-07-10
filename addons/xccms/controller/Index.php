@@ -36,8 +36,10 @@ class Index extends Controller
         if (!isset($_SERVER['HTTP_HOST'])){
             $this->error('域名异常');
         }
+        $menuArr = [];
         $companyId = input('cid');
         if ($companyId){
+            $menuArr = ['cid'=>$companyId];
             $this->company_id = $companyId;
         }else{
             $domain = get_first_host($_SERVER['HTTP_HOST']);
@@ -78,17 +80,17 @@ class Index extends Controller
             switch($item['menu_type'])
             {
                 case 'index':
-                    $main_menu_item_url = addon_url('xccms/index/index');
+                    $main_menu_item_url = addon_url('xccms/index/index',$menuArr);
                     break;
                 case 'partner':
                 case 'job':
-                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type']);
+                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type'],$menuArr);
                     break;
                 case 'page':
                     $main_menu_item_url = addon_url('xccms/index/page', [':id'=>$item['menu_object_id']]);
                     break;
                 case 'news':
-                    $main_menu_item_url = addon_url('xccms/index/news');
+                    $main_menu_item_url = addon_url('xccms/index/news',$menuArr);
                     break;
                 case 'link':
                     $main_menu_item_url = $item['url'];
@@ -100,13 +102,13 @@ class Index extends Controller
                     $main_menu_item_url = addon_url('xccms/index/info', [':id'=>$item['menu_object_id']]);
                     break;
                 case 'aboutus':
-                    $main_menu_item_url = addon_url('xccms/index/about_us');
+                    $main_menu_item_url = addon_url('xccms/index/about_us',$menuArr);
                     break;
                 case 'contactus':
-                    $main_menu_item_url = addon_url('xccms/index/contact_us');
+                    $main_menu_item_url = addon_url('xccms/index/contact_us',$menuArr);
                     break;
                 case 'faq':
-                    $main_menu_item_url = addon_url('xccms/index/faq');
+                    $main_menu_item_url = addon_url('xccms/index/faq',$menuArr);
                     break;
             }
             $sub_menu = Xccmsmenuinfo::where($where)->field('id,name,menu_type,menu_object_id,url')
@@ -121,17 +123,17 @@ class Index extends Controller
                 switch($sitem['menu_type'])
                 {
                     case 'index':
-                        $sub_menu_item_url = addon_url('xccms/index/index');
+                        $sub_menu_item_url = addon_url('xccms/index/index',$menuArr);
                         break;
                     case 'partner':
                     case 'job':
-                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type']);
+                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type'],$menuArr);
                         break;
                     case 'page':
                         $sub_menu_item_url = addon_url('xccms/index/page', [':id'=>$sitem['menu_object_id']]);
                         break;
                     case 'news':
-                        $sub_menu_item_url = addon_url('xccms/index/news');
+                        $sub_menu_item_url = addon_url('xccms/index/news',$menuArr);
                     case 'link':
                         $sub_menu_item_url = $item['url'];
                         break;
@@ -142,13 +144,13 @@ class Index extends Controller
                         $sub_menu_item_url = addon_url('xccms/index/info', [':id'=>$sitem['menu_object_id']]);
                         break;
                     case 'aboutus':
-                        $sub_menu_item_url = addon_url('xccms/index/about_us');
+                        $sub_menu_item_url = addon_url('xccms/index/about_us',$menuArr);
                         break;
                     case 'contactus':
-                        $sub_menu_item_url = addon_url('xccms/index/contact_us');
+                        $sub_menu_item_url = addon_url('xccms/index/contact_us',$menuArr);
                         break;
                     case 'faq':
-                        $sub_menu_item_url = addon_url('xccms/index/faq');
+                        $sub_menu_item_url = addon_url('xccms/index/faq',$menuArr);
                         break;
                 }
                 $sub_menu[$s]['url'] = $sub_menu_item_url;
@@ -176,17 +178,17 @@ class Index extends Controller
             switch($item['menu_type'])
             {
                 case 'index':
-                    $main_menu_item_url = addon_url('xccms/index/index');
+                    $main_menu_item_url = addon_url('xccms/index/index',$menuArr);
                     break;
                 case 'partner':
                 case 'job':
-                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type']);
+                    $main_menu_item_url = addon_url('xccms/index/' . $item['menu_type'],$menuArr);
                     break;
                 case 'page':
                     $main_menu_item_url = addon_url('xccms/index/page', [':id'=>$item['menu_object_id']]);
                     break;
                 case 'news':
-                    $main_menu_item_url = addon_url('xccms/index/news');
+                    $main_menu_item_url = addon_url('xccms/index/news',$menuArr);
                     break;
                 case 'link':
                     $main_menu_item_url = $item['url'];
@@ -198,13 +200,13 @@ class Index extends Controller
                     $main_menu_item_url = addon_url('xccms/index/info', [':id'=>$item['menu_object_id']]);
                     break;
                 case 'aboutus':
-                    $main_menu_item_url = addon_url('xccms/index/about_us');
+                    $main_menu_item_url = addon_url('xccms/index/about_us',$menuArr);
                     break;
                 case 'contactus':
-                    $main_menu_item_url = addon_url('xccms/index/contact_us');
+                    $main_menu_item_url = addon_url('xccms/index/contact_us',$menuArr);
                     break;
                 case 'faq':
-                    $main_menu_item_url = addon_url('xccms/index/faq');
+                    $main_menu_item_url = addon_url('xccms/index/faq',$menuArr);
                     break;
             }
 
@@ -220,17 +222,17 @@ class Index extends Controller
                 switch($sitem['menu_type'])
                 {
                     case 'index':
-                        $sub_menu_item_url = addon_url('xccms/index/index');
+                        $sub_menu_item_url = addon_url('xccms/index/index',$menuArr);
                         break;
                     case 'partner':
                     case 'job':
-                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type']);
+                        $sub_menu_item_url = addon_url('xccms/index/' . $sitem['menu_type'],$menuArr);
                         break;
                     case 'page':
                         $sub_menu_item_url = addon_url('xccms/index/page', [':id'=>$sitem['menu_object_id']]);
                         break;
                     case 'news':
-                        $sub_menu_item_url = addon_url('xccms/index/news');
+                        $sub_menu_item_url = addon_url('xccms/index/news',$menuArr);
                     case 'link':
                         $sub_menu_item_url = $item['url'];
                         break;
@@ -241,13 +243,13 @@ class Index extends Controller
                         $sub_menu_item_url = addon_url('xccms/index/info', [':id'=>$sitem['menu_object_id']]);
                         break;
                     case 'aboutus':
-                        $sub_menu_item_url = addon_url('xccms/index/about_us');
+                        $sub_menu_item_url = addon_url('xccms/index/about_us',$menuArr);
                         break;
                     case 'contactus':
-                        $sub_menu_item_url = addon_url('xccms/index/contact_us');
+                        $sub_menu_item_url = addon_url('xccms/index/contact_us',$menuArr);
                         break;
                     case 'faq':
-                        $sub_menu_item_url = addon_url('xccms/index/faq');
+                        $sub_menu_item_url = addon_url('xccms/index/faq',$menuArr);
                         break;
                 }
 
