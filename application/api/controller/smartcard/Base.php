@@ -262,6 +262,7 @@ class Base extends Api
             ->select();
         foreach($main_menu_list as $i=>$item)
         {
+            $item->icon = cdnurl($item->icon);
             $main_menu_item_url = 'javascript:;';
             switch($item['menu_type'])
             {
