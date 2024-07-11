@@ -3,3 +3,6 @@ addons/smartcard/smartcard-uniapp/unpackage
 .env
 runtime
 public/.user.ini
+public/.htaccess
+public/404.html
+index.html
