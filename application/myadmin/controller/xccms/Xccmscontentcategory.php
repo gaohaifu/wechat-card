@@ -28,7 +28,7 @@ class Xccmscontentcategory extends Backend
         Service::check_xccms_init();
 
         $this->model = new \app\admin\model\Xccmscontentcategory;
-        $categorydata = $this->model->get_category_tree();
+        [$this->categorylist,$categorydata] = $this->model->get_category_tree();
 
         $this->view->assign("parentList", $categorydata);
     }
