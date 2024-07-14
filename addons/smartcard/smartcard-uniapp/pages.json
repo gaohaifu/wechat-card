@@ -231,7 +231,7 @@
 						   "text": "首页"
 					},
 					{
-						"pagePath": "pages/corpCard/corpCard",
+						"pagePath": "pages/member/member",
 						"iconPath": "static/images/menu/corp.png",
 						"selectedIconPath": "static/images/menu/corp__selected.png",
 						"text": "企业名片"					

@@ -1,49 +1,55 @@
 <!-- 成员列表 -->
 <template>
 	<view>
-		<view class="flex_between focus-box">
-			<text>关注公众号，及时查收成员申请</text>
-			<view class="primary-btn">立即关注</view>
+		<view class="no-data" v-if="userData.is_authentication != 2">
+			<image class="img" src="../../static/images/empty.png" mode=""></image>
+			您还未完成企业认证，<text class="btn" @click="linkToCert">前往认证</text>
 		</view>
-		<view class="flex menu-box">
-			<view class="flex-1 flex flex-vc flex-hc menu-item" :class="{'active' : item.value === activeId}"
-				v-for="(item, inx) in menu" :key="inx" @click="tabChange(inx)">
-				{{item.label}}
+		<view class="" v-else>
+			<view class="flex_between focus-box">
+				<text>关注公众号，及时查收成员申请</text>
+				<view class="primary-btn">立即关注</view>
 			</view>
-		</view>
-		<view class="flex flex-vc search-box">
-			<icon type="search" size="16" color="#858585" style="margin-right: 8rpx;" />
-			<input v-model="keyword" class="uni-input" placeholder="请输入姓名/公司/职位" @input="doSearch" />
-		</view>
-		<view class="flex more-search-box">
-			<view class="btn01" @click="showAll">全部模板</view>
-			<view class="flex flex-vc btn02" @click="openPopup">
-				{{themename ? themename : '按模板筛选'}}
-				<text class="iconfont icon-down" v-show="themename"></text>
+			<view class="flex menu-box">
+				<view class="flex-1 flex flex-vc flex-hc menu-item" :class="{'active' : item.value === activeId}"
+					v-for="(item, inx) in menu" :key="inx" @click="tabChange(inx)">
+					{{item.label}}
+				</view>
 			</view>
-		</view>
-		<view class="flex flex-hsb member-list" v-for="(item, index) in list" :key="index">
-			<image class="avatar" :src="item.avatar" mode=""></image>
-			<view class="flex-1 flex flex-vc right-box">
-				<view class="flex-1">
-					<view class="flex flex-vc">
-						<text class="name">{{ item.name }}</text>
-						<text class="tag" v-if="item.is_owner === 1">{{ item.is_owner === 1 ? '超级管理员' : '' }}</text>
+			<view class="flex flex-vc search-box">
+				<icon type="search" size="16" color="#858585" style="margin-right: 8rpx;" />
+				<input v-model="keyword" class="uni-input" placeholder="请输入姓名/公司/职位" @input="doSearch" />
+			</view>
+			<view class="flex more-search-box">
+				<view class="btn01" @click="showAll">全部模板</view>
+				<view class="flex flex-vc btn02" @click="openPopup">
+					{{themename ? themename : '按模板筛选'}}
+					<text class="iconfont icon-down" v-show="themename"></text>
+				</view>
+			</view>
+			<view class="flex flex-hsb member-list" v-for="(item, index) in list" :key="index">
+				<image class="avatar" :src="item.avatar" mode=""></image>
+				<view class="flex-1 flex flex-vc right-box">
+					<view class="flex-1">
+						<view class="flex flex-vc">
+							<text class="name">{{ item.name }}</text>
+							<text class="tag" v-if="item.is_owner === 1">{{ item.is_owner === 1 ? '超级管理员' : '' }}</text>
+						</view>
+						<view class="position">{{ item.position }}</view>
+						<view class="muban">{{ item.companyname }}</view>
 					</view>
-					<view class="position">{{ item.position }}</view>
-					<view class="muban">{{ item.companyname }}</view>
-				</view>
-				<view class="more-box" v-if="(activeId === '1' && item.is_owner !== 1) || activeId === '2'">
-					<text class="iconfont icon-gengduo" @click="showOperate(item)"></text>
-					<!-- <view class="more-text" v-if="['1', '2'].includes(activeId)">
-						<text class="iconfont icon-sanjiaoxing"></text>
-						<text @click="agree(item)" v-if="activeId === '2'">通过</text>
-						<text @click="reject(item)" v-if="item.is_owner !== 1">{{activeId === '1'? '删除' : '拒绝'}}</text>
-					</view> -->
+					<view class="more-box" v-if="(activeId === '1' && item.is_owner !== 1) || activeId === '2'">
+						<text class="iconfont icon-gengduo" @click="showOperate(item)"></text>
+						<!-- <view class="more-text" v-if="['1', '2'].includes(activeId)">
+							<text class="iconfont icon-sanjiaoxing"></text>
+							<text @click="agree(item)" v-if="activeId === '2'">通过</text>
+							<text @click="reject(item)" v-if="item.is_owner !== 1">{{activeId === '1'? '删除' : '拒绝'}}</text>
+						</view> -->
+					</view>
 				</view>
 			</view>
+			<uni-load-more :status="status"></uni-load-more>
 		</view>
-		<uni-load-more :status="status"></uni-load-more>
 		
 		
 		<uni-popup ref="popup" type="bottom">
@@ -81,7 +87,7 @@
 		data() {
 			return {
 				cdnUrl: cdnUrl,
-				activeId: '1',
+				activeId: '2',
 				menu: [{
 						label: '已加入成员',
 						value: '1'
@@ -100,7 +106,8 @@
 				page: 1,
 				status: 'more', // 值还有loading，noMore
 				templet1:[],
-				themename: ''
+				themename: '',
+				userData: uni.getStorageSync('userData') || {}
 			}
 		},
 		onLoad(options) {
