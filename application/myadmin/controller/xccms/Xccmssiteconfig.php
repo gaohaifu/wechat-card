@@ -288,6 +288,59 @@ class Xccmssiteconfig extends Backend
             $this->success('设置成功');
         }
     }
+    /**
+     * 扩展配置Theme
+     */
+    public function set_theme_ext(){
+        $themeName = input('t_name','theme1');
+        if (false === $this->request->isPost()) {
+            $config = get_addon_config('xccms');
+            $config_theme_ext_theme1 = json_decode($config['theme_ext'][$themeName], true);
+
+            if (!isset($config_theme_ext_theme1['datareport']))
+            {
+                $config_theme_ext_theme1['datareport'] = ['status'=>0, 'rows'=>[]];
+            }
+            if (!isset($config_theme_ext_theme1['services']))
+            {
+                $config_theme_ext_theme1['services'] = ['status'=>0, 'title'=>'', 'rows'=>[]];
+            }
+
+
+            $this->view->assign('config_ext', $config_theme_ext_theme1);
+            return $this->view->fetch('set_'.$themeName.'_ext');
+        }
+
+        $params = $this->request->post('row/a');
+        if (empty($params)) {
+            $this->error(__('Parameter %s can not be empty', ''));
+        }
+        $params = $this->preExcludeFields($params);
+
+        $datareport_status = $params['datareport_status'];
+        $datareport = $params['datareport'];
+        $services_status = $params['services_status'];
+        $services_title = $params['services_title'];
+        $services_data = $params['services_data'];
+
+        $data = [
+            'datareport'=>[
+                'status'=>$datareport_status,
+                'rows'=>$datareport
+            ],
+            'services'=>[
+                'status'=>$services_status,
+                'title'=>$services_title,
+                'rows'=>$services_data
+            ]
+        ];
+
+        $config = $config = get_addon_config('xccms');
+        $config['theme_ext'][$themeName] = json_encode($data);
+        set_addon_config('xccms', $config, true);
+
+        $this->success();
+    }
 
     /**
      * 扩展配置Theme1
