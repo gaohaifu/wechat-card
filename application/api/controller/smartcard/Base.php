@@ -262,6 +262,7 @@ class Base extends Api
             ->select();
         foreach($main_menu_list as $i=>$item)
         {
+            $item->icon = cdnurl($item->icon);
             $main_menu_item_url = 'javascript:;';
             switch($item['menu_type'])
             {
@@ -340,6 +341,7 @@ class Base extends Api
                         break;
                 }
                 $sub_menu[$s]['url'] = $sub_menu_item_url;
+                $sub_menu[$s]['icon'] = cdnurl($sub_menu[$s]['icon']);
             }
         
             $main_menu_item_url = count($sub_menu) > 0 ? $sub_menu[0]['url'] : $main_menu_item_url;

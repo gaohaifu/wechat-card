@@ -25,6 +25,26 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('icon')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <ul class="row list-inline faupload-preview" id="p-icon"></ul>
+            <div class="input-group">
+                <input id="c-icon" readonly class="form-control" data-rule="" size="50" name="row[icon]" type="text"
+                       value="{$row.icon|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-icon" class="btn btn-danger faupload"
+                                  data-input-id="c-icon" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp"
+                                  data-multiple="false" data-preview-id="p-icon"><i class="fa fa-upload"></i>
+                        </button></span>
+                    <span><button type="button" id="fachoose-icon" class="btn btn-primary fachoose"
+                                  data-input-id="c-icon" data-mimetype="image/*" data-multiple="false"> <i
+                            class="fa fa-list"></i> </button></span>
+                </div>
+                <span class="msg-box n-right" for="c-icon"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Menu_type')}:</label>
         <div class="col-xs-12 col-sm-8">
             {:build_radios('row[menu_type]', ['product'=>__('产品分类'), 'content'=>__('内容分类'), 'page'=>__('单页'), 'news'=>__('新闻'), 'index'=>__('首页'), 'aboutus'=>__('关于我们'), 'contactus'=>__('联系我们'), 'partner'=>__('合作伙伴'), 'job'=>__('在线招聘'), 'faq'=>__('FAQ'), 'link'=>__('链接')], $row.menu_type)}
