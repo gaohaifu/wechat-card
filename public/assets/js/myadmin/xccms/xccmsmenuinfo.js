@@ -97,6 +97,7 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
                             return html;
                         }, operate: false},
                         {field: 'en_name', title: __('En_name'), operate: 'LIKE'},
+                        {field: 'icon', title: __('图标'), formatter: Table.api.formatter.image},
                         {field: 'menu_type', title: __('Menu_type'), searchList: {"product":__('产品分类'),"content":__('内容分类'),"page":__('单页'),"news":__('新闻'),"index":__('首页'),"aboutus":__('关于我们'),"contactus":__('联系我们'),"partner":__('合作伙伴'),"job":__('在线招聘'),"faq":__('FAQ'),"link":__('链接')}, formatter: Table.api.formatter.flag},
                         {field: 'menu_object_id', title: __('Menu_object_id'), formatter: function(value, row) {
                             return row['menu_object_name'];
