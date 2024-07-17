@@ -159,7 +159,8 @@ class Xccmssiteconfig extends Backend
 
         $data = [
             'name'=>$name,
-            'logo'=>$logo,
+            'logo'=>$params['videofiles']??'',
+            'videofiles'=>$logo,
             'logo_bottom'=>$logo_bottom,
             'icp'=>$icp,
             'tel'=>$tel,
@@ -181,9 +182,6 @@ class Xccmssiteconfig extends Backend
             'guestbook_description'=>$guestbook_description,
         ];
 
-        if(!$data['videofiles']){
-            $data['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
-        }
         $this->model->where('id', $id)->update([
             'json_data'=>json_encode($data),
             'updatetime'=>time(),
