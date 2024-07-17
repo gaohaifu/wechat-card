@@ -221,7 +221,7 @@ class Base extends Api
                 $siteconfig = Xccmssiteconfig::where(['company_id'=>$staffInfo['company_id']])->value('json_data');
                 if($siteconfig){
                     $siteconfigData = json_decode($siteconfig, true);
-                    $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
+                    $siteconfigData['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4';//,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4
                     $videofiles=[];
                     if(isset($siteconfigData['videofiles'])){
                         $videofiles=explode(',',$siteconfigData['videofiles']);
