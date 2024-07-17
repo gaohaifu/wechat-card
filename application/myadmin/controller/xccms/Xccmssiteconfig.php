@@ -45,6 +45,7 @@ class Xccmssiteconfig extends Backend
                 'icp'=>'测ICP备88888888号',
                 'logo'=>'/assets/addons/xccms/img/test-logo.jpg',
                 'logo_bottom'=>'/assets/addons/xccms/img/test-logo.jpg',
+                'videofiles'=>'/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4',
                 'tel'=>'400-XXXX-XXXX',
                 'email'=>'xccms@example.com',
                 'address'=>'测试通信地址',
@@ -180,6 +181,9 @@ class Xccmssiteconfig extends Backend
             'guestbook_description'=>$guestbook_description,
         ];
 
+        if(!$data['videofiles']){
+            $data['videofiles'] = '/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4,/uploads/20240309/46abcc6f406fb60ef78d1c0cab7a1dfd.mp4';
+        }
         $this->model->where('id', $id)->update([
             'json_data'=>json_encode($data),
             'updatetime'=>time(),
