@@ -84,7 +84,7 @@
 			</view>
 			
 			<!-- 企业视频 -->
-			<view class="card-box" v-if="videofiles.length > 0">
+			<view class="card-box" v-if="videofiles.length > 0 && !hidden">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">企业视频</view>
 					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseVideo')">
@@ -102,7 +102,7 @@
 				</view>
 			</view>
 			<!-- 企业简介 -->
-			<view class="card-box" v-if="description">
+			<view class="card-box" v-if="description && !hidden">
 				<view class="flex flex-hsb flex-vc title-bar">
 					<view class="flex-1 title">企业简介</view>
 					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseProfile')">
@@ -183,6 +183,7 @@
 		},
 		data() {
 			return {
+				hidden: true, // 演示，先因此部分模块
 				cdnUrl,
 				isShare: false,
 				bgColor:'bg-gradual-custom',

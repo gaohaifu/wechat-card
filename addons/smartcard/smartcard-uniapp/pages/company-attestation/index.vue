@@ -5,7 +5,7 @@
 			<view class="company-box">
 				<image class="company-icon" src="../../static/images/corp-icon.png" />
 				<view class="company-content">
-					<view class="company-name">{{ companyname }}</view>
+					<view class="company-name">{{ companyname || company || '企业名字' }}</view>
 					<view class="attestation">
 						<image src="../../static/images/enterprise-cert.png" />
 						<text>企业认证</text>
@@ -44,9 +44,13 @@
 	import { navigateTo } from '@/config/common.js'
 	export default {
 		name: 'coporationCert',
+		props: {
+			company: String
+		},
 		data() {
 			return {
-				companyname: ''
+				companyname: '',
+				userData: uni.getStorageSync('userData') || {}
 			}
 		},
 		onLoad(options) {

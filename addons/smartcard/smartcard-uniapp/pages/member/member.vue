@@ -2,14 +2,13 @@
 <template>
 	<view>
 		<view class="no-data" v-if="userData.is_authentication != 2">
-			<image class="img" src="../../static/images/empty.png" mode=""></image>
-			您还未完成企业认证，<text class="btn" @click="linkToCert">前往认证</text>
+			<CorpCertIndex :company="companyname" />
 		</view>
 		<view class="" v-else>
-			<view class="flex_between focus-box">
+			<!-- <view class="flex_between focus-box">
 				<text>关注公众号，及时查收成员申请</text>
 				<view class="primary-btn">立即关注</view>
-			</view>
+			</view> -->
 			<view class="flex menu-box">
 				<view class="flex-1 flex flex-vc flex-hc menu-item" :class="{'active' : item.value === activeId}"
 					v-for="(item, inx) in menu" :key="inx" @click="tabChange(inx)">
@@ -79,13 +78,17 @@
 </template>
 
 <script>
+	import CorpCertIndex from '@/pages/company-attestation/index.vue'
 	import { debounce } from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
 	export default {
+		name: 'member',
+		components: { CorpCertIndex },
 		data() {
 			return {
+				companyname: '',
 				cdnUrl: cdnUrl,
 				activeId: '2',
 				menu: [{
@@ -114,6 +117,8 @@
 			if(options.type) this.activeId = options.type
 			this.getMembers()
 			this.themeList()
+			this.userData.smartcardcompany = this.userData.smartcardcompany || {}
+			this.companyname = this.userData.companyname || this.userData.smartcardcompany.name || '企业名字'
 		},
 		onReachBottom() {
 			++this.page
@@ -127,6 +132,7 @@
 				this.getMembers()
 			}, 500),
 			getMembers() {
+				if (this.userData.is_authentication != 2) return;
 				this.status = 'loading'
 				this.$api.getMemberList({
 					page: this.page, 
