@@ -638,7 +638,6 @@ class Security
             'keygen',
             'object',
             'plaintext',
-            'style',
             'script',
             'textarea',
             'title',
@@ -651,7 +650,6 @@ class Security
 
         static $evil_attributes = array(
             'on\w+',
-            'style',
             'xmlns',
             'formaction',
             'form',
