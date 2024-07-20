@@ -119,6 +119,11 @@
 			this.themeList()
 			this.userData.smartcardcompany = this.userData.smartcardcompany || {}
 			this.companyname = this.userData.companyname || this.userData.smartcardcompany.name || '企业名字'
+			if (this.userData.is_authentication != 2) {
+				uni.setNavigationBarTitle({
+					title: '我们的优势'
+				})
+			}
 		},
 		onReachBottom() {
 			++this.page

@@ -67,10 +67,29 @@
 					</view>
 				</view>
 			</view>
+			<!-- 企业视频 -->
+			<view class="card-box" v-if="videofiles.length > 0">
+				<view class="flex flex-hsb flex-vc title-bar">
+					<view class="flex-1 title">企业视频</view>
+					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseVideo')">
+						<template v-if="!showEnterpriseVideo">
+							<text>查看详情</text>
+							<text class="iconfont icon-Rightyou"></text>
+						</template>
+						<text class="iconfont icon-down" v-else></text>
+					</view>
+				</view>
+				<view class="flex flex-v flex-vc video" v-show="showEnterpriseVideo">
+					<video :src="item"
+					    @error="videoErrorCallback" controls
+						v-for="(item, index) in videofiles" :key="index"
+						style="margin-bottom: 20rpx;"></video>
+				</view>
+			</view>
 			<!-- 快捷服务 -->
 			<view class="services">
 				<view class="flex flex-hsb flex-vc title-bar">
-					<view class="flex-1 title">服务</view>
+					<view class="flex-1 title">企业官网</view>
 				</view>
 				<view class="flex_between">
 					<view class="flex flex-v flex-vc flex-hc flex-wrap service-item"
@@ -82,25 +101,7 @@
 					</view>
 				</view>
 			</view>
-			
-			<!-- 企业视频 -->
-			<view class="card-box" v-if="videofiles.length > 0 && !hidden">
-				<view class="flex flex-hsb flex-vc title-bar">
-					<view class="flex-1 title">企业视频</view>
-					<view class="flex flex-vc more" @click="toggleCardBox('showEnterpriseVideo')">
-						<template v-if="!showEnterpriseVideo">
-							<text>查看详情</text>
-							<text class="iconfont icon-Rightyou"></text>
-						</template>
-						<text class="iconfont icon-down" v-else></text>
-					</view>
-				</view>
-				<view class="video" v-show="showEnterpriseVideo">
-					<video :src="item"
-					    @error="videoErrorCallback" controls
-						v-for="(item, index) in videofiles" :key="index"></video>
-				</view>
-			</view>
+						
 			<!-- 企业简介 -->
 			<view class="card-box" v-if="description && !hidden">
 				<view class="flex flex-hsb flex-vc title-bar">

@@ -13,26 +13,36 @@
 				</view>
 			</view>
 		</view>
-		<view class="attestation-title">企业认证 - <text>专属权益</text></view>
+		<view class="attestation-title"><text>我们的优势</text></view>
 		<view class="attestation-box pad attestation-mar">
 			<view class="equity-box">
 				<view class="equity-num">01</view>
 				<view class="equity-content">
-					<view>分享名片卡片</view>
-					<text>发名片时，分享卡片上显示企业认证标识</text>
+					<view>依托微信 使用便捷 高效</view>
+					<text>电子名片通依托微信小程序开发，可以直接通过微信一键发送名片，分享、交换名片，便捷，高效。</text>
 				</view>
 			</view>
-			<view class="equity-img"><image src="../../static/images/corp-cert-img01.png" /></view>
+			<view class="equity-img"><image src="../../static/images/cert01.png" /></view>
 		</view>
 		<view class="attestation-box pad">
 			<view class="equity-box">
 				<view class="equity-num">02</view>
 				<view class="equity-content">
-					<view>名片详情页</view>
-					<text>显示企业专属认证标识，增加名片可信度</text>
+					<view>名片上的官方网站</view>
+					<text>可以展示企业的简介、宣传片，业务产品信息，联系信息、导航定位等，让您的客户直观全面的了解你的企业。</text>
 				</view>
 			</view>
-			<view class="equity-img"><image src="../../static/images/corp-cert-img01.png" /></view>
+			<view class="equity-img"><image src="../../static/images/cert02.png" /></view>
+		</view>
+		<view class="attestation-box pad">
+			<view class="equity-box">
+				<view class="equity-num">03</view>
+				<view class="equity-content">
+					<view>云上名片 数据不丢失</view>
+					<text>所有客户名片资料都可以上传到云服务，随时获取、管理、分析数据信息。没有丢失隐患。</text>
+				</view>
+			</view>
+			<view class="equity-img"><image src="../../static/images/cert02.png" /></view>
 		</view>
 		<view class="attestation-btn">
 			<view @click="linkTo">立即认证</view>
@@ -115,15 +125,59 @@
 		vertical-align: middle;
 	}
 	.attestation-title {
-		padding: 40rpx 0;
+		position: relative;
+		padding: 40rpx 80rpx;
 		text-align: center;
 		font-size: 36rpx;
 		color: #333;
 		font-weight: 700;
 	}
+	.attestation-title::before,
+	.attestation-title::after {
+		content: '';
+		position: absolute;
+		width: 28rpx;
+		height: 9rpx;
+		background: linear-gradient( 270deg, #0256FF 0%, rgba(2,86,255,0) 100%);
+		border-radius: 36rpx 36rpx 36rpx 36rpx;
+	}
+	.attestation-title::before {
+		left: 180rpx;
+		top: 64rpx;
+		-webkit-transform: rotate(45deg);
+		transform: rotate(45deg);
+	}
+	.attestation-title::after {
+		right: 180rpx;
+		top: 64rpx;
+		-webkit-transform: rotate(135deg);
+		transform: rotate(135deg);
+	}
 	.attestation-title text {
-		margin-left: 8rpx;
-		color: #0256FF;
+		position: relative;
+		padding: 30rpx;
+	}
+	.attestation-title text::before,
+	.attestation-title text::after {
+		content: '';
+		position: absolute;
+		width: 36rpx;
+		height: 12rpx;
+		background: linear-gradient( 270deg, #0256FF 0%, rgba(2,86,255,0) 100%);
+		border-radius: 45rpx 45rpx 45rpx 45rpx;
+		transform: rotateX(45deg);
+	}
+	.attestation-title text::before {
+		left: -50rpx;
+		top: 50rpx;
+		-webkit-transform: rotate(45deg);
+		transform: rotate(45deg);
+	}
+	.attestation-title text::after {
+		right: -50rpx;
+		top: 50rpx;
+		-webkit-transform: rotate(135deg);
+		transform: rotate(135deg);
 	}
 	.attestation-mar {
 		margin-bottom: 20rpx;
@@ -135,23 +189,26 @@
 		text-align: center;
 	}
 	.equity-img image{
-		width: 478rpx;
-		height: 412rpx;
+		width: 500rpx;
+		height: 455rpx;
 	}
 	.equity-box {
-		display: flex;
-		align-items: center;
+		position: relative;
+		padding-top: 60rpx;
 		margin-bottom: 40rpx;
 	}
 	.equity-num {
-		flex-shrink: 0;
-		font-size: 64rpx;
-		color: #0256FF;
+		position: absolute;
+		right: 0;
+		top: 0;
+		font-size: 84rpx;
+		color: rgba(2, 86, 255, .4);
 		font-weight: 700;
 		margin-right: 20rpx;
+		font-family: Source Han Sans, Source Han Sans;
+		font-weight: 700;
 	}
 	.equity-content {
-		flex: 1;
 		overflow: hidden;
 		font-size: 32rpx;
 		color: #333;
