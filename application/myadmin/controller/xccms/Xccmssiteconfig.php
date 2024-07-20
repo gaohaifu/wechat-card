@@ -45,6 +45,7 @@ class Xccmssiteconfig extends Backend
                 'icp'=>'测ICP备88888888号',
                 'logo'=>'/assets/addons/xccms/img/test-logo.jpg',
                 'logo_bottom'=>'/assets/addons/xccms/img/test-logo.jpg',
+                'videofiles'=>'/uploads/20240309/f58033bd750bf2df36819471118b1188.mp4',
                 'tel'=>'400-XXXX-XXXX',
                 'email'=>'xccms@example.com',
                 'address'=>'测试通信地址',
@@ -158,7 +159,8 @@ class Xccmssiteconfig extends Backend
 
         $data = [
             'name'=>$name,
-            'logo'=>$logo,
+            'logo'=>$params['videofiles']??'',
+            'videofiles'=>$logo,
             'logo_bottom'=>$logo_bottom,
             'icp'=>$icp,
             'tel'=>$tel,

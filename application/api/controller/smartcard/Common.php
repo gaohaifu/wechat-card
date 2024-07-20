@@ -975,6 +975,9 @@ class Common extends Base
     public function shareCardInfo()
     {
         $site = Config::get('site');
+        if(!isset($site['greetingsList'])){
+            $this->error('未配置招呼语');
+        }
         $greetingsList = $site['greetingsList'];
 //        $backgroundimageList = $site['backgroundimageList'];
         $Staff = new Staff();
@@ -988,9 +991,14 @@ class Common extends Base
 
         $gfirstKey = '';
         $bfirstKey = '';
-        foreach ($greetingsList as $k=>&$item) {
-            if($gfirstKey=='') $gfirstKey = $k;
-            $item = str_replace('XXX',$staff['name'],$item);
+        if(!$staff){
+            $this->error('未创建名片');
+        }
+        if(isset($staff['name'])){
+            foreach ($greetingsList as $k=>&$item) {
+                if($gfirstKey=='') $gfirstKey = $k;
+                $item = str_replace('XXX',$staff['name'],$item);
+            }
         }
 
         $text_4 =['text_0'=>'手机：'.$staff['mobile']];
@@ -1001,11 +1009,15 @@ class Common extends Base
         for ($count;$count<4;$count++){
             $text_4['text_'.$count] = '';
         }
+        $avatar = \app\common\model\User::where(['id' =>$this->user_id])->value('avatar');
+        if(!$avatar){
+            $avatar= 'https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132' ;
+        }
         $params = [
             'id' => 2,
             'params' => [
                 'image_0' => '/assets/addons/posters/img/bg1.png',
-                'image_1' => \app\common\model\User::where(['id' =>$this->user_id])->value('avatar'),
+                'image_1' => $avatar,
                 'text_2' => [
                     'name' => $staff['name'],
                 ],
@@ -1024,7 +1036,7 @@ class Common extends Base
             'id' => 2,
             'params' => [
                 'image_0' => '/assets/addons/posters/img/bg2.png',
-                'image_1' => \app\common\model\User::where(['id' =>$this->user_id])->value('avatar'),
+                'image_1' => $avatar,
                 'text_2' => [
                     'name' => $staff['name'],
                 ],

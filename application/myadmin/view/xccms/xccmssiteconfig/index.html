@@ -106,6 +106,26 @@
                                 </tr>
                                 <tr>
                                     <td>
+                                        视频<br />
+                                    </td>
+                                    <td>
+                                        <div class="row">
+                                            <div class="col-sm-8 col-xs-12">
+                                                <div class="form-inline">
+                                                    <input id="c-videofiles" class="form-control" size="50" name="row[videofiles]" type="text" value="{$json_data['videofiles']}">
+                                                    <span><button type="button" id="faupload-videofiles" class="btn btn-danger faupload" data-input-id="c-videofiles" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" data-preview-id="p-videofiles"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                                                    <span><button type="button" id="fachoose-videofiles" class="btn btn-primary fachoose" data-input-id="c-videofiles" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                                                    <span class="msg-box n-right" for="c-videofiles"></span>
+                                                    <ul class="row list-inline faupload-preview" id="p-videofiles"></ul>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         底部Logo<br />(225 x 45)
                                     </td>
                                     <td>
