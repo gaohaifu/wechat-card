@@ -300,7 +300,7 @@ class Base extends Api
                     $main_menu_item_url = addon_url('xccms/index/faq',['cid'=>$company_id],true,true);
                     break;
             }
-            $sub_menu = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,name,menu_type,menu_object_id,url')
+            $sub_menu = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,name,menu_type,icon,menu_object_id,url')
                 ->where('parent_id', $item['id'])
                 ->where('is_top_show', 1)
                 ->where('state', 1)
