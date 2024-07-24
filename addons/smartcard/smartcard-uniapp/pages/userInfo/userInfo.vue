@@ -358,6 +358,8 @@
 					})
 			},
 			submit() {
+				const fi = this.companyList.find(i => i.name === this.companyname)
+				if (!fi) this.company_id = 0 // 防止用户再次搜索后没有查到公司直接点击保存
 				var data = {};
 				data['user_id'] = this.user_id
 				data['company_id'] = this.company_id || 0 // 企业id 不存在的企业由后端自由生成新企业保存
