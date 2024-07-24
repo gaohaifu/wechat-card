@@ -340,7 +340,7 @@
 			this.sendCard()
 			return {
 			  title: (this.companyInfo.name || this.userData.companyname ? `${this.companyInfo.name || this.userData.companyname}名片夹` : "名片夹"),
-			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + this.s_staff_id + '&user_id='+ tbis.s_user_id + '&pageTitle='+this.userData.name,
+			  path: weixinShare.url + '?origin=1&isShare=1&staff_id=' + this.s_staff_id + '&user_id='+ this.s_user_id + '&pageTitle='+this.userData.name,
 			  // imageUrl: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/uni@2x.png",
 			  type: weixinShare.type, // 0正式版 2体验版 1开发板
 			}
