@@ -252,6 +252,8 @@ class Base extends Api
      */
     public function getMenu($company_id)
     {
+        if (!$company_id)
+            return [];
 //        $domain = Domain::where(['company_id'=>$company_id])->value('name');
         //菜单
         $main_menu_list = Xccmsmenuinfo::where(['company_id'=>$company_id])->field('id,parent_id,name as label,icon,en_name,menu_type,menu_object_id,url')
