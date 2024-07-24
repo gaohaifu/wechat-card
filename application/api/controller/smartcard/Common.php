@@ -1377,6 +1377,8 @@ class Common extends Base
         if(isset($data['avatar'])){
           $avatar = $this->request->request('avatar', '', 'trim,strip_tags,htmlspecialchars');
           $user->avatar = $avatar;
+          $user->nickname = $data['name'];
+          $user->mobile = $data['mobile'];
           $user->save();
           unset($data['avatar']);
         }
