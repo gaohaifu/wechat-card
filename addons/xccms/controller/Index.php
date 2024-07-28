@@ -4,6 +4,7 @@ namespace addons\xccms\controller;
 
 use addons\myadmin\model\Domain;
 use app\common\service\Language;
+use app\common\service\ThemeService;
 use think\addons\Controller;
 use think\Config;
 use think\Validate;
@@ -904,7 +905,8 @@ class Index extends Controller
         $config_theme_ext_theme = null;
         if (isset($config['theme_ext'][$theme]))
         {
-            $config_theme_ext_theme = json_decode($config['theme_ext'][$theme], true);
+            //$config_theme_ext_theme = json_decode($config['theme_ext'][$theme], true);
+            $config_theme_ext_theme = ThemeService::getThemeText(COMPANY_ID, $theme);
         }
 
         $this->view->assign('theme_ext', $config_theme_ext_theme);

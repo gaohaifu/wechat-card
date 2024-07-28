@@ -21,3 +21,17 @@ php think menu -c fastscrm/system/Setting --force=true
 
 php think crud -t mod_ai_knowledge_base --local=0 -c ai/KnowledgeBase -m ai/KnowledgeBase --force=true
 php think menu -c ai/KnowledgeBase --force=true
+
+
+
+
+
+php think crud -t mod_xccms_site_theme --local=0 -c xccms/Xccmssitetheme -m xccms/Xccmssitetheme --force=true
+php think menu -c xccms/Xccmssitetheme --force=true
+
+
+
+
+
+
+

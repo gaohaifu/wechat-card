@@ -3,3 +3,20 @@ FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE '%fastscrm%';
 
 
+
+
+
+
+
+CREATE TABLE `mod_xccms_site_theme` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) DEFAULT NULL COMMENT '公司id',
+  `name` varchar(50) DEFAULT NULL COMMENT '名称',
+  `content` longtext COMMENT '内容',
+  `createtime` int(11) DEFAULT NULL COMMENT '创建时间',
+  `updatetime` int(11) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COMMENT='网站模版扩展';
+
+
+

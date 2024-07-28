@@ -71,7 +71,8 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function($, undefine
             $('.js_setTheme').click(function() {
                 var that = $(this);
                 var theme = that.data('value');
-                var url = 'xccms/xccmssiteconfig/set_theme_ext?t_name='+theme;
+                var url = 'xccms/xccmssiteconfig/set_' + theme + '_ext';
+                //var url = 'xccms/xccmssiteconfig/set_theme_ext?t_name='+theme;
                 $(this).data("area", ["70%", "70%"]);
                 Fast.api.open(url, '扩展配置', $(this).data() || {});
             });
