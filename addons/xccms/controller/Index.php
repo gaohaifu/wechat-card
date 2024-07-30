@@ -906,7 +906,7 @@ class Index extends Controller
         if (isset($config['theme_ext'][$theme]))
         {
             //$config_theme_ext_theme = json_decode($config['theme_ext'][$theme], true);
-            $config_theme_ext_theme = ThemeService::getThemeText(COMPANY_ID, $theme);
+            $config_theme_ext_theme = ThemeService::getThemeText($this->company_id, $theme);
         }
 
         $this->view->assign('theme_ext', $config_theme_ext_theme);
