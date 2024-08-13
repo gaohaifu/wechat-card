@@ -3,6 +3,7 @@
 namespace app\myadmin\controller\xccms;
 
 use addons\myadmin\library\Backend;
+use app\common\service\ThemeService;
 use think\Db;
 use app\admin\library\xccms\Service;
 use app\admin\model\Xccmsconfig;
@@ -296,20 +297,26 @@ class Xccmssiteconfig extends Backend
     public function set_theme_ext(){
         $themeName = input('t_name','theme1');
         if (false === $this->request->isPost()) {
-            $config = get_addon_config('xccms');
-            $config_theme_ext_theme1 = json_decode($config['theme_ext'][$themeName], true);
+            //$config = get_addon_config('xccms');
+            //$config_theme_ext_theme = json_decode($config['theme_ext'][$themeName], true);
+            $config_theme_ext_theme = ThemeService::getThemeText(COMPANY_ID, $themeName);
 
-            if (!isset($config_theme_ext_theme1['datareport']))
+            if (!isset($config_theme_ext_theme['aboutus']))
             {
-                $config_theme_ext_theme1['datareport'] = ['status'=>0, 'rows'=>[]];
-            }
-            if (!isset($config_theme_ext_theme1['services']))
-            {
-                $config_theme_ext_theme1['services'] = ['status'=>0, 'title'=>'', 'rows'=>[]];
+                $config_theme_ext_theme['aboutus'] = ['status'=>0, 'bg_image'=>''];
             }
 
+            if (!isset($config_theme_ext_theme['datareport']))
+            {
+                $config_theme_ext_theme['datareport'] = ['status'=>0, 'title'=>'', 'sub_title'=>'', 'rows'=>''];
+            }
+            if (!isset($config_theme_ext_theme['services']))
+            {
+                $config_theme_ext_theme['services'] = ['status'=>0, 'title'=>'', 'sub_title'=>'', 'description'=>'', 'rows'=>'', 'url'=>''];
+            }
 
-            $this->view->assign('config_ext', $config_theme_ext_theme1);
+
+            $this->view->assign('config_ext', $config_theme_ext_theme);
             return $this->view->fetch('set_'.$themeName.'_ext');
         }
 
@@ -350,8 +357,9 @@ class Xccmssiteconfig extends Backend
     public function set_theme1_ext()
     {
         if (false === $this->request->isPost()) {
-            $config = get_addon_config('xccms');
-            $config_theme_ext_theme1 = json_decode($config['theme_ext']['theme1'], true);
+            /*$config = get_addon_config('xccms');
+            $config_theme_ext_theme1 = json_decode($config['theme_ext']['theme1'], true);*/
+            $config_theme_ext_theme1 = ThemeService::getThemeText(COMPANY_ID, 'theme1');
 
             if (!isset($config_theme_ext_theme1['datareport']))
             {
@@ -391,9 +399,10 @@ class Xccmssiteconfig extends Backend
             ]
         ];
 
-        $config = $config = get_addon_config('xccms');
+        /*$config = $config = get_addon_config('xccms');
         $config['theme_ext']['theme1'] = json_encode($data);
-        set_addon_config('xccms', $config, true);
+        set_addon_config('xccms', $config, true);*/
+        ThemeService::setThemeText(COMPANY_ID, 'theme1', json_encode($data));
 
         $this->success();
     }
@@ -404,8 +413,9 @@ class Xccmssiteconfig extends Backend
     public function set_theme2_ext()
     {
         if (false === $this->request->isPost()) {
-            $config = get_addon_config('xccms');
-            $config_theme_ext_theme2 = json_decode($config['theme_ext']['theme2'], true);
+            /*$config = get_addon_config('xccms');
+            $config_theme_ext_theme2 = json_decode($config['theme_ext']['theme2'], true);*/
+            $config_theme_ext_theme2 = ThemeService::getThemeText(COMPANY_ID, 'theme2');
 
             if (!isset($config_theme_ext_theme2['datareport']))
             {
@@ -445,9 +455,11 @@ class Xccmssiteconfig extends Backend
             ]
         ];
 
-        $config = $config = get_addon_config('xccms');
+        /*$config = $config = get_addon_config('xccms');
         $config['theme_ext']['theme2'] = json_encode($data);
-        set_addon_config('xccms', $config, true);
+        set_addon_config('xccms', $config, true);*/
+
+        ThemeService::setThemeText(COMPANY_ID, 'theme2', json_encode($data));
 
         $this->success();
     }
@@ -459,8 +471,9 @@ class Xccmssiteconfig extends Backend
     {
         if (false === $this->request->isPost()) {
 
-            $config = get_addon_config('xccms');
-            $config_theme_ext_theme3 = json_decode($config['theme_ext']['theme3'], true);
+            /*$config = get_addon_config('xccms');
+            $config_theme_ext_theme3 = json_decode($config['theme_ext']['theme3'], true);*/
+            $config_theme_ext_theme3 = ThemeService::getThemeText(COMPANY_ID, 'theme3');
 
             if (!isset($config_theme_ext_theme3['aboutus']))
             {
@@ -523,10 +536,11 @@ class Xccmssiteconfig extends Backend
             ]
         ];
 
-        $config = $config = get_addon_config('xccms');
+        /*$config = $config = get_addon_config('xccms');
         $config['theme_ext']['theme3'] = json_encode($data);
-        set_addon_config('xccms', $config, true);
+        set_addon_config('xccms', $config, true);*/
 
+        ThemeService::setThemeText(COMPANY_ID, 'theme3', json_encode($data));
         $this->success();
     }
 
@@ -537,8 +551,9 @@ class Xccmssiteconfig extends Backend
     {
         if (false === $this->request->isPost()) {
 
-            $config = get_addon_config('xccms');
-            $config_theme_ext_theme3 = json_decode($config['theme_ext']['theme3'], true);
+            /*$config = get_addon_config('xccms');
+            $config_theme_ext_theme3 = json_decode($config['theme_ext']['theme3'], true);*/
+            $config_theme_ext_theme3 = ThemeService::getThemeText(COMPANY_ID, 'theme3');
 
             if (!isset($config_theme_ext_theme3['aboutus']))
             {

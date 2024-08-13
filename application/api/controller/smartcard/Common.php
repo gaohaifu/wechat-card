@@ -1389,6 +1389,9 @@ class Common extends Base
             if($userres['company_id']!=$data['company_id']){
                 $data['statusdata']='2';
             }
+            if($data['company_id']!=0){
+                $data['companyname']='';
+            }
             $userres->allowField(true)->save($data);
             $this->success('更新员工信息成功');
         }
