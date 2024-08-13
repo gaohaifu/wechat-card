@@ -112,6 +112,7 @@
 								},
 								fail: (err) => {
 									console.log('保存失败', err)
+									if (err.errMsg === 'saveImageToPhotosAlbum:fail cancel') return
 									uni.showModal({
 										title: '提示',
 										content: '拒绝访问相处会导致下载名片码失败，请重新访问',
