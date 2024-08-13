@@ -13,10 +13,11 @@
 					<view>{{item.subtitle}}</view>
 				</view>
 			</view>
-			<view class="download">
+			<view class="download" v-if="isAlbum">
 				<uni-icons size="24" color="#fff" type="download" />
 				<text @click="downloadFn">下载名片码</text>
 			</view>
+			<button open-type="openSetting" bindopensetting="openSettingCallback" v-if="!isAlbum">打开设置页</button>
 		</view>
 	</uni-popup>
 </template>
@@ -26,6 +27,7 @@
 		name: 'MycardCode',
 		data() {
 			return {
+				isAlbum: true, // 是否打开设置页 默认不开启
 				active: 0,
 				base64Code: '',
 				sizeList: [
@@ -53,12 +55,25 @@
 			}
 		},
 		created() {
-			// this.open()
-			this.getImageCode()
-			console.info('11111111111111111')
-			
+			// this.getImageCode()
+			// this.checkOpenAblum()
 		},
 		methods: {
+			checkOpenAblum() {
+				uni.getSetting({
+					success: res => {
+						// console.log(res.authSetting['scope.writePhotosAlbum'], '==========>>>23333', res.authSetting)
+						if (res.authSetting['scope.writePhotosAlbum'] === false) {
+							this.isAlbum = false
+						} else if (res.authSetting['scope.writePhotosAlbum'] === true) {
+							this.isAlbum = true
+						}
+					},
+					// complete(com) {
+					// 	console.log('eom================', com)
+					// }
+				})
+			},
 			getImageCode() {
 				this.$api.getMiniCode({
 					path: 'pages/myCard/myCard',
@@ -74,10 +89,12 @@
 			},
 			sizeChange(index) {
 				if (this.active === index) return
-				this.active = index
+				this.active = index			
 			},
 			open() {
 				this.$refs.codePopupRef.open('bottom')
+				this.getImageCode()
+				this.checkOpenAblum()
 			},
 			close() {
 				this.$refs.codePopupRef.close()
@@ -93,8 +110,17 @@
 								success: function() {
 									console.log('保存成功')
 								},
-								fail: function() {
-									console.log('保存失败')
+								fail: (err) => {
+									console.log('保存失败', err)
+									uni.showModal({
+										title: '提示',
+										content: '拒绝访问相处会导致下载名片码失败，请重新访问',
+										showCancel: false,
+										success: (res) => {
+											this.close()
+											this.isAlbum = false
+										}
+									});
 								}
 							})
 						} else {
@@ -102,6 +128,10 @@
 						}
 					}
 				})
+			},
+			openSettingCallback(e) {
+				console.log('eeeeeeeeeeeeeeeeee', e)
+				this.close()
 			}
 		}
 	}

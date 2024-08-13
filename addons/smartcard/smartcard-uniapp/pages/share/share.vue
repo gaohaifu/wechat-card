@@ -1,44 +1,13 @@
 <template>
 	<view class="overall_content">
-		<view class="header_background" :style="{'background-image':'url('+cdnUrl+backgroundImg+')'}">
-			<cu-custom :bgColor="bgColor" :isBack="true" :backGround="backGround">
-				<block slot="backText">返回</block>
-				<block slot="content">{{pageTitle}}</block>
-			</cu-custom>
-			<view class="header_padding">
-				<view class="header_message" :style="{'background-image':'url('+cdnUrl + cardimage+')'}">
-					<view class="flex_layout userImg">
-						<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
-						<view class="name_position">
-							<view :style="{color:fontcolor}">{{userData.name?userData.name:''}}</view>
-							<text :style="{color:fontcolor}">{{userData.position}}</text>
-							<text :style="{color:fontcolor}">{{companyInfo.name || userData.companyname}}</text>
-						</view>
-					</view>
-					<!-- <view class="cert-status" :class="{'waitOp': !certificateStatus, 'op': certificateStatus}"
-						:style="{'background-image':'url('+(certificateStatus? smartcardBG.cert : smartcardBG.unCert)+')',
-									color:(certificateStatus ? 'white' : fontcolor)}"
-						@click="linkToCert">
-						{{!certificateStatus? '未认证' : '已认证'}}
-					</view> -->
-					<view class="extra">
-						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
-								:style="{color:fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
-						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-youjian1"></i><text
-								:style="{color:fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
-						<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:fontcolor}"
-								class="iconfont icon-weizhi"></i><text
-								:style="{color:fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
-						</view>
-					</view>
-					<view class="isHC-box" v-if="smartcardObj.save_status[userData.save_status]">
-						<view class="bg">
-							{{smartcardObj.save_status[userData.save_status]}}
-						</view>
-					</view>
-				</view>
-			</view>
-		</view>
+		<smallUserInfo page-title="首页"
+			:is-show="isShowSmallUserInfo"
+			:bg-color="bgColor"
+			:back-ground="backGround"
+			:is-back="true"
+			:init-done="isInitDone"
+			:theme-data="theme"
+			:share-user-data="userData"></smallUserInfo>
 		<view class="overall_padding contents">
 			<!-- 快捷工具 -->
 			<view class="flex_between tools">
@@ -173,17 +142,20 @@
 <script>
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
+	import smallUserInfo from "../../components/small-user-info/small-user-info.vue"
 	import {smartcardObj, userInfo, weixinShare} from '@/config/common.js'
 	import {
 		cdnUrl
 	} from '@/config/config.js'
 	export default {
 		components:{
+			smallUserInfo,
 			bottomSheet,
 			myCardCode
 		},
 		data() {
 			return {
+				isInitDone: false,
 				hidden: true, // 演示，先因此部分模块
 				cdnUrl,
 				isShare: false,
@@ -744,7 +716,7 @@
 						if(this.isShare) {
 							this.services = (this.allData.services || [])
 						}
-												
+						this.isInitDone = true					
 						console.info('首页请求的接口名称： ', api, 
 							'allData', this.allData, 'isShare', this.isShare, 
 							'services', this.services)

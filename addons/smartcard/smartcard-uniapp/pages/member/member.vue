@@ -99,10 +99,10 @@
 						label: '申请加入',
 						value: '2'
 					},
-					{
-						label: '等待激活',
-						value: '3'
-					},
+					// {
+					// 	label: '等待激活',
+					// 	value: '3'
+					// },
 				],
 				list: [],
 				keyword: '',
@@ -130,6 +130,13 @@
 			this.getMembers()
 		},
 		methods: {
+			getShareCardInfo() {
+				this.$api.shareCardInfo({}, res => {
+					if(res.code === 1) {
+						this.shareCardInfo = res.shareCardInfo || {}
+					}
+				})
+			},
 			// 接口还不支持搜索，参数不够
 			doSearch: debounce(() => {
 				console.log('搜索')

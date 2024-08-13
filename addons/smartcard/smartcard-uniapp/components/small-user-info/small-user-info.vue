@@ -76,6 +76,17 @@
 				type: String,
 				default: '标题'
 			},
+			shareUserData: {
+				type: Object,
+				default() {
+					return {
+						nickname: '微信昵称',
+						name: '微信昵称',
+						avatar: '',
+						position: ''
+					}
+				}
+			},
 			themeData: {
 				type: Object,
 				default() {
@@ -86,6 +97,11 @@
 						color: '#333', // 主题颜色
 					}
 				}
+			},
+			// 解决首页和分享页的数据请求问题
+			initDone: {
+				type: Boolean,
+				default: false
 			}
 		},
 		data() {
@@ -94,7 +110,7 @@
 				smartcardBG: smartcardBG,
 				smartcardObj: smartcardObj,
 				theme: this.themeData || {},
-				userData: {
+				userData: this.shareUserData || {
 					nickname: '微信昵称',
 					name: '微信昵称',
 					avatar: '',
@@ -105,44 +121,27 @@
 			};
 		},
 		watch: {
-			themeData: {
-				deep: true,
-				handler(vl = {}) {
-					console.info('=======首页有没有执行监听到themeData')
-					if(vl.cardimage) this.theme = vl
-				}
-			},
 			isShow(vl) {
+				if(vl) this.getSessionData()
+			},
+			initDone(vl) {
 				if(vl) this.getSessionData()
 			}
 		},
 		created() {
-			// this.getTheme()
 			// 分享出去后子组件监听不到刷新，直接再请求一次接口
 			this.getSessionData()
-			// console.info('----------small user info 回退是否会执行当前生命周期？？？', this.userData.is_certified, '====',
-			// 	this.userData.save_status, this.smartcardObj.save_status[this.userData.save_status])
 		},
 		methods: {
-			getTheme() {
-				this.$api.doIndex({}, res => {
-					if(res.code === 1) {
-						res.data = res.data || {}
-						this.userData = res.data.userInfo || {}
-						const smartcardtheme = userData.smartcardtheme || {}
-						this.theme = {
-							color: smartcardtheme.colour || '',
-							backgroundimage: smartcardtheme.backgroundimage || smartcardBG.backgroundimage,
-							cardimage: smartcardtheme.cardimage || smartcardBG.cardimage,
-							fontcolor: smartcardtheme.fontcolor || ''
-						}
-					}
-				})
-			},
 			getSessionData() {
 				this.userData = uni.getStorageSync('userData') || {}
 				const themeData = uni.getStorageSync('themeData') || {}
 				if(themeData.cardimage) this.theme = themeData
+				// 解决分享页头部
+				if (this.shareUserData.name != '微信昵称') {
+					this.userData = this.shareUserData
+					this.theme = this.themeData
+				}
 				this.userData.smartcardcompany = this.userData.smartcardcompany || {}
 				// 企业负责人
 				if(this.userData.usertype === 1 && this.userData.smartcardcompany.is_authentication === 1) this.certificateStatus=true;

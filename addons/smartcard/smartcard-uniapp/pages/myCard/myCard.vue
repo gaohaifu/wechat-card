@@ -1,38 +1,11 @@
 <template>
 	<view class="overall_content">
-		<view class="header_background" :style="{'background-image':'url('+cdnUrl+backgroundImg+')'}">
-			<cu-custom :bgColor="bgColor" :isBack="isBack" :backGround="backGround">
-				<block slot="backText">返回</block>
-				<block slot="content">首页</block>
-			</cu-custom>
-			<view class="header_padding" @click="test">
-				<view class="header_message" :style="{'background-image':'url('+cdnUrl + cardimage+')'}">
-					<view class="flex_layout userImg">
-						<image :src="userData.avatar?userData.avatar:'../../static/images/user.png'" mode=""></image>
-						<view class="name_position">
-							<view :style="{color:fontcolor}">{{userData.name?userData.name:''}}</view>
-							<text :style="{color:fontcolor}">{{userData.position}}</text>
-							<text :style="{color:fontcolor}">{{companyInfo.name || userData.companyname}}</text>
-						</view>
-					</view>
-					<view class="extra">
-						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-dianhua"></i><text
-								:style="{color:fontcolor}">{{userData.mobile?userData.mobile:'暂未填写'}}</text></view>
-						<view class="flex_layout"><i :style="{color:fontcolor}" class="iconfont icon-youjian1"></i><text
-								:style="{color:fontcolor}">{{userData.email?userData.email:'暂未填写'}}</text></view>
-						<view class="flex_layout" v-if="companyInfo.address"><i :style="{color:fontcolor}"
-								class="iconfont icon-weizhi"></i><text
-								:style="{color:fontcolor}">{{companyInfo.address?companyInfo.address:'暂未填写'}}</text>
-						</view>
-					</view>
-					<view class="isHC-box" v-if="smartcardObj.save_status[userData.save_status]">
-						<view class="bg">
-							{{smartcardObj.save_status[userData.save_status]}}
-						</view>
-					</view>
-				</view>
-			</view>
-		</view>
+		<smallUserInfo page-title="首页"
+			:is-show="isShowSmallUserInfo"
+			:bg-color="bgColor"
+			:back-ground="backGround"
+			:is-back="true"
+			:init-done="isInitDone"></smallUserInfo>
 		<view class="overall_padding contents">
 			<!-- 发名片 -->
 			<button type="primary" open-type="share" class="share-btn">发名片</button>
@@ -181,6 +154,7 @@
 </template>
 
 <script>
+	import smallUserInfo from "../../components/small-user-info/small-user-info.vue"
 	import bottomSheet from '../../components/bbh-sheet/bottomSheet.vue';
 	import myCardCode from '../../components/mycard-code/index.vue'
 	import {smartcardBG,smartcardObj, weixinShare, isLogin} from '@/config/common.js'
@@ -189,11 +163,13 @@
 	} from '@/config/config.js'
 	export default {
 		components:{
+			smallUserInfo,
 			bottomSheet,
 			myCardCode
 		},
 		data() {
 			return {
+				isInitDone: false,
 				cdnUrl,
 				smartcardBG,
 				is_authentication: '', // 企业负责人 0=未认证,1=待审核,2=已审核,3=审核失败
@@ -375,6 +351,7 @@
 			// #ifdef MP-WEIXIN
 			this.wxLogin();
 			// #endif
+			this.$refs.myCardCode && this.$refs.myCardCode.close();
 		},
 		onHide() {
 		},
@@ -735,7 +712,8 @@
 						
 						if(this.isShare) {
 							this.services = this.allData.services || []
-						}						
+						}	
+						this.isInitDone = true
 						console.info('首页请求的接口名称： ', api, 
 							'allData', this.allData, 'isShare', this.isShare, 
 							'services', this.services)
