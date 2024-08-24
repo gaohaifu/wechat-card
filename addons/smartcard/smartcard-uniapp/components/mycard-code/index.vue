@@ -13,9 +13,9 @@
 					<view>{{item.subtitle}}</view>
 				</view>
 			</view>
-			<view class="download" v-if="isAlbum">
+			<view class="download" v-if="isAlbum" @click="downloadFn">
 				<uni-icons size="24" color="#fff" type="download" />
-				<text @click="downloadFn">下载名片码</text>
+				<text>下载名片码</text>
 			</view>
 			<button open-type="openSetting" bindopensetting="openSettingCallback" v-if="!isAlbum">打开设置页</button>
 		</view>
@@ -23,10 +23,12 @@
 </template>
 
 <script>
+	import {weixinShare} from '@/config/common.js'
 	export default {
 		name: 'MycardCode',
 		data() {
 			return {
+				userData: null,
 				isAlbum: true, // 是否打开设置页 默认不开启
 				active: 0,
 				base64Code: '',
@@ -69,17 +71,17 @@
 							this.isAlbum = true
 						}
 					},
-					// complete(com) {
-					// 	console.log('eom================', com)
-					// }
+					complete(com) {
+						console.log('getSetting================>>>', com)
+					}
 				})
 			},
 			getImageCode() {
 				this.$api.getMiniCode({
-					path: 'pages/myCard/myCard',
-					scene: 'a=1',
+					path: 'pages/myCard/myCard', // weixinShare.url, //'pages/myCard/myCard',
+					scene: 'a=1', // 'is=1&staff_id=' + this.userData.id + '&user_id='+ this.userData.user_id,
 					check_path: false, // 默认是true，检查page 是否存在，为 true 时 page 必须是已经发布的小程序存在的页面（否则报错）；为 false 时允许小程序未发布或者 page 不存在， 但page 有数量上限（60000个）请勿滥用。
-					env_version: 'develop' // develop开发版，release正式版，trial体验版
+					env_version: 'release' // develop开发版，release正式版，trial体验版
 				}, (res) => {
 					console.log(res, 'miniCode', res.data.img)
 					this.base64Code = res.data.img;
@@ -93,6 +95,7 @@
 			},
 			open() {
 				this.$refs.codePopupRef.open('bottom')
+				this.userData = uni.getStorageSync('userData') || {}
 				this.getImageCode()
 				this.checkOpenAblum()
 			},
@@ -101,6 +104,9 @@
 			},
 			downloadFn () {
 				const that = this
+				uni.showLoading({
+					title: '加载中'
+				})
 				uni.downloadFile({
 					url: that.base64Code,
 					success: res => {
@@ -109,6 +115,10 @@
 								filePath: res.tempFilePath,
 								success: function() {
 									console.log('保存成功')
+									uni.showToast({
+										title: '保存成功',
+										icon: 'success'
+									})
 								},
 								fail: (err) => {
 									console.log('保存失败', err)
@@ -122,11 +132,21 @@
 											this.isAlbum = false
 										}
 									});
+								},
+								complete(com) {
+									uni.hideLoading()
+									console.log('保存相册complete===========>>>', com)
 								}
 							})
 						} else {
 							console.log('保存失败')
 						}
+					},
+					fail() {
+						uni.hideLoading()
+					},
+					complete(com) {
+						console.log('下载文件complete===========>>>', com)
 					}
 				})
 			},

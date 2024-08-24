@@ -19,7 +19,7 @@ export const smartcardBG = {
 // 分享type
 export const weixinShare = {
 	url : '/pages/share/share',
-	type: 2
+	type: 1
 }
 // 一些公共变量
 export const smartcardObj = {
