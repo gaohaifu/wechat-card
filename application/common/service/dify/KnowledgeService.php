@@ -15,7 +15,7 @@ class DifyKnowService extends Base
         
         $company = Company::get($companyId);
 
-        $dify = new DifyKnowledgeBase();
+        $dify = new \app\common\service\KnowledgeBase();
 
         $knowledgeBase = $dify->createKnowledgeBase($company->name);
         if(isset($knowledgeBase['id'])){
